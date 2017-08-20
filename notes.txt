@@ -1,0 +1,11 @@
+Possible BOM:
+- (1) arduino nano
+- (1) Arduino Nano 7-12V, 2A Dual Motor Controller by Gravitech
+  see http://www.robotshop.com/en/arduino-nano-7-12v-2a-dual-motor-controller.html
+- (1+) lipo battery (need sizing)
+- (1) GY-521 Gyro (uses the MPU-6050 chip)﻿
+  Consider the breakout used in the 2-wheeled bot
+  Makerfire GY 521 MPU 6050 MPU6050 Module 3 Axis analog gyro sensors 3 Axis Accelerometer Module
+  https://www.amazon.com/gp/product/B008BOPN40/ref=oh_aui_detailpage_o03_s00?ie=UTF8&psc=1
+- (2) Mitsumi M25N-2 series Motor with a 334 PPR Encoder
+- (1) lipo battery charger
