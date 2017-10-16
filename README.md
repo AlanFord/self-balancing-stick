@@ -7,6 +7,7 @@ This project is inspired by Mike Rouleau's "Self Balancing Stick", altered so th
 - https://drive.google.com/file/d/0B9CxKhrEOT-3Z2Y2ajhiaWl6QU0/view
 - https://drive.google.com/file/d/0B9CxKhrEOT-3ekE1MnRoT3Izdm8/view
 - https://grabcad.com/library/self-balancing-stick-dual-axis-reaction-wheel-inverted-pendulum-1/details
+- https://www.reddit.com/r/arduino/comments/3n0g8p/self_balancing_stick_dual_axis_reaction_wheel/?st=is6s1bi9&sh=097623e7
 
 Primary components used are:
 - Mitsumi M25N-2 series Motor with a 334 PPR Encoder
