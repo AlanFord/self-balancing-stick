@@ -1,0 +1,3 @@
+Record=SheetSymbol|SourceDocument=MB1180.SchDoc|Designator=U_MCU_32|SchDesignator=U_MCU_32|FileName=MCU_32.SchDoc|SymbolType=Normal|RawFileName=MCU_32.SchDoc|DesignItemId= |SourceLibraryName= |ObjectKind=Sheet Symbol|RevisionGUID= |ItemGUID= |VaultGUID= 
+Record=SheetSymbol|SourceDocument=MB1180.SchDoc|Designator=U_ST_LINK_V2-1|SchDesignator=U_ST_LINK_V2-1|FileName=ST_LINK_V2-1.SCHDOC|SymbolType=Normal|RawFileName=ST_LINK_V2-1.SCHDOC|DesignItemId= |SourceLibraryName= |ObjectKind=Sheet Symbol|RevisionGUID= |ItemGUID= |VaultGUID= 
+Record=TopLevelDocument|FileName=MB1180.SchDoc

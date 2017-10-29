@@ -60,6 +60,8 @@ Encoder:
 Microcontroller:
 ==================================	
 	Arduino UNO Rev. 3
+
+Alt: NUCLEO-L432KC board, STM32L4 series, STM32L432KCUx MCU
 	
 ==================================	
 Motor Controller:
@@ -77,6 +79,11 @@ Motor Controller:
 Gyro:
 ==================================	
 	GY-521 Gyro (uses the MPU-6050 chip)﻿
+
+Alt:
+	https://www.adafruit.com/product/2472
+	9-DOF IMU Fusion Breakout - BNO055
+	possible source code: https://github.com/MikroElektronika/Click_10DOF_BNO055
 	
 ==================================	
 Parts to be manufactured:
