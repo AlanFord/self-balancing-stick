@@ -1,0 +1,11 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Pendulum Dynamics}{}% 2
+\BOOKMARK [1][-]{section.3}{Motor and Flywheel Dynamics}{}% 3
+\BOOKMARK [1][-]{section.4}{Motor Control}{}% 4
+\BOOKMARK [1][-]{section.5}{Modeling in the Frequency Domain}{}% 5
+\BOOKMARK [1][-]{section*.2}{Appendices}{}% 6
+\BOOKMARK [1][-]{Appendix.1.A}{Motor and Gear Set Data}{}% 7
+\BOOKMARK [1][-]{Appendix.1.B}{Pendulum Constants}{}% 8
+\BOOKMARK [1][-]{Appendix.1.C}{Measuring Motor Constants}{}% 9
+\BOOKMARK [1][-]{Appendix.1.D}{Measuring Motor Friction Constants}{}% 10
+\BOOKMARK [1][-]{Appendix.1.E}{Arduino Code for Measuring RPM}{}% 11

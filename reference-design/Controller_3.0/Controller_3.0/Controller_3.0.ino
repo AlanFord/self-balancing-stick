@@ -1,7 +1,7 @@
 
 // Library Inclusions
 
-#include <I2Cdev.h>                             // IMU IC2 Communication
+#include <i2cdevlib/Arduino/I2Cdev.h>                             // IMU IC2 Communication
 #include <Wire.h>                               // IMU IC2 Communication
 #include <MPU6050_6Axis_MotionApps20_mod_1.h>   // IMU,  changed value in line 305 to 1 to change update speed from every 15ms to every 10ms
 #include <PinChangeInt.h>                       // Pin Change Interrupt
