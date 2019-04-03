@@ -1,7 +1,7 @@
 # self-balancing-stick
 Dual Axis Reaction Wheel Inverted Pendulum
 
-This project is inspired by an earlier project by Mike Rouleau.  For details, read Mike.md.
+This project is inspired by an earlier project by Mike Rouleau.  For details, read [Mike.md](../blob/master/Mike.md).
 
 My design looks similar to Mike's, but a lot of the components required substitutes
 * Machined tube and end-point replaced with a knitting needle
