@@ -28,3 +28,4 @@ The hardware is based on what I have at hand.
 * Pololu Dual VNH5019 Motor Driver Shield for Arduino (Pololu Part # 2507)
 * STMicrolectronics NUCLEO-L432KC Dev Board (possibly?)
 * Adafruit 9-DOF Absolute Orientation IMU Fusion Breakout - BNO055 (Adafruit Part # 2472)
+
