@@ -1,2 +1,7 @@
 references/nucleo/cube/
 motor_testing/hold/
+latex/*.aux
+latex/*.log
+latex/*.out
+latex/*.gz
+
