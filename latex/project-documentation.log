@@ -1,10 +1,10 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.7.29)  16 NOV 2018 11:21
+This is pdfTeX, Version 3.14159265-2.6-1.40.19 (TeX Live 2018) (preloaded format=pdflatex 2018.7.29)  30 MAY 2019 21:41
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
  %&-line parsing enabled.
-**writeup-new.tex
-(./writeup-new.tex
+**project-documentation.tex
+(./project-documentation.tex
 LaTeX2e <2018-04-01> patch level 5
 (/usr/local/texlive/2018/texmf-dist/tex/latex/base/article.cls
 Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
@@ -281,8 +281,8 @@ Package: titlesec 2016/03/21 v2.10.2 Sectioning titles
 \titlewidthlast=\dimen132
 \titlewidthfirst=\dimen133
 )
-(./writeup-new.aux)
-\openout1 = `writeup-new.aux'.
+(./project-documentation.aux)
+\openout1 = `project-documentation.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 10.
 LaTeX Font Info:    ... okay on input line 10.
@@ -322,9 +322,9 @@ LaTeX Info: Redefining \ref on input line 10.
 LaTeX Info: Redefining \pageref on input line 10.
 LaTeX Info: Redefining \nameref on input line 10.
 
-(./writeup-new.out) (./writeup-new.out)
+(./project-documentation.out) (./project-documentation.out)
 \@outlinefile=\write3
-\openout3 = `writeup-new.out'.
+\openout3 = `project-documentation.out'.
 
 
 (/usr/local/texlive/2018/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
@@ -369,7 +369,7 @@ Package caption Info: End \AtBeginDocument code.
 LaTeX Warning: Reference `fig.basicControlSystem' on page 2 undefined on input 
 line 30.
 
-<images/pencil.png, id=62, 390.45876pt x 513.92pt>
+<images/pencil.png, id=54, 390.45876pt x 513.92pt>
 File: images/pencil.png Graphic file (type png)
 <use images/pencil.png>
 Package pdftex.def Info: images/pencil.png  used on input line 39.
@@ -396,16 +396,13 @@ Package epstopdf Info: Source file: <images/basicControl.eps>
 (epstopdf)                    date: 2018-11-12 12:53:34
 (epstopdf)                    size: 24015 bytes
 (epstopdf)             Output file: <images/basicControl-eps-converted-to.pdf>
+(epstopdf)                    date: 2018-11-16 11:21:10
+(epstopdf)                    size: 10972 bytes
 (epstopdf)             Command: <repstopdf --outfile=images/basicControl-eps-co
 nverted-to.pdf images/basicControl.eps>
 (epstopdf)             \includegraphics on input line 43.
-runsystem(repstopdf --outfile=images/basicControl-eps-converted-to.pdf images/b
-asicControl.eps)...executed safely (allowed).
-
-Package epstopdf Info: Result file: <images/basicControl-eps-converted-to.pdf>
-(epstopdf)                    date: 2018-11-16 11:21:10
-(epstopdf)                    size: 10972 bytes.
-<images/basicControl-eps-converted-to.pdf, id=72, 532.99126pt x 131.49126pt>
+Package epstopdf Info: Output file is already uptodate.
+<images/basicControl-eps-converted-to.pdf, id=64, 532.99126pt x 131.49126pt>
 File: images/basicControl-eps-converted-to.pdf Graphic file (type pdf)
 <use images/basicControl-eps-converted-to.pdf>
 Package pdftex.def Info: images/basicControl-eps-converted-to.pdf  used on inpu
@@ -422,16 +419,13 @@ Package epstopdf Info: Source file: <images/regulator.eps>
 (epstopdf)                    date: 2018-11-12 12:46:36
 (epstopdf)                    size: 20806 bytes
 (epstopdf)             Output file: <images/regulator-eps-converted-to.pdf>
+(epstopdf)                    date: 2018-11-16 11:21:10
+(epstopdf)                    size: 10059 bytes
 (epstopdf)             Command: <repstopdf --outfile=images/regulator-eps-conve
 rted-to.pdf images/regulator.eps>
 (epstopdf)             \includegraphics on input line 47.
-runsystem(repstopdf --outfile=images/regulator-eps-converted-to.pdf images/regu
-lator.eps)...executed safely (allowed).
-
-Package epstopdf Info: Result file: <images/regulator-eps-converted-to.pdf>
-(epstopdf)                    date: 2018-11-16 11:21:10
-(epstopdf)                    size: 10059 bytes.
-<images/regulator-eps-converted-to.pdf, id=78, 505.89pt x 98.3675pt>
+Package epstopdf Info: Output file is already uptodate.
+<images/regulator-eps-converted-to.pdf, id=70, 505.89pt x 98.3675pt>
 File: images/regulator-eps-converted-to.pdf Graphic file (type pdf)
 <use images/regulator-eps-converted-to.pdf>
 Package pdftex.def Info: images/regulator-eps-converted-to.pdf  used on input l
@@ -457,7 +451,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 80--85
 [5
 
 ]
-<images/scan1.png, id=122, 455.7025pt x 339.2675pt>
+<images/scan1.png, id=114, 455.7025pt x 339.2675pt>
 File: images/scan1.png Graphic file (type png)
 <use images/scan1.png>
 Package pdftex.def Info: images/scan1.png  used on input line 119.
@@ -542,17 +536,13 @@ Package epstopdf Info: Source file: <images/transferFunction.eps>
 (epstopdf)                    size: 19882 bytes
 (epstopdf)             Output file: <images/transferFunction-eps-converted-to.p
 df>
+(epstopdf)                    date: 2018-11-16 11:21:10
+(epstopdf)                    size: 9742 bytes
 (epstopdf)             Command: <repstopdf --outfile=images/transferFunction-ep
 s-converted-to.pdf images/transferFunction.eps>
 (epstopdf)             \includegraphics on input line 426.
-runsystem(repstopdf --outfile=images/transferFunction-eps-converted-to.pdf imag
-es/transferFunction.eps)...executed safely (allowed).
-
-Package epstopdf Info: Result file: <images/transferFunction-eps-converted-to.p
-df>
-(epstopdf)                    date: 2018-11-16 11:21:10
-(epstopdf)                    size: 9742 bytes.
-<images/transferFunction-eps-converted-to.pdf, id=227, 505.89pt x 98.3675pt>
+Package epstopdf Info: Output file is already uptodate.
+<images/transferFunction-eps-converted-to.pdf, id=219, 505.89pt x 98.3675pt>
 File: images/transferFunction-eps-converted-to.pdf Graphic file (type pdf)
 <use images/transferFunction-eps-converted-to.pdf>
 Package pdftex.def Info: images/transferFunction-eps-converted-to.pdf  used on 
@@ -567,16 +557,13 @@ Package epstopdf Info: Source file: <images/rootLocus.eps>
 (epstopdf)                    date: 2018-11-01 12:33:37
 (epstopdf)                    size: 29518 bytes
 (epstopdf)             Output file: <images/rootLocus-eps-converted-to.pdf>
+(epstopdf)                    date: 2018-11-16 11:21:11
+(epstopdf)                    size: 9347 bytes
 (epstopdf)             Command: <repstopdf --outfile=images/rootLocus-eps-conve
 rted-to.pdf images/rootLocus.eps>
 (epstopdf)             \includegraphics on input line 430.
-runsystem(repstopdf --outfile=images/rootLocus-eps-converted-to.pdf images/root
-Locus.eps)...executed safely (allowed).
-
-Package epstopdf Info: Result file: <images/rootLocus-eps-converted-to.pdf>
-(epstopdf)                    date: 2018-11-16 11:21:11
-(epstopdf)                    size: 9347 bytes.
-<images/rootLocus-eps-converted-to.pdf, id=228, 687.56876pt x 563.10374pt>
+Package epstopdf Info: Output file is already uptodate.
+<images/rootLocus-eps-converted-to.pdf, id=220, 687.56876pt x 563.10374pt>
 File: images/rootLocus-eps-converted-to.pdf Graphic file (type pdf)
 <use images/rootLocus-eps-converted-to.pdf>
 Package pdftex.def Info: images/rootLocus-eps-converted-to.pdf  used on input l
@@ -592,16 +579,13 @@ Package epstopdf Info: Source file: <images/rootLocusPD.eps>
 (epstopdf)                    date: 2018-11-03 09:12:22
 (epstopdf)                    size: 30253 bytes
 (epstopdf)             Output file: <images/rootLocusPD-eps-converted-to.pdf>
+(epstopdf)                    date: 2018-11-16 11:21:11
+(epstopdf)                    size: 9262 bytes
 (epstopdf)             Command: <repstopdf --outfile=images/rootLocusPD-eps-con
 verted-to.pdf images/rootLocusPD.eps>
 (epstopdf)             \includegraphics on input line 434.
-runsystem(repstopdf --outfile=images/rootLocusPD-eps-converted-to.pdf images/ro
-otLocusPD.eps)...executed safely (allowed).
-
-Package epstopdf Info: Result file: <images/rootLocusPD-eps-converted-to.pdf>
-(epstopdf)                    date: 2018-11-16 11:21:11
-(epstopdf)                    size: 9262 bytes.
-<images/rootLocusPD-eps-converted-to.pdf, id=243, 790.955pt x 667.49374pt>
+Package epstopdf Info: Output file is already uptodate.
+<images/rootLocusPD-eps-converted-to.pdf, id=235, 790.955pt x 667.49374pt>
 File: images/rootLocusPD-eps-converted-to.pdf Graphic file (type pdf)
 <use images/rootLocusPD-eps-converted-to.pdf>
 Package pdftex.def Info: images/rootLocusPD-eps-converted-to.pdf  used on input
@@ -619,17 +603,13 @@ Package epstopdf Info: Source file: <images/rootLocusFull.eps>
 (epstopdf)                    size: 93345 bytes
 (epstopdf)             Output file: <images/rootLocusFull-eps-converted-to.pdf>
 
+(epstopdf)                    date: 2018-11-16 11:21:12
+(epstopdf)                    size: 89957 bytes
 (epstopdf)             Command: <repstopdf --outfile=images/rootLocusFull-eps-c
 onverted-to.pdf images/rootLocusFull.eps>
 (epstopdf)             \includegraphics on input line 438.
-runsystem(repstopdf --outfile=images/rootLocusFull-eps-converted-to.pdf images/
-rootLocusFull.eps)...executed safely (allowed).
-
-Package epstopdf Info: Result file: <images/rootLocusFull-eps-converted-to.pdf>
-
-(epstopdf)                    date: 2018-11-16 11:21:12
-(epstopdf)                    size: 89957 bytes.
-<images/rootLocusFull-eps-converted-to.pdf, id=256, 671.50874pt x 538.01pt>
+Package epstopdf Info: Output file is already uptodate.
+<images/rootLocusFull-eps-converted-to.pdf, id=248, 671.50874pt x 538.01pt>
 File: images/rootLocusFull-eps-converted-to.pdf Graphic file (type pdf)
 <use images/rootLocusFull-eps-converted-to.pdf>
 Package pdftex.def Info: images/rootLocusFull-eps-converted-to.pdf  used on inp
@@ -682,7 +662,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 610--614
 
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
 nput line 615.
-(../arduino/rpm/rpm.ino
+(../motor_testing/rpm/rpm.ino
 LaTeX Font Info:    Try loading font information for OML+cmr on input line 1.
 
 (/usr/local/texlive/2018/texmf-dist/tex/latex/base/omlcmr.fd
@@ -718,12 +698,19 @@ Overfull \hbox (32.99927pt too wide) in paragraph at lines 82--83
  []
 
 ) [27]
-<images/reactionWheel.png, id=423, 519.9425pt x 575.14874pt>
+
+LaTeX Warning: Reference `reactionWheel' on page 28 undefined on input line 620
+.
+
+
+LaTeX Warning: Reference `simpleReactionWheel' on page 28 undefined on input li
+ne 625.
+
+<images/reactionWheel.png, id=415, 519.9425pt x 575.14874pt>
 File: images/reactionWheel.png Graphic file (type png)
 <use images/reactionWheel.png>
 Package pdftex.def Info: images/reactionWheel.png  used on input line 634.
 (pdftex.def)             Requested size: 390.0pt x 431.40437pt.
-
 
 Package caption Warning: The option `hypcap=true' will be ignored for this
 (caption)                particular \caption on input line 635.
@@ -732,7 +719,7 @@ See the caption package documentation for explanation.
 [28
 
 ]
-<images/simpleReactionWheel.png, id=430, 546.04pt x 574.145pt>
+<images/simpleReactionWheel.png, id=420, 546.04pt x 574.145pt>
 File: images/simpleReactionWheel.png Graphic file (type png)
 <use images/simpleReactionWheel.png>
 Package pdftex.def Info: images/simpleReactionWheel.png  used on input line 638
@@ -749,25 +736,34 @@ Package atveryend Info: Empty hook `BeforeClearDocument' on input line 645.
  [30 <./images/simpleReactionWheel.png>]
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 645.
 
-(./writeup-new.aux)
+(./project-documentation.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 645.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 645.
-Package rerunfilecheck Info: File `writeup-new.out' has not changed.
-(rerunfilecheck)             Checksum: F99BDE7F81741C2AD2B311DEF6601645;712.
 
+
+Package rerunfilecheck Warning: File `project-documentation.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `project-documentation.out':
+(rerunfilecheck)             Before: 70DBCED456BFC3B25BA5D720EDADD420;575
+(rerunfilecheck)             After:  F99BDE7F81741C2AD2B311DEF6601645;712.
 
 LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
 
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 645.
  ) 
 Here is how much of TeX's memory you used:
- 8919 strings out of 492642
- 131953 string characters out of 6129384
- 237345 words of memory out of 5000000
- 12544 multiletter control sequences out of 15000+600000
+ 8917 strings out of 492642
+ 132073 string characters out of 6129384
+ 237274 words of memory out of 5000000
+ 12542 multiletter control sequences out of 15000+600000
  10806 words of font info for 39 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 36i,10n,39p,520b,1798s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 36i,10n,39p,530b,1798s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
 ></usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb>
 </usr/local/texlive/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb><
@@ -783,10 +779,10 @@ e/2018/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2
 018/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/20
 18/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2018
 /texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on writeup-new.pdf (30 pages, 554741 bytes).
+Output written on project-documentation.pdf (30 pages, 554479 bytes).
 PDF statistics:
- 530 PDF objects out of 1000 (max. 8388607)
- 450 compressed objects within 5 object streams
+ 522 PDF objects out of 1000 (max. 8388607)
+ 442 compressed objects within 5 object streams
  183 named destinations out of 1000 (max. 500000)
- 147 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 131 words of extra memory for PDF output out of 10000 (max. 10000000)
 
