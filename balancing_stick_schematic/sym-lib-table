@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name balancing_stick)(type Legacy)(uri ${KIPRJMOD}/balancing_stick.lib)(options "")(descr ""))
+)
