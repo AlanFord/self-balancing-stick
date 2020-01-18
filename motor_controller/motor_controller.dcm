@@ -1,0 +1,7 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP MAX14780
+F https://datasheets.maximintegrated.com/en/ds/MAX14870-MAX14872.pdf
+$ENDCMP
+#
+#End Doc Library
