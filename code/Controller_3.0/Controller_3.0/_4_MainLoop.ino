@@ -454,7 +454,7 @@ void loop() {
       omega_Ks = update_Value(omega_Ks);
       break;
 
-    case 108:                                   // l - theta_Kt
+    case 108:                                   // l - omega_Kt
       omega_Kt = update_Value(omega_Kt);
       break;
 

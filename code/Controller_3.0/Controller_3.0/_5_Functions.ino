@@ -212,11 +212,13 @@ void set_left_Motor_Voltage() {         // Switched directions (0's and 1's) fro
   }
   else {
     if (left_Voltage < 0) {
-      digitalWrite(pin_IN1, 1);
-      digitalWrite(pin_IN2, 0);
+      digitalWrite(pin_left_dir, 1);  //clockwise
+      //digitalWrite(pin_IN1, 1);
+      //digitalWrite(pin_IN2, 0);
     } else {
-      digitalWrite(pin_IN1, 0);
-      digitalWrite(pin_IN2, 1);
+      digitalWrite(pin_left_dir, 0);  //counterclockwise
+      //digitalWrite(pin_IN1, 0);
+      //digitalWrite(pin_IN2, 1);
     }
     analogWrite(pin_left_PMW, abs(left_Voltage) + voltage_Offset);
   }
@@ -229,11 +231,13 @@ void set_right_Motor_Voltage() {         // Switched directions (0's and 1's) fr
   }
   else {
     if (right_Voltage < 0) {
-      digitalWrite(pin_IN3, 1);
-      digitalWrite(pin_IN4, 0);
+      digitalWrite(pin_right_dir, 1);  //clockwise
+      //digitalWrite(pin_IN3, 1);
+      //digitalWrite(pin_IN4, 0);
     } else {
-      digitalWrite(pin_IN3, 0);
-      digitalWrite(pin_IN4, 1);
+      digitalWrite(pin_right_dir, 0);  //counterclockwise
+      //digitalWrite(pin_IN3, 0);
+      //digitalWrite(pin_IN4, 1);
     }
     analogWrite(pin_right_PMW, abs(right_Voltage) + voltage_Offset);
   }

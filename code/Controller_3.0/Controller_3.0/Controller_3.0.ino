@@ -7,40 +7,49 @@
 #include <PinChangeInt.h>                       // Pin Change Interrupt
 #include <digitalWriteFast.h>                   // Fast Digital Readings
 
-// Some of the following pins have been disabled because they are not used in the software.
-// Reenabling can be performed by uncommenting the lines
+// #define CUSTOM
+#define POLOLU
 
-
-// Pin Assignments
-
-  #define   pin_left_PMW          9
-//#define   pin_left_EncoderA     5
-  #define   pin_left_EncoderB     11
-
-  #define   pin_right_PMW         10
-//#define   pin_right_EncoderA    13 
-  #define   pin_right_EncoderB    A2
-
-  #define   pin_IN1               2
-  #define   pin_IN2               4
-  #define   pin_IN3               7
-  #define   pin_IN4               8
-
-//#define   pin_left_Current      A0
-//#define   pin_right_Current     A1
-
-#define   pin_IMU_Interrupt     3
-#define   pin_IMU_SDA           A4
-#define   pin_IMU_SCL           A5
-
-// #define   pin_Pot               A3
-#define   pin_Pot_kp            //
-#define   pin_Pot_ki            //
-#define   pin_Pot_kd            //
-
-
-
-// Interrupt Assignment
-
-#define   interruptPin_left_Encoder    0
-#define   interruptPin_right_Encoder   1
+#if defined(CUSTOM)
+  // PinAssignments
+  // These pin assignments correspond to the Arduino shield developed as part of this project.
+  
+  #define   pin_left_PMW          7    // PWM output for Left Motor
+  #define   pin_left_EncoderB     A2   // Encoder_B input from Left Motor
+  #define   pin_left_dir          8
+  
+  #define   pin_right_PMW         12   // PWM output for Left Motor
+  #define   pin_right_EncoderB    6    // Encoder_B input from Right Moor
+  #define   pin_right_dir         13
+  
+  #define   pin_IMU_Interrupt     A3
+  #define   pin_IMU_SDA           A4
+  #define   pin_IMU_SCL           A5
+  
+  // Interrupt Assignment
+  
+  #define   interruptPin_left_Encoder    0   // mapped to D2 - pin_left_EncoderA
+  #define   interruptPin_right_Encoder   1   // mapped to D3 - pin_right_EncoderA
+#else
+  #if defined(POLOLU)
+    // PinAssignments
+    // These pin assignments correspond to the Pololu Dual MAX14870 Motor Driver Shield for Arduino.
+    
+    #define   pin_left_PMW          9    // PWM output for Left Motor
+    #define   pin_left_EncoderB     A2   // Encoder_B input from Left Motor
+    #define   pin_left_dir          7
+    
+    #define   pin_right_PMW         11   // PWM output for Left Motor
+    #define   pin_right_EncoderB    6    // Encoder_B input from Right Moor
+    #define   pin_right_dir         8
+    
+    #define   pin_IMU_Interrupt     A3
+    #define   pin_IMU_SDA           A4
+    #define   pin_IMU_SCL           A5
+    
+    // Interrupt Assignment
+    
+    #define   interruptPin_left_Encoder    0   // mapped to D2 - pin_left_EncoderA
+    #define   interruptPin_right_Encoder   1   // mapped to D3 - pin_right_EncoderA
+  #endif
+#endif

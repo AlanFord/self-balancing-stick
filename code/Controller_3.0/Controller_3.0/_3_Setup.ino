@@ -12,10 +12,12 @@ void setup() {
   pinMode(pin_IMU_Interrupt, INPUT);
   pinMode(pin_left_PMW, OUTPUT);
   pinMode(pin_right_PMW, OUTPUT);
-  pinMode(pin_IN1, OUTPUT);
-  pinMode(pin_IN2, OUTPUT);
-  pinMode(pin_IN3, OUTPUT);
-  pinMode(pin_IN4, OUTPUT);
+  pinMode(pin_left_dir, OUTPUT);
+  pinMode(pin_right_dir, OUTPUT);
+  //pinMode(pin_IN1, OUTPUT);
+  //pinMode(pin_IN2, OUTPUT);
+  //pinMode(pin_IN3, OUTPUT);
+  //pinMode(pin_IN4, OUTPUT);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -96,4 +98,3 @@ Serial.println(F("\n\n"));
 mpu.resetFIFO();   
 
 }
-
