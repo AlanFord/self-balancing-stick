@@ -34,12 +34,13 @@
   #if defined(POLOLU)
     // PinAssignments
     // These pin assignments correspond to the Pololu Dual MAX14870 Motor Driver Shield for Arduino.
+    // https://www.pololu.com/product/2519
     
     #define   pin_left_PMW          9    // PWM output for Left Motor
     #define   pin_left_EncoderB     A2   // Encoder_B input from Left Motor
     #define   pin_left_dir          7
     
-    #define   pin_right_PMW         11   // PWM output for Left Motor
+    #define   pin_right_PMW         10   // PWM output for Left Motor
     #define   pin_right_EncoderB    6    // Encoder_B input from Right Moor
     #define   pin_right_dir         8
     
