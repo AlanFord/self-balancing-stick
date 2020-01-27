@@ -1,3 +1,15 @@
+/////////////////////////////////////////////////////////
+// File:  _5_Functions.ino
+// Purpose:  Misc Functions
+//      void get_IMU_Values() -           Returns gyro angles and speeds 
+//      void get_left_Encoder_Speeds() -  Returns left wheel encoder speed and acceleration
+//      void get_right_Encoder_Speeds() - Returns left wheel encoder speed and acceleration
+//      void set_left_Motor_Voltage() -   Set the left motor PWM and direction
+//      void set_right_Motor_Voltage() -  Set the right motor PWM and direction
+//      float update_Value(float x) -     Prompts for a new value and returns the new value
+//      float get_Serial() -              Reads a float from the serial input line
+/////////////////////////////////////////////////////////
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////// IMU ////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,6 +45,16 @@
 //      Front Edge Pitch Up:    Positive Values of ypr[1]
 //      Roll to the Right:      Positive Values of ypr[2]
 //      Roll to the Left:       Negative Values of ypr[2]
+//
+//      Note that "forward" motor rotations, associated with positive voltages,
+//      are alway counter-clockwise when viewed from the "shaft end", and
+//      clockwise when viewed from the motor body end.
+//
+//      Hence,
+//      Positive Right Motor rotation ==> positive voltage ==> positive Omega ==> negative ypr[1]
+//      Positive Left Motor rotation ==> positive voltage ==> positive Theta ==> positive ypr[2]
+//      Note the sign change when converting ypr[1] to Omega
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
