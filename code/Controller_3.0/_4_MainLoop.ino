@@ -8,10 +8,10 @@ void loop() {
       // Serial Console
       package = "";
       package += F("Pitch:\t");
-      package += (int) ypr[1];
+      package += (int) ypr[1]*100;
       package += "\t";
       package += F("Role:\t");
-      package += (int) ypr[2];
+      package += (int) ypr[2]*100;
      Serial.println(package);
      stat =0;
    
