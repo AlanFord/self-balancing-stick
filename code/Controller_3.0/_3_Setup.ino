@@ -90,7 +90,8 @@ void setup() {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   Serial.println(F("Setup Complete"));
-Serial.println(F("\n\n"));
+  Serial.println(F(" Press Any Key (but no line return!) to reset FIFO and Start ..."));
+  Serial.println(F("\n\n"));
   while (Serial.available() && Serial.read());                                    // empty buffer
   while (!Serial.available());                                                    // wait for data
   while (Serial.available() && Serial.read());                                    // empty buffer again
