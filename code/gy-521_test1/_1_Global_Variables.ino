@@ -35,7 +35,9 @@ float     friction_Value        = 10;
 //  Note: PPR vs CPR vs CPR => taken from https://www.cuidevices.com/blog/what-is-encoder-ppr-cpr-and-lpr
 //        The Pololu 25D motor encoders are 48 counts per rev, counting both edges of both channels.
 //        This should be equivalent to 48/4 = 12. PPR
-#define   encoder_PPR               12. //334              // Encoder pulse per revolution (was 334 in Mike's version of the software)
+//        However, the gear ratio must also be included.  The gear ratio is 4.4:1,
+//        so 12. PPR of the motor shaft is 12*4.4 = 52.8 PPR of the gear shaft
+#define   encoder_PPR               52.8 //334             // Encoder pulse per revolution (was 334 in Mike's version of the software)
 #define   serial_Frequency          250000                 // Frequency of serial interface
 
 
