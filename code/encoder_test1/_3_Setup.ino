@@ -1,7 +1,6 @@
 ////////////////////////////////////////
 // File: _3_Setup.ino
 //
-// TODO: set gyro offsets
 //
 ////////////////////////////////////////
 void setup() {
@@ -63,10 +62,10 @@ void setup() {
   devStatus = mpu.dmpInitialize();                                                // load and configure the DMP
 
   // supply your own gyro offsets here, scaled for min sensitivity
-  //mpu.setXGyroOffset(220);
-  //mpu.setYGyroOffset(76);
-  //mpu.setZGyroOffset(-85);
-  //mpu.setZAccelOffset(1788);                  // 1688 factory default for my test chip
+  mpu.setXGyroOffset(233);
+  mpu.setYGyroOffset(96);
+  mpu.setZGyroOffset(18);
+  mpu.setZAccelOffset(1434);                  // 1688 factory default for my test chip
 
   if (devStatus == 0) {                       // make sure it worked (devStatus returns 0 if so)
     mpu.setDMPEnabled(true);                  // turn on the DMP, now that it's ready
