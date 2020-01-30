@@ -1,7 +1,7 @@
 
 // User Variable Definitions
-
-#define   encoder_Tick_Resolution   10                    // Defines how many ticks to 'wait' until calculating encoder positions and time measurments. Higher values lead to decreased ISR times, but decreased encoder accuracy.
+// encoder_Tick_Resolution was 10 for Mikes version
+#define   encoder_Tick_Resolution   1 //10                // Defines how many ticks to 'wait' until calculating encoder positions and time measurments. Higher values lead to decreased ISR times, but decreased encoder accuracy.
 #define   pmw_Length                256                   // Defines wavelength of PMW signals by modifying divisor, [ 1, 8, 64(default), 256, 1024].  Base Freq.: 31250 Hz. Lower values lead to smoother motors, but worse current readings (or better, not sure).
 #define   encoder_Speed_Time_Limit  100                   // Defines how long to wait for a new tick before assuming wheel is stopped [ms]
 #define   motor_Current_Sample_Size 400 //50              // Defines the number of current samples to take, should be atleast 255, [20us*400 = 8000us = PMW Length@Divisor=256]
@@ -9,7 +9,7 @@
 #define   time_Delay                1                     // Defines amount of time program pauses
 #define   voltage_Offset            0                     // Defines amount of volateg added to compensate for motor sticktion, [0 - 255].
 #define   twbr_Value                24                    // Defines clocck speed of I2C, higher value leads to slower speeds and more robust comms 'aledgledy', [1-255, 24(default)].
-#define   angle_Rounding_Value      1000.                   // Defines what value to multiple by before round theta and omega. Cuts down on noise, [10 = x.1,  100 = x.x1 , 1(Default)]
+#define   angle_Rounding_Value      1000.                  // Defines what value to multiple by before round theta and omega. Cuts down on noise, [10 = x.1,  100 = x.x1 , 1(Default)]
 //Line 305 of MPU6050_6Axis_MotionApps20.h  = 1[10ms]    // Defines frequency of FIFO, higher value leads to less frequent updates, (200Hz /(1+value)), [0x02 (default)].
 
 
@@ -32,27 +32,29 @@ float     angle_Smoothed_Filter = 0.997;
 float     friction_Value        = 10;
 
 // Definitions
-
-#define   encoder_PPR               334.                   // Encoder pulse per revolution
-#define   serial_Frequency          250000 //230400               // Frequency of serial interface
+//  Note: PPR vs CPR vs CPR => taken from https://www.cuidevices.com/blog/what-is-encoder-ppr-cpr-and-lpr
+//        The Pololu 25D motor encoders are 48 counts per rev, counting both edges of both channels.
+//        This should be equivalent to 48/4 = 12. PPR
+#define   encoder_PPR               12. //334              // Encoder pulse per revolution (was 334 in Mike's version of the software)
+#define   serial_Frequency          250000                 // Frequency of serial interface
 
 
 // Motor Global Variables
 
-volatile unsigned int   left_Rel_Tick_Count = 0;          // Encoder ticks untill resolution
-volatile long           left_Abs_Tick_Count = 0;          // Absolute total of encoder ticks
-volatile long           left_Abs_Tick_Count_Prev = 0;     // Previous Absolute total of encoder ticks
-volatile int            left_Encoder_Direction = 0;       // Encoder measured direction, [-1 or 1]
-volatile int            left_Encoder_Direction_Prev = 0;  // Encoder measured direction, [-1 or 1]
-volatile int            left_Encoder_Direction_Now = 0;   // Encoder measured direction, [-1 or 1]
-volatile int            left_Encoder_Direction_Debug = 0;   // Encoder measured direction, [-1 or 1]
-volatile unsigned long  left_Time_Prev = 0;               // Time at previous absolute tick change, [us]
-volatile unsigned long  left_Time_Now = 0;                // Time at current absolute tick change, [us]
+volatile unsigned int   left_Rel_Tick_Count = 0;           // Encoder ticks untill resolution
+volatile long           left_Abs_Tick_Count = 0;           // Absolute total of encoder ticks
+volatile long           left_Abs_Tick_Count_Prev = 0;      // Previous Absolute total of encoder ticks
+volatile int            left_Encoder_Direction = 0;        // Encoder measured direction, [-1 or 1]
+volatile int            left_Encoder_Direction_Prev = 0;   // Encoder measured direction, [-1 or 1]
+volatile int            left_Encoder_Direction_Now = 0;    // Encoder measured direction, [-1 or 1]
+volatile int            left_Encoder_Direction_Debug = 0;  // Encoder measured direction, [-1 or 1]
+volatile unsigned long  left_Time_Prev = 0;                // Time at previous absolute tick change, [us]
+volatile unsigned long  left_Time_Now = 0;                 // Time at current absolute tick change, [us]
 volatile unsigned long  left_Time_Dif = 0;            
-volatile unsigned long  left_Time_Acc_Prev = 0;           // Time at previous absolute tick change, [us]
-volatile unsigned long  left_Time_Acc_Now = 0;            // Time at current absolute tick change, [us]
-         unsigned long  left_Time_Age = 0;                // Time at current absolute tick change, [us]
-         unsigned long  left_Time_Saved = 0;              // Time at current absolute tick change, [us]
+volatile unsigned long  left_Time_Acc_Prev = 0;            // Time at previous absolute tick change, [us]
+volatile unsigned long  left_Time_Acc_Now = 0;             // Time at current absolute tick change, [us]
+         unsigned long  left_Time_Age = 0;                 // Time at current absolute tick change, [us]
+         unsigned long  left_Time_Saved = 0;               // Time at current absolute tick change, [us]
 
 volatile unsigned int   right_Rel_Tick_Count = 0;          // Encoder ticks untill resolution
 volatile long           right_Abs_Tick_Count = 0;          // Absolute total of encoder ticks
@@ -226,5 +228,3 @@ VectorFloat   gravity;              // [x, y, z]            gravity vector
 
 uint8_t       teapotPacket[14] = { '$', 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0x00, '\r', '\n' };     // packet structure for InvenSense teapot demo
 volatile bool mpuInterrupt = false;                                                                 // indicates whether MPU interrupt pin has gone high
-
-

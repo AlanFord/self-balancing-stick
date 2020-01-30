@@ -1,3 +1,9 @@
+////////////////////////////////////////
+// File: _3_Setup.ino
+//
+// TODO: set gyro offsets
+//
+////////////////////////////////////////
 void setup() {
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,6 +15,10 @@ void setup() {
 
   // Pin Modes
   pinMode(pin_IMU_Interrupt, INPUT);
+  pinMode(pin_left_PMW, OUTPUT);
+  pinMode(pin_right_PMW, OUTPUT);
+  pinMode(pin_left_dir, OUTPUT);
+  pinMode(pin_right_dir, OUTPUT);
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -19,6 +29,28 @@ void setup() {
 
   // Interrupts
   PCintPort::attachInterrupt(pin_IMU_Interrupt, dmpDataReady, RISING);
+  attachInterrupt(interruptPin_left_Encoder, ISR_left_Encoder, RISING);
+  attachInterrupt(interruptPin_right_Encoder, ISR_right_Encoder, RISING);
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // Setting PMW Wavelength
+  byte mode;
+  switch (pmw_Length) {
+    case 1: mode = 0x01; break;
+    case 8: mode = 0x02; break;
+    case 64: mode = 0x03; break;
+    case 256: mode = 0x04; break;
+    case 1024: mode = 0x05; break;
+    default:  ;                        // Code that is executed when pmw_Length does not match a case
+  }
+  TCCR1B = TCCR1B & 0b11111000 | mode;
+
+ //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // Initializing Other Calculations
+  encoder_Resolution_Size = (encoder_Tick_Resolution * 1000000. / encoder_PPR);
+  voltage_Max = 255 - voltage_Offset;
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -28,7 +60,7 @@ void setup() {
   mpu.initialize();   // Initialize IMU
 
   Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed")); // verify connection
-  devStatus = mpu.dmpInitialize();                                    // load and configure the DMP
+  devStatus = mpu.dmpInitialize();                                                // load and configure the DMP
 
   // supply your own gyro offsets here, scaled for min sensitivity
   //mpu.setXGyroOffset(220);
@@ -55,10 +87,11 @@ void setup() {
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   Serial.println(F("Setup Complete"));
-  Serial.println(" Press Any Key (but no line return!) to reset FIFO and Start ...");
+  Serial.println(F(" Press Any Key (but no line return!) to reset FIFO and Start ..."));
   Serial.println(F("\n\n"));
   while (Serial.available() && Serial.read());                                    // empty buffer
   while (!Serial.available());                                                    // wait for data
   while (Serial.available() && Serial.read());                                    // empty buffer again
-  mpu.resetFIFO();   
+mpu.resetFIFO();   
+
 }

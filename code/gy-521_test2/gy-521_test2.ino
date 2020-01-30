@@ -1,6 +1,9 @@
 //////////////////////////////////////////////
-// file: Controller_3.0.ino
+// file: gy-521_test2.ino
+// purpose: This is a test routine that will demonstrate proper functioning of
+//          the get_IMU_Values() function.
 //////////////////////////////////////////////
+
 
 // Library Inclusions
 

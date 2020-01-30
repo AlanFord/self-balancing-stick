@@ -1,5 +1,9 @@
 //////////////////////////////////////////////
-// file: Controller_3.0.ino
+// file: encoder_test1.ino
+// purpose: This is a test routine that will demonstrate proper functioning of
+//          the motor encoders.
+//          WARNING: Disconnect power to the motors.  Only leave the encoders connected.
+//          Manually turn the motor shaft and verify that the encoder direction is correct.
 //////////////////////////////////////////////
 
 // Library Inclusions
