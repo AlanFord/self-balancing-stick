@@ -1,10 +1,11 @@
-references/nucleo/cube/
-motor_testing/hold/
-latex/*.aux
-latex/*.log
-latex/*.out
-latex/*.gz
+#############################################
+# TeXShop
+documentation/*.aux
+documentation/*.log
+documentation/*.out
+documentation/*.gz
 
+#############################################
 # For PCBs designed using KiCad: http://www.kicad-pcb.org/
 # Format documentation: http://kicad-pcb.org/help/file-formats/
 
@@ -32,3 +33,24 @@ fp-info-cache
 *.xml
 *.csv
 
+#########################
+# Microsoft Office
+*.tmp
+
+# Word temporary
+~$*.doc*
+
+# Word Auto Backup File
+Backup of *.doc*
+
+# Excel temporary
+~$*.xls*
+
+# Excel Backup File
+*.xlk
+
+# PowerPoint temporary
+~$*.ppt*
+
+# Visio autosave temporary files
+*.~vsd*
