@@ -1,5 +1,16 @@
 //////////////////////////////////////////////
 // file: simulation.ino
+//
+//   The pendulum simulator!
+//
+//   The goal here is to implement software that will simulate the gyro,
+//   the encoder, and the motors.
+//   The gyro can be simulated with a step input of user selected magnitude,
+//   in impulse input, a sign input, or a mechanical feedback calculation based
+//   on rotor acceleration.
+//   The encoder signal should be calculated from the changing voltage, incorporating
+//   the effects of mass, acceleration, EMF response of the motor.
+//   The motor voltage, well, it's just set as usual.
 //////////////////////////////////////////////
 
 // Library Inclusions
