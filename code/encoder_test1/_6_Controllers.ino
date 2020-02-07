@@ -1,3 +1,10 @@
+/////////////////////////////////////////////////////////
+// File:  _6_Controllers.ino
+// Purpose:  Implements the Control Functions
+//      void get_left_PID_Voltage_Value() -   sets left_PID_Voltage 
+//      void get_right_PID_Voltage_Value() -  sets right_PID_Voltage
+/////////////////////////////////////////////////////////
+
 
 
 void get_left_PID_Voltage_Value() {
@@ -43,5 +50,3 @@ void get_right_PID_Voltage_Value() {
 
   right_PID_Voltage = round(constrain(voltage, -voltage_Max, voltage_Max));
 }
-
-
