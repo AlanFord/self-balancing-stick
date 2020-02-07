@@ -23,7 +23,6 @@
 #define   omega_Integral_Max        3.0
 #define   right_Speed_Filter        0.8
 
-
    
 float     angle_Average_Filter  = 0.970;
 float     theta_Zero_Filter     = 0.995;
