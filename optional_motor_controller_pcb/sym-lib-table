@@ -1,3 +1,4 @@
 (sym_lib_table
   (lib (name motor_controller)(type Legacy)(uri ${KIPRJMOD}/motor_controller.lib)(options "")(descr ""))
+  (lib (name motor_controller-rescue)(type Legacy)(uri ${KIPRJMOD}/motor_controller-rescue.lib)(options "")(descr ""))
 )

@@ -1,5 +1,4 @@
 EESchema Schematic File Version 4
-LIBS:motor_controller-cache
 EELAYER 30 0
 EELAYER END
 $Descr A 11000 8500
@@ -461,7 +460,7 @@ Encoder_A
 Text Notes 3450 5050 1    50   ~ 0
 Encoder_B
 $Comp
-L MCU_Module:Arduino_UNO_R3 A101
+L motor_controller-rescue:Arduino_UNO_R3-MCU_Module A101
 U 1 1 5DD771DD
 P 9100 4850
 F 0 "A101" H 9950 5950 50  0000 C CNN
