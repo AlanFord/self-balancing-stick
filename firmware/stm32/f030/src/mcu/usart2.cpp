@@ -5,18 +5,19 @@
 ///
 ///	Author: Ronald Sousa (Opticalworm)
 /////////////////////////////////////////////////////////////////////////
+#include "nodate.h"
 #include "mcu/usart2.h"
 #include "fifo.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief alternative function set bit 1 for AFR2
 ///////////////////////////////////////////////////////////////////////////////
-#define GPIO_AFRL_AFR2_0 ((uint32_t) 0x00000100)
+//#define GPIO_AFRL_AFR2_0 ((uint32_t) 0x00000100)
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief alternative function set bit 1 for AFR3
 ///////////////////////////////////////////////////////////////////////////////
-#define GPIO_AFRL_AFR3_0 ((uint32_t) 0x00001000)
+//#define GPIO_AFRL_AFR3_0 ((uint32_t) 0x00001000)
 
 /////////////////////////////////////////////////////////////////////////
 /// \brief enable 16x oversampling. Used to reduce the baudrate calculation
@@ -28,6 +29,14 @@
 /// \brief Keeps track if the serial port is configure and open
 ///////////////////////////////////////////////////////////////////////////////
 static uint_fast8_t IsOpenFlag = FALSE;
+
+///////////////////////////////////////////////////////////////////////////////
+/// \brief internal function for handling the RX interrupt routing
+///////////////////////////////////////////////////////////////////////////////
+static inline void InterruptRead(char ch) {
+	FIFO_Write(ch);
+
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief return the serial open state
@@ -46,10 +55,12 @@ static uint_fast8_t IsSerialOpen(void)
 ///////////////////////////////////////////////////////////////////////////////
 static void Close(void)
 {
-	USART2->CR1 &= ~(USART_CR1_UE);
-	NVIC_DisableIRQ(USART2_IRQn);
+	//USART2->CR1 &= ~(USART_CR1_UE);
+	//NVIC_DisableIRQ(USART2_IRQn);
+	USART::stopUart(USART_2);
+	IsOpenFlag = FALSE;
 }
-
+/*
 /////////////////////////////////////////////////////////////////////////
 ///	\brief	Set usart baudrate. can be called at any time.
 ///
@@ -87,6 +98,7 @@ static void Setbaudrate(const uint32_t baud)
 	}
 
 }
+*/
 
 /////////////////////////////////////////////////////////////////////////
 ///	\brief	you can use this function to check if the write buffer is
@@ -116,6 +128,9 @@ static uint_fast8_t Open(const uint32_t baudrate)
 
 	if(!IsOpenFlag)
 	{
+		// nucleo-f030r8
+		USART::startUart(USART_2, GPIO_PORT_A, 2, 1, GPIO_PORT_A, 3, 1, baudrate, InterruptRead);
+		/*
 		// reset the FIFO
 	    FIFO_Initialiser();
 
@@ -145,14 +160,14 @@ static uint_fast8_t Open(const uint32_t baudrate)
 		USART2->CR1 |= USART_CR1_PEIE | USART_CR1_RXNEIE;
 
 		USART2->CR1 |= USART_CR1_OVER8 | USART_CR1_UE | USART_CR1_TE | USART_CR1_RE;
-
+		 */
 
 
 		IsOpenFlag = TRUE;
 	}
 
 	// This Setbaudrate is for testing if it does turn of and off the uart while is setting the baudrate.
-	Setbaudrate(baudrate);
+	//Setbaudrate(baudrate);
 
     return FALSE;
 }
@@ -226,9 +241,7 @@ static int_fast8_t GetByte(uint8_t *destination)
 	return Result;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-/// \brief internal function for handling the RX interrupt routing
-///////////////////////////////////////////////////////////////////////////////
+/*
 static inline void InterruptRead(void)
 {
 	uint8_t DummyRead;
@@ -259,6 +272,7 @@ static inline void InterruptRead(void)
 		USART2->ICR |= USART_ICR_PECF;
 	}
 }
+*/
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Write a string

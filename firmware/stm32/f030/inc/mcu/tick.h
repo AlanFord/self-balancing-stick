@@ -18,7 +18,7 @@
 
 
     void Tick_init(void);
-    uint32_t Tick_GetMs(void);
+    //uint32_t Tick_GetMs(void);
     int_fast8_t Tick_DelayMs_NonBlocking(uint_fast8_t reset, TickType * config);
     void Tick_DelayMs(uint32_t delayMs);
 

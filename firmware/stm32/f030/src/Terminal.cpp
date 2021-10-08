@@ -3,12 +3,11 @@
 ///
 ///	\author Ronald Sousa @Opticalworm
 ///////////////////////////////////////////////////////////////////////////////
+//#include "Nodate.h"
 #include "universal.h"
-#include "Nodate.h"
 #include "mcu/led.h"
-#include "mcu/serialport.h"
-//#include "MCU/usart2.h"
-//#include "MCU/tick.h"
+#include "MCU/usart2.h"
+#include "MCU/tick.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Defines our terminal buffer size which in turn set the longest command
@@ -18,8 +17,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief UART device used for communications
 ///////////////////////////////////////////////////////////////////////////////
-static USART_devices my_usart;
-static SerialPort my_serial_port;
+//static USART_devices my_usart;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Keep track of the number of bytes we received from the computer
@@ -88,11 +86,11 @@ static void DisplaySystemInformation(void)
 {
 	//SerialPort2.SendByte(0x0C); // clear terminal
 	char ch = 0x0C;
-	USART::sendUart(my_usart, ch);  // clear termina
-    //SerialPort2.SendString(&SystemMessageString[0]);
+	//USART::sendUart(my_usart, ch);  // clear termina
+    SerialPort2.SendString(&SystemMessageString[0]);
 	// Send new line feed and prompt
-	//SerialPort2.SendString("\n> ");
-	printf("%s\n ", SystemMessageString);
+	SerialPort2.SendString("\n> ");
+	//printf("%s\n ", SystemMessageString);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -101,9 +99,8 @@ static void DisplaySystemInformation(void)
 void Terminal_Init(void)
 {
     Led_Init();
-	McuCore::initSysTick();
-	my_serial_port.Open(115200);
-    //SerialPort2.Open(115200);
+    Tick_init();
+    SerialPort2.Open(115200);
 
     NumberOfByteReceived = 0;
     DisplaySystemInformation();
@@ -290,7 +287,7 @@ int_fast8_t Terminal_Process(void)
 	uint8_t SerialTempData = 0; // hold the new byte from the serial fifo
 	int_fast8_t Result = FALSE;
 
-	Result = my_serial_port.GetByte(&SerialTempData);
+	Result = SerialPort2.GetByte(&SerialTempData);
 
 	if ( TRUE != Result )
 	{
@@ -298,12 +295,12 @@ int_fast8_t Terminal_Process(void)
 	}
 
 	// echo the user command
-	my_serial_port.SendByte(SerialTempData);
+	SerialPort2.SendByte(SerialTempData);
 
 	if ('\r' == SerialTempData)
 	{
 		// Send new line feed and prompt
-		my_serial_port.SendString("\n> ");
+		SerialPort2.SendString("\n> ");
 
 		if (NumberOfByteReceived)
 		{

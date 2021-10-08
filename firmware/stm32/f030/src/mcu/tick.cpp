@@ -4,6 +4,7 @@
 ///
 /// Author: Ronald Sousa (Opticalworm)
 /////////////////////////////////////////////////////////////////////////
+#include "nodate.h"
 #include "mcu/tick.h"
 
 /////////////////////////////////////////////////////////////////////////
@@ -21,10 +22,11 @@ static volatile uint32_t TickCounter;
 /////////////////////////////////////////////////////////////////////////
 /// \brief setup the ARM M0 tick counter to trigger every 1ms
 /////////////////////////////////////////////////////////////////////////
-void Tick_init(void)
+ void Tick_init(void)
 {
     // configure the system tick so that it trigger every one ms
-  SysTick_Config(SystemCoreClock / TIMER_FREQUENCY_HZ);
+  //SysTick_Config(SystemCoreClock / TIMER_FREQUENCY_HZ);
+	 McuCore::initSysTick();
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -35,10 +37,12 @@ void Tick_init(void)
 /// \note the tick counter is expected to overflow and therefore code
 /// using the tick value should take this into account.
 /////////////////////////////////////////////////////////////////////////
-uint32_t Tick_GetMs(void)
+/*
+ uint32_t Tick_GetMs(void)
 {
     return TickCounter;
 }
+ */
 
 /////////////////////////////////////////////////////////////////////////
 /// \brief this is a blocking delay.
@@ -66,12 +70,12 @@ void Tick_DelayMs(uint32_t delayMs)
 {
   uint32_t StartTickValue;
 
-  StartTickValue = TickCounter;
+  StartTickValue = McuCore::getSysTick();
 
   // sit in the while loop until the difference between the start tick
   // and current tick is greater than or equal to
   // the delayMs.
-  while((TickCounter - StartTickValue) < delayMs);
+  while((McuCore::getSysTick() - StartTickValue) < delayMs);
 
 }
 
@@ -119,7 +123,7 @@ void Tick_DelayMs(uint32_t delayMs)
 /////////////////////////////////////////////////////////////////////////
 int_fast8_t Tick_DelayMs_NonBlocking(uint_fast8_t reset, TickType * config)
 {
-    uint32_t LapsedTick = 0;
+    uint32_t LapsedMs = 0;
 
     if( !config )
     {
@@ -128,13 +132,13 @@ int_fast8_t Tick_DelayMs_NonBlocking(uint_fast8_t reset, TickType * config)
 
     if ( reset )
     {
-        config->StartMs = Tick_GetMs();
+        config->StartMs = McuCore::getSysTick();
         return FALSE;
     }
 
-    LapsedTick = (Tick_GetMs() - config->StartMs);
+	LapsedMs = (McuCore::getSysTick() - config->StartMs);
 
-    if( LapsedTick < config->DelayMs )
+    if( LapsedMs < config->DelayMs )
     {
         return FALSE;
     }
