@@ -3,10 +3,10 @@
 ///
 ///	\author Ronald Sousa @Opticalworm
 ///////////////////////////////////////////////////////////////////////////////
-#include "Tcommon.h"
+#include "universal.h"
 #include "Nodate.h"
-#include "MCU/led.h"
-#include "MCU/serialport.h"
+#include "mcu/led.h"
+#include "mcu/serialport.h"
 //#include "MCU/usart2.h"
 //#include "MCU/tick.h"
 

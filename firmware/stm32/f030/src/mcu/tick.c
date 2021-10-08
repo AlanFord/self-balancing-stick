@@ -4,7 +4,7 @@
 ///
 /// Author: Ronald Sousa (Opticalworm)
 /////////////////////////////////////////////////////////////////////////
-#include "MCU/tick.h"
+#include "mcu/tick.h"
 
 /////////////////////////////////////////////////////////////////////////
 /// \brief defines the frequency we want the system tick to trigger.
@@ -149,7 +149,9 @@ int_fast8_t Tick_DelayMs_NonBlocking(uint_fast8_t reset, TickType * config)
 ///
 /// \sa TickCounter
 /////////////////////////////////////////////////////////////////////////
+/*
 void SysTick_Handler(void)
 {
     TickCounter++;
 }
+*/
