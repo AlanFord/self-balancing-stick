@@ -18,14 +18,14 @@ NDLANGUAGE ?= cpp
 #BOARD ?= purple
 # the following is used for the Purple board
 #APP_FLAGS = -DPURPLE
-BOARD ?= nucleo-f030r8
+#BOARD ?= nucleo-f030r8
 #BOARD ?= nucleo-f103rb
 #BOARD ?= nucleo-f446re
 #BOARD ?= nucleo-f042k6
 #BOARD ?= nucleo-l432kc
-#BOARD ?= nucleo-f746zg
+BOARD ?= nucleo-f746zg
 # the following is used for the nucleo-f746zg
-#APP_FLAGS = -DHSE_VALUE=8000000
+APP_FLAGS = -DHSE_VALUE=8000000
 
 # Set the MCU and programmer types.
 #
@@ -44,7 +44,7 @@ APP_C_FILES += $(wildcard src/mcu/*.c)
 LIB_INCLUDES += -I $(APPFOLDER)/inc
 LIB_INCLUDES += -I $(APPFOLDER)/inc/mcu
 
-APP_FLAGS = -O0
+APP_FLAGS += -O0
 
 
 # Set Nodate modules to enable.
