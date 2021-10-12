@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////
-///	\file usart2.c
-///	\brief STM32 serial2 MCU hardware interface layer. to maintain
+///	\file usart3.c
+///	\brief STM32 serial3 MCU hardware interface layer. to maintain
 ///	code portability, the hardware related code is split from the main logic.
 ///
 ///	Author: Ronald Sousa (Opticalworm)
 /////////////////////////////////////////////////////////////////////////
 #include "nodate.h"
-#include "mcu/usart2.h"
+#include "mcu/usart3.h"
 #include "fifo.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ static void Close(void)
 {
 	//USART2->CR1 &= ~(USART_CR1_UE);
 	//NVIC_DisableIRQ(USART2_IRQn);
-	USART::stopUart(USART_2);
+	USART::stopUart(USART_3);
 	IsOpenFlag = FALSE;
 }
 /*
@@ -108,7 +108,7 @@ static void Setbaudrate(const uint32_t baud)
 /////////////////////////////////////////////////////////////////////////
 static uint_fast8_t IsWriteBusy(void)
 {
-	if ( USART2->ISR & USART_ISR_TXE )
+	if ( USART3->ISR & USART_ISR_TXE )
 	{
 		return FALSE;
 	}
@@ -128,8 +128,10 @@ static uint_fast8_t Open(const uint32_t baudrate)
 
 	if(!IsOpenFlag)
 	{
+		// nucleo-f746zg
+		USART::startUart(USART_3, GPIO_PORT_D, 8, 7, GPIO_PORT_D, 9, 7, baudrate, InterruptRead);
 		// nucleo-f030r8
-		USART::startUart(USART_2, GPIO_PORT_A, 2, 1, GPIO_PORT_A, 3, 1, baudrate, InterruptRead);
+		//USART::startUart(USART_2, GPIO_PORT_A, 2, 1, GPIO_PORT_A, 3, 1, baudrate, InterruptRead);
 		/*
 		// reset the FIFO
 	    FIFO_Initialiser();
@@ -185,7 +187,7 @@ static uint_fast8_t SendByte(const uint8_t source)
 	{
 		while( IsWriteBusy() );
 
-		USART2->TDR = source;
+		USART3->TDR = source;
 
 		return TRUE;
 	}
@@ -341,7 +343,7 @@ void USART2_IRQHandler(void)
 ///
 /// \sa SerialInterface
 ///////////////////////////////////////////////////////////////////////////////
-SerialInterface SerialPort2 = {
+SerialInterface SerialPort3 = {
                                     IsSerialOpen,
                                     Open,
                                     Close,

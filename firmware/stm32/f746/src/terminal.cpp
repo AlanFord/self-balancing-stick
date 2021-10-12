@@ -6,7 +6,7 @@
 //#include "Nodate.h"
 #include "universal.h"
 #include "mcu/led.h"
-#include "MCU/usart2.h"
+#include "MCU/usart3.h"
 #include "MCU/tick.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,9 +87,9 @@ static void DisplaySystemInformation(void)
 	//SerialPort2.SendByte(0x0C); // clear terminal
 	char ch = 0x0C;
 	//USART::sendUart(my_usart, ch);  // clear termina
-    SerialPort2.SendString(&SystemMessageString[0]);
+    SerialPort3.SendString(&SystemMessageString[0]);
 	// Send new line feed and prompt
-	SerialPort2.SendString("\n> ");
+	SerialPort3.SendString("\n> ");
 	//printf("%s\n ", SystemMessageString);
 }
 
@@ -100,7 +100,7 @@ void Terminal_Init(void)
 {
     Led_Init();
     Tick_init();
-    SerialPort2.Open(115200);
+    SerialPort3.Open(115200);
 
     NumberOfByteReceived = 0;
     DisplaySystemInformation();
@@ -108,6 +108,13 @@ void Terminal_Init(void)
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief process the buffer data and extract the commands
+///
+/// 'source' is a pointer to a list of uint8_t, ostensibly a list of bytes representing ascii characters.
+/// 'length' is the lenght of said source character list
+/// 'destination' is a pointer to a list of parameters parsed from the source list
+/// A parameter is of type ParamStructureType, containing either a string, or a structure that includes both a type field and a
+/// data converter field.  The type field is just a single character field, 'S' for command and 'U' for integer.
+/// The data converter field is an 8-byte union of data types, ranging from int8_t to long double.
 ///
 ///	\return TRUE success
 ///
@@ -131,14 +138,21 @@ static int_fast8_t ProcessData(uint8_t *source, uint32_t length, ListOfParameter
 		return ERROR;
 	}
 
+	// TODO: should NumberOfParameter start at 1?  Is it an index or a count?  How would newline be handled?
+	// looks like it is first used as an index and subseqently incremented, possibly to a count?
+	
 	destination->NumberOfParameter = 0; // reset
 	CurrentParamStrPointer = &destination->List[destination->NumberOfParameter].StringArray[0];
 
+	/* iterate through the source list. A blank space with advance to the next parameter.  Else
+	 the source character is copied into the string array of the current location in the destination array.
+	 In summary, the destination array is filled with white-space separated character strings from the terminal input line*/
 	for( ; length ; length--)
 	{
 
 		if ( *source  == ' ')
 		{
+			// we found a "space" in the input source string, so we must have another value coming up
 			destination->NumberOfParameter++;
 
 			if (destination->NumberOfParameter < MAX_NUMBER_OF_PARAMETERS )
@@ -156,21 +170,21 @@ static int_fast8_t ProcessData(uint8_t *source, uint32_t length, ListOfParameter
 		}
 		else
 		{
-
+			// TODO: should number
 			if ( ParameterCharacterLength < (PARAMETER_STRING_SIZE -1) )
 			{
 
 				*CurrentParamStrPointer = *source;
 				CurrentParamStrPointer++;
-				*CurrentParamStrPointer = 0;
+				*CurrentParamStrPointer = 0;  // make sure the string is zero-terminated (will be overwritten if another character is added)
 				ParameterCharacterLength++;
 			}
 		}
 
 		source++;
 	}
-
-
+	
+	// TODO: figure out what this is for!!!!!
 	if (ParameterCharacterLength >= 2)
 	{
 		destination->NumberOfParameter++;
@@ -179,7 +193,11 @@ static int_fast8_t ProcessData(uint8_t *source, uint32_t length, ListOfParameter
 	{
 		destination->NumberOfParameter = 0;
 		return FALSE;
-	} else if ( 's' == !destination->List[0].Type && 'S' == !destination->List[0].Type)
+	}
+	// much weirdness here.  We have never set List[0].Type.  However, List[0].Type occupies the same memory location as
+	// List[0].StringArray[0].  However, should it be "!=" instead of "== !"?  May be pointer weirdness
+	// anyway, appears to be verifying that the first parameter is a command paramenter
+	else if ( 's' == !destination->List[0].Type && 'S' == !destination->List[0].Type)
 	{
 		destination->NumberOfParameter = 0;
 		return ERROR;
@@ -188,6 +206,9 @@ static int_fast8_t ProcessData(uint8_t *source, uint32_t length, ListOfParameter
 
 
 	// We have a valid number of parameters
+	
+	/* Here we appear to be making sure the parameter types are lower-case.  Note that the accepted parameter types are now
+	 defined as S, U, F, and T (a change from the comment in the ParamStructureType definition */
 	for(ParameterCounter = 0; ParameterCounter < destination->NumberOfParameter ; ParameterCounter++)
 	{
 
@@ -235,6 +256,13 @@ static int_fast8_t ProcessData(uint8_t *source, uint32_t length, ListOfParameter
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief run the terminal command
+///
+/// Commands are as follows.
+/// The switch statement looks at the value of the first parameter.  An integer value of 1 will control the LED.
+/// If there is a second parameter of type 'u' (integer), the integer value of the second parameter is checked.
+/// A non-zero value will result in Led_On.  A zero value will result in Led_Off.
+///
+/// If there is no second parameter or if the second parameter is not of type 'u' (integer), the LED is toggled.
 ///
 ///	\return TRUE success
 ///
@@ -287,7 +315,7 @@ int_fast8_t Terminal_Process(void)
 	uint8_t SerialTempData = 0; // hold the new byte from the serial fifo
 	int_fast8_t Result = FALSE;
 
-	Result = SerialPort2.GetByte(&SerialTempData);
+	Result = SerialPort3.GetByte(&SerialTempData);
 
 	if ( TRUE != Result )
 	{
@@ -295,12 +323,12 @@ int_fast8_t Terminal_Process(void)
 	}
 
 	// echo the user command
-	SerialPort2.SendByte(SerialTempData);
+	SerialPort3.SendByte(SerialTempData);
 
 	if ('\r' == SerialTempData)
 	{
 		// Send new line feed and prompt
-		SerialPort2.SendString("\n> ");
+		SerialPort3.SendString("\n> ");
 
 		if (NumberOfByteReceived)
 		{

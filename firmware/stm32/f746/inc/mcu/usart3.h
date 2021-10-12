@@ -1,14 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// \file usart2.h
+/// \file usart3.h
 ///	Author: Ronald Sousa (@Opticalworm)
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __USART_TWO_MCU_H__
-#define __USART_TWO_MCU_H__
+#ifndef __USART_THREE_MCU_H__
+#define __USART_THREE_MCU_H__
 
 	#include "universal.h"
     #include "MCU/SerialStructure.h"
 
-    extern SerialInterface SerialPort2;
+    extern SerialInterface SerialPort3;
 
 #endif
