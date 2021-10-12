@@ -185,6 +185,7 @@ static int_fast8_t ProcessData(uint8_t *source, uint32_t length, ListOfParameter
 	}
 	
 	// TODO: figure out what this is for!!!!!
+	
 	if (ParameterCharacterLength >= 2)
 	{
 		destination->NumberOfParameter++;
@@ -208,7 +209,13 @@ static int_fast8_t ProcessData(uint8_t *source, uint32_t length, ListOfParameter
 	// We have a valid number of parameters
 	
 	/* Here we appear to be making sure the parameter types are lower-case.  Note that the accepted parameter types are now
-	 defined as S, U, F, and T (a change from the comment in the ParamStructureType definition */
+	 defined as S, U, F, and T (a change from the comment in the ParamStructureType definition
+	 S,s: Command Parameter type
+	 U,u: Integer type
+	 F,f: ????  possibly floating point type?
+	 T,t: ????  possibly text string type?
+	 Does this mean that each parameter must be prefaced by S, U, F, or T?
+	 */
 	for(ParameterCounter = 0; ParameterCounter < destination->NumberOfParameter ; ParameterCounter++)
 	{
 
@@ -263,6 +270,12 @@ static int_fast8_t ProcessData(uint8_t *source, uint32_t length, ListOfParameter
 /// A non-zero value will result in Led_On.  A zero value will result in Led_Off.
 ///
 /// If there is no second parameter or if the second parameter is not of type 'u' (integer), the LED is toggled.
+///
+/// S1 command means control the LED
+///    S1 ----> Toggle LED
+///    S1 U0 -> Led_Off
+///    S1 U1 -> Led_On
+///
 ///
 ///	\return TRUE success
 ///
