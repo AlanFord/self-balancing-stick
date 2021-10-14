@@ -1,13 +1,22 @@
 /////////////////////////////////////////////////////////////////////////
-///	\file usart3.c
-///	\brief STM32 serial3 MCU hardware interface layer. to maintain
-///	code portability, the hardware related code is split from the main logic.
+///	\file SerialPort.cpp
+///	\brief STM32 serial port MCU hardware interface layer. 
 ///
-///	Author: Ronald Sousa (Opticalworm)
+///	Author: Alan Ford
+///		Derived from work by Ronald Sousa (Opticalworm)
 /////////////////////////////////////////////////////////////////////////
 #include "nodate.h"
-#include "mcu/usart3.h"
+#include "mcu/SerialPort.h"
 #include "fifo.h"
+
+// nucleo-f746zg
+#define ACTIVE_UART (USART_3)
+#define UART_TX_PORT GPIO_PORT_D
+#define UART_TX_PIN  8
+#define UART_TX_AF   7
+#define UART_RX_PORT GPIO_PORT_D
+#define UART_RX_PIN  9
+#define UART_RX_AF   7
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief alternative function set bit 1 for AFR2
@@ -43,7 +52,7 @@ static inline void InterruptRead(char ch) {
 ///
 /// \return true = the serial port is open else false
 ///////////////////////////////////////////////////////////////////////////////
-static uint_fast8_t IsSerialOpen(void)
+uint_fast8_t SerialPort::IsSerialOpen(void)
 {
     return IsOpenFlag;
 }
@@ -53,11 +62,11 @@ static uint_fast8_t IsSerialOpen(void)
 ///
 /// \return true = success else port is already open
 ///////////////////////////////////////////////////////////////////////////////
-static void Close(void)
+void SerialPort::Close(void)
 {
 	//USART2->CR1 &= ~(USART_CR1_UE);
 	//NVIC_DisableIRQ(USART2_IRQn);
-	USART::stopUart(USART_3);
+	USART::stopUart(ACTIVE_UART);
 	IsOpenFlag = FALSE;
 }
 /*
@@ -123,53 +132,14 @@ static uint_fast8_t IsWriteBusy(void)
 ///
 /// \return true = success else port is already open
 ///////////////////////////////////////////////////////////////////////////////
-static uint_fast8_t Open(const uint32_t baudrate)
+uint_fast8_t SerialPort::Open(const uint32_t baudrate)
 {
 
 	if(!IsOpenFlag)
 	{
-		// nucleo-f746zg
-		USART::startUart(USART_3, GPIO_PORT_D, 8, 7, GPIO_PORT_D, 9, 7, baudrate, InterruptRead);
-		// nucleo-f030r8
-		//USART::startUart(USART_2, GPIO_PORT_A, 2, 1, GPIO_PORT_A, 3, 1, baudrate, InterruptRead);
-		/*
-		// reset the FIFO
-	    FIFO_Initialiser();
-
-		RCC->APB1ENR |= RCC_APB1ENR_USART2EN; // en USART clock
-
-		USART2->CR1 = 0; // reset the usart CR1 register
-
-		RCC->AHBENR |= RCC_AHBENR_GPIOAEN; // en GPIOA clock
-
-		GPIOA->MODER &= (~(GPIO_MODER_MODER2) | ~(GPIO_MODER_MODER3)); // clear PA2 moder
-		GPIOA->MODER  |= GPIO_MODER_MODER2_1 | GPIO_MODER_MODER3_1; // Set PA2 to alter function
-
-		GPIOA->AFR[0] &= (~(GPIO_AFRL_AFRL2) | ~(GPIO_AFRL_AFRL3)); // clear PA2 config
-		GPIOA->AFR[0] |= GPIO_AFRL_AFR2_0 | GPIO_AFRL_AFR3_0;
-
-		// set baudrate
-		Setbaudrate(baudrate);
-
-		NVIC_SetPriority(USART2_IRQn, 0); // set the USART to the highest interrupt priority
-
-		NVIC_EnableIRQ(USART2_IRQn); 	// enable interrupt
-
-		// enable interrupt for framing, overrun and noise;
-		USART2->CR3 |= USART_CR3_EIE;
-
-		// enable interrupt for PE and RX
-		USART2->CR1 |= USART_CR1_PEIE | USART_CR1_RXNEIE;
-
-		USART2->CR1 |= USART_CR1_OVER8 | USART_CR1_UE | USART_CR1_TE | USART_CR1_RE;
-		 */
-
-
+		USART::startUart(ACTIVE_UART, UART_TX_PORT, UART_TX_PIN, UART_TX_AF, UART_RX_PORT, UART_RX_PIN, UART_RX_AF, baudrate, InterruptRead);
 		IsOpenFlag = TRUE;
 	}
-
-	// This Setbaudrate is for testing if it does turn of and off the uart while is setting the baudrate.
-	//Setbaudrate(baudrate);
 
     return FALSE;
 }
@@ -181,7 +151,7 @@ static uint_fast8_t Open(const uint32_t baudrate)
 ///
 /// \return true = success else port is not open
 ///////////////////////////////////////////////////////////////////////////////
-static uint_fast8_t SendByte(const uint8_t source)
+uint_fast8_t SerialPort::SendByte(const uint8_t source)
 {
 	if(IsOpenFlag)
 	{
@@ -201,7 +171,7 @@ static uint_fast8_t SendByte(const uint8_t source)
 ///              0 = no data to read
 ///             ERROR = Port is not open
 ///////////////////////////////////////////////////////////////////////////////
-static int_fast8_t DoesReceiveBufferHaveData(void)
+int_fast8_t SerialPort::DoesReceiveBufferHaveData(void)
 {
 	if(IsOpenFlag)
 	{
@@ -231,7 +201,7 @@ static int_fast8_t DoesReceiveBufferHaveData(void)
 ///												or if the data is corrupted (ie, framing error or buffer overflow)
 ///					ERROR_INVALID_POINTER Invalid pointer
 ///////////////////////////////////////////////////////////////////////////////
-static int_fast8_t GetByte(uint8_t *destination)
+int_fast8_t SerialPort::GetByte(uint8_t *destination)
 {
 	int_fast8_t Result = ERROR;
 
@@ -243,38 +213,6 @@ static int_fast8_t GetByte(uint8_t *destination)
 	return Result;
 }
 
-/*
-static inline void InterruptRead(void)
-{
-	uint8_t DummyRead;
-
-	if(USART2->ISR & USART_ISR_RXNE)
-	{
-		DummyRead = USART2->RDR;
-		FIFO_Write(DummyRead);
-	}
-
-	if (USART2->ISR & USART_ISR_ORE)
-	{
-		USART2->ICR |= USART_ICR_ORECF;
-	}
-
-	if (USART2->ISR & USART_ISR_FE)
-	{
-		USART2->ICR |= USART_ICR_FECF;
-	}
-
-	if (USART2->ISR & USART_ISR_NE)
-	{
-		USART2->ICR |= USART_ICR_NCF;
-	}
-
-	if (USART2->ISR & USART_ISR_PE)
-	{
-		USART2->ICR |= USART_ICR_PECF;
-	}
-}
-*/
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Write a string
@@ -284,7 +222,7 @@ static inline void InterruptRead(void)
 /// \return true = success else either the port is not open or the pointer
 /// to the array is invalid.
 ///////////////////////////////////////////////////////////////////////////////
-static uint_fast8_t SendString(const char *source)
+uint_fast8_t SerialPort::SendString(const char *source)
 {
     if (IsOpenFlag && source)
     {
@@ -310,7 +248,7 @@ static uint_fast8_t SendString(const char *source)
 /// \return true = success else either the port is not open or the pointer
 /// to the array is invalid.
 ///////////////////////////////////////////////////////////////////////////////
-static uint_fast8_t SendArray(const uint8_t *source, uint32_t length)
+uint_fast8_t SerialPort::SendArray(const uint8_t *source, uint32_t length)
 {
     if (IsOpenFlag && source)
     {
@@ -327,17 +265,7 @@ static uint_fast8_t SendArray(const uint8_t *source, uint32_t length)
     return FALSE;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-/// \brief the USART 2 interrupt handler.
-///
-///	\todo Need to implement the TX interrupt
-///////////////////////////////////////////////////////////////////////////////
 /*
-void USART2_IRQHandler(void)
-{
-	InterruptRead();
-}
-*/
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Defines the standard serial functions for usart 2
 ///
@@ -353,3 +281,5 @@ SerialInterface SerialPort3 = {
                                     DoesReceiveBufferHaveData,
                                     GetByte
                                 };
+ 
+ */

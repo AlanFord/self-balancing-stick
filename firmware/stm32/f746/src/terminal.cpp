@@ -6,7 +6,7 @@
 //#include "Nodate.h"
 #include "universal.h"
 #include "mcu/led.h"
-#include "MCU/usart3.h"
+#include "MCU/SerialPort.h"
 #include "MCU/tick.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,9 +87,9 @@ static void DisplaySystemInformation(void)
 	//SerialPort2.SendByte(0x0C); // clear terminal
 	char ch = 0x0C;
 	//USART::sendUart(my_usart, ch);  // clear termina
-    SerialPort3.SendString(&SystemMessageString[0]);
+	SerialPort::SendString(&SystemMessageString[0]);
 	// Send new line feed and prompt
-	SerialPort3.SendString("\n> ");
+	SerialPort::SendString("\n> ");
 	//printf("%s\n ", SystemMessageString);
 }
 
@@ -100,7 +100,7 @@ void Terminal_Init(void)
 {
     Led_Init();
     Tick_init();
-    SerialPort3.Open(115200);
+	SerialPort::Open(115200);
 
     NumberOfByteReceived = 0;
     DisplaySystemInformation();
@@ -328,7 +328,7 @@ int_fast8_t Terminal_Process(void)
 	uint8_t SerialTempData = 0; // hold the new byte from the serial fifo
 	int_fast8_t Result = FALSE;
 
-	Result = SerialPort3.GetByte(&SerialTempData);
+	Result = SerialPort::GetByte(&SerialTempData);
 
 	if ( TRUE != Result )
 	{
@@ -336,12 +336,13 @@ int_fast8_t Terminal_Process(void)
 	}
 
 	// echo the user command
-	SerialPort3.SendByte(SerialTempData);
+	SerialPort::SendByte(SerialTempData);
 
+	// TODO: process a backspace key
 	if ('\r' == SerialTempData)
 	{
 		// Send new line feed and prompt
-		SerialPort3.SendString("\n> ");
+		SerialPort::SendString("\n> ");
 
 		if (NumberOfByteReceived)
 		{
