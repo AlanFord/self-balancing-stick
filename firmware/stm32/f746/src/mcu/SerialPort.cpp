@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////
 ///	\file SerialPort.cpp
-///	\brief STM32 serial port MCU hardware interface layer. 
+///	\brief STM32 serial port MCU hardware interface layer.
 ///
 ///	Author: Alan Ford
 ///		Derived from work by Ronald Sousa (Opticalworm)
@@ -18,21 +18,6 @@
 #define UART_RX_PIN  9
 #define UART_RX_AF   7
 
-///////////////////////////////////////////////////////////////////////////////
-/// \brief alternative function set bit 1 for AFR2
-///////////////////////////////////////////////////////////////////////////////
-//#define GPIO_AFRL_AFR2_0 ((uint32_t) 0x00000100)
-
-///////////////////////////////////////////////////////////////////////////////
-/// \brief alternative function set bit 1 for AFR3
-///////////////////////////////////////////////////////////////////////////////
-//#define GPIO_AFRL_AFR3_0 ((uint32_t) 0x00001000)
-
-/////////////////////////////////////////////////////////////////////////
-/// \brief enable 16x oversampling. Used to reduce the baudrate calculation
-/// error.
-/////////////////////////////////////////////////////////////////////////
-//#define USART_OVER_SAMPLE_16
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Keeps track if the serial port is configure and open
@@ -47,6 +32,22 @@ static inline void InterruptRead(char ch) {
 
 }
 
+/////////////////////////////////////////////////////////////////////////
+///	\brief	you can use this function to check if the write buffer is
+///	empty and ready for new data
+///
+///	\return TRUE = Busy else ready. else false
+/////////////////////////////////////////////////////////////////////////
+uint_fast8_t SerialPort::IsWriteBusy(void)
+{
+	if ( USART3->ISR & USART_ISR_TXE )
+	{
+		return FALSE;
+	}
+
+	return TRUE;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief return the serial open state
 ///
@@ -55,74 +56,6 @@ static inline void InterruptRead(char ch) {
 uint_fast8_t SerialPort::IsSerialOpen(void)
 {
     return IsOpenFlag;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-/// \brief Open the serial port
-///
-/// \return true = success else port is already open
-///////////////////////////////////////////////////////////////////////////////
-void SerialPort::Close(void)
-{
-	//USART2->CR1 &= ~(USART_CR1_UE);
-	//NVIC_DisableIRQ(USART2_IRQn);
-	USART::stopUart(ACTIVE_UART);
-	IsOpenFlag = FALSE;
-}
-/*
-/////////////////////////////////////////////////////////////////////////
-///	\brief	Set usart baudrate. can be called at any time.
-///
-///	\param baud the desire baudrate
-///
-///	\note setting baudrate will effect any data currently been sent.susb
-///		make sure that you check that the write buffer is empty
-/////////////////////////////////////////////////////////////////////////
-static void Setbaudrate(const uint32_t baud)
-{
-	uint_fast8_t WasUartEnable = FALSE;
-
-	uint16_t BaudrateTemp = 0;
-
-	if (IsOpenFlag)
-	{
-		WasUartEnable = TRUE;
-		Close();
-	}
-
-#ifdef USART_OVER_SAMPLE_16
-	BaudrateTemp = (SystemCoreClock) / (baud);
-#else
-	BaudrateTemp = (2 * SystemCoreClock) / (baud);
-	BaudrateTemp = ((BaudrateTemp & 0xFFFFFFF0) | ((BaudrateTemp >> 1) & 0x00000007));
-#endif
-
-	USART2->BRR = BaudrateTemp;
-
-
-	if(WasUartEnable)
-	{
-		NVIC_EnableIRQ(USART2_IRQn); // enable interrupt
-		USART2->CR1 |=  USART_CR1_UE;
-	}
-
-}
-*/
-
-/////////////////////////////////////////////////////////////////////////
-///	\brief	you can use this function to check if the write buffer is
-///	empty and ready for new data
-///
-///	\return TRUE = Busy else ready. else false
-/////////////////////////////////////////////////////////////////////////
-static uint_fast8_t IsWriteBusy(void)
-{
-	if ( USART3->ISR & USART_ISR_TXE )
-	{
-		return FALSE;
-	}
-
-	return TRUE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -141,7 +74,20 @@ uint_fast8_t SerialPort::Open(const uint32_t baudrate)
 		IsOpenFlag = TRUE;
 	}
 
-    return FALSE;
+	return FALSE;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+/// \brief Open the serial port
+///
+/// \return true = success else port is already open
+///////////////////////////////////////////////////////////////////////////////
+void SerialPort::Close(void)
+{
+	//USART2->CR1 &= ~(USART_CR1_UE);
+	//NVIC_DisableIRQ(USART2_IRQn);
+	USART::stopUart(ACTIVE_UART);
+	IsOpenFlag = FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -264,22 +210,3 @@ uint_fast8_t SerialPort::SendArray(const uint8_t *source, uint32_t length)
     }
     return FALSE;
 }
-
-/*
-///////////////////////////////////////////////////////////////////////////////
-/// \brief Defines the standard serial functions for usart 2
-///
-/// \sa SerialInterface
-///////////////////////////////////////////////////////////////////////////////
-SerialInterface SerialPort3 = {
-                                    IsSerialOpen,
-                                    Open,
-                                    Close,
-                                    SendByte,
-                                    SendString,
-                                    SendArray,
-                                    DoesReceiveBufferHaveData,
-                                    GetByte
-                                };
- 
- */
