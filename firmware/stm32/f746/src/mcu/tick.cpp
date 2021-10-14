@@ -133,17 +133,17 @@ int_fast8_t Tick_DelayMs_NonBlocking(uint_fast8_t reset, TickType * config)
     if ( reset )
     {
         config->StartMs = McuCore::getSysTick();
-        return FALSE;
+        return U_FALSE;
     }
 
 	LapsedMs = (McuCore::getSysTick() - config->StartMs);
 
     if( LapsedMs < config->DelayMs )
     {
-        return FALSE;
+        return U_FALSE;
     }
 
-    return TRUE; // time has lapsed
+    return U_TRUE; // time has lapsed
 
 }
 

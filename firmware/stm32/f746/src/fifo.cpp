@@ -82,7 +82,7 @@ void FIFO_Initialiser(void)
 ////////////////////////////////////////////////////////
 uint_fast8_t FIFO_Read(uint8_t *outputDataPointer)
 {
-	uint_fast8_t Result = FALSE;
+	uint_fast8_t Result = U_FALSE;
 
 	// check pointer is valid and not set to zero
 	if ( outputDataPointer )
@@ -103,13 +103,13 @@ uint_fast8_t FIFO_Read(uint8_t *outputDataPointer)
 				ReadPosition = 0;
 			}
 
-			Result = TRUE;
+			Result = U_TRUE;
 		}
 	}
 	else
 	{
 		// pointer error
-		Result = ERROR_INVALID_POINTER;
+		Result = U_ERROR_INVALID_POINTER;
 	}
 
 
@@ -126,7 +126,7 @@ uint_fast8_t FIFO_Read(uint8_t *outputDataPointer)
 ////////////////////////////////////////////////////////
 uint_fast8_t FIFO_Write(uint8_t inputData)
 {
-	uint_fast8_t Result = FALSE;
+	uint_fast8_t Result = U_FALSE;
 
 
 	if( BufferCurrentSize < FIFO_BUFFER_MAX_SIZE )
@@ -146,7 +146,7 @@ uint_fast8_t FIFO_Write(uint8_t inputData)
 			WritePosition = 0;
 		}
 
-		Result = TRUE;
+		Result = U_TRUE;
 	}
 
 	return Result;

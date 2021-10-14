@@ -22,7 +22,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Keeps track if the serial port is configure and open
 ///////////////////////////////////////////////////////////////////////////////
-static uint_fast8_t IsOpenFlag = FALSE;
+static uint_fast8_t IsOpenFlag = U_FALSE;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief internal function for handling the RX interrupt routing
@@ -42,10 +42,10 @@ uint_fast8_t SerialPort::IsWriteBusy(void)
 {
 	if ( USART3->ISR & USART_ISR_TXE )
 	{
-		return FALSE;
+		return U_FALSE;
 	}
 
-	return TRUE;
+	return U_TRUE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -71,10 +71,10 @@ uint_fast8_t SerialPort::Open(const uint32_t baudrate)
 	if(!IsOpenFlag)
 	{
 		USART::startUart(ACTIVE_UART, UART_TX_PORT, UART_TX_PIN, UART_TX_AF, UART_RX_PORT, UART_RX_PIN, UART_RX_AF, baudrate, InterruptRead);
-		IsOpenFlag = TRUE;
+		IsOpenFlag = U_TRUE;
 	}
 
-	return FALSE;
+	return U_FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ void SerialPort::Close(void)
 	//USART2->CR1 &= ~(USART_CR1_UE);
 	//NVIC_DisableIRQ(USART2_IRQn);
 	USART::stopUart(ACTIVE_UART);
-	IsOpenFlag = FALSE;
+	IsOpenFlag = U_FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -105,10 +105,10 @@ uint_fast8_t SerialPort::SendByte(const uint8_t source)
 
 		USART3->TDR = source;
 
-		return TRUE;
+		return U_TRUE;
 	}
 
-    return FALSE;
+    return U_FALSE;
 }
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief return the serial receive byte buffer state
@@ -123,11 +123,11 @@ int_fast8_t SerialPort::DoesReceiveBufferHaveData(void)
 	{
 		if(FIFO_CounnterBufferCount())
 		{
-			return TRUE;
+			return U_TRUE;
 		}
 		else
 		{
-			return FALSE;
+			return U_FALSE;
 		}
 	}
 
@@ -176,13 +176,13 @@ uint_fast8_t SerialPort::SendString(const char *source)
         {
             if (!SendByte(*source) )
             {
-                return FALSE;
+                return U_FALSE;
             }
             source++;
         }
-        return TRUE;
+        return U_TRUE;
     }
-    return FALSE;
+    return U_FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -202,11 +202,11 @@ uint_fast8_t SerialPort::SendArray(const uint8_t *source, uint32_t length)
         {
             if ( !SendByte(*source) )
             {
-                return FALSE;
+                return U_FALSE;
             }
             source++;
         }
-        return TRUE;
+        return U_TRUE;
     }
-    return FALSE;
+    return U_FALSE;
 }

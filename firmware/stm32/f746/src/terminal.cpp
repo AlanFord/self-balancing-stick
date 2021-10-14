@@ -20,6 +20,12 @@
 //static USART_devices my_usart;
 
 ///////////////////////////////////////////////////////////////////////////////
+/// \brief signaling LED
+///////////////////////////////////////////////////////////////////////////////
+// TODO: should this somehow be in the "mcu" folder?
+static LED signal_led(GPIO_PORT_B, 0);
+
+///////////////////////////////////////////////////////////////////////////////
 /// \brief Keep track of the number of bytes we received from the computer
 ///////////////////////////////////////////////////////////////////////////////
 static uint32_t NumberOfByteReceived;
@@ -98,7 +104,7 @@ static void DisplaySystemInformation(void)
 ///////////////////////////////////////////////////////////////////////////////
 void Terminal_Init(void)
 {
-    Led_Init();
+    //Led_Init();
     Tick_init();
 	SerialPort::Open(115200);
 
@@ -129,13 +135,13 @@ static int_fast8_t ProcessData(uint8_t *source, uint32_t length, ListOfParameter
 	// checking the pointer aren't null
 	if ( !destination )
 	{
-		return ERROR;
+		return U_ERROR;
 	}
 	if ( !source )
 	{
 		// don't do this unless the destination pointer has already been validated
 		destination->NumberOfParameter = 0; // reset the number of parameters
-		return ERROR;
+		return U_ERROR;
 	}
 
 	// TODO: should NumberOfParameter start at 1?  Is it an index or a count?  How would newline be handled?
@@ -162,7 +168,7 @@ static int_fast8_t ProcessData(uint8_t *source, uint32_t length, ListOfParameter
 			else
 			{
 				destination->NumberOfParameter = 0; // reset the number of parameters
-				return FALSE;
+				return U_FALSE;
 			}
 
 			ParameterCharacterLength = 0;
@@ -193,7 +199,7 @@ static int_fast8_t ProcessData(uint8_t *source, uint32_t length, ListOfParameter
 	else if ( !destination->NumberOfParameter )
 	{
 		destination->NumberOfParameter = 0;
-		return FALSE;
+		return U_FALSE;
 	}
 	// much weirdness here.  We have never set List[0].Type.  However, List[0].Type occupies the same memory location as
 	// List[0].StringArray[0].  However, should it be "!=" instead of "== !"?  May be pointer weirdness
@@ -201,7 +207,7 @@ static int_fast8_t ProcessData(uint8_t *source, uint32_t length, ListOfParameter
 	else if ( 's' == !destination->List[0].Type && 'S' == !destination->List[0].Type)
 	{
 		destination->NumberOfParameter = 0;
-		return ERROR;
+		return U_ERROR;
 	}
 
 
@@ -248,7 +254,7 @@ static int_fast8_t ProcessData(uint8_t *source, uint32_t length, ListOfParameter
 
 		default:
 			destination->NumberOfParameter = 0;
-			return ERROR;
+			return U_ERROR;
 			break;
 
 		}
@@ -258,7 +264,7 @@ static int_fast8_t ProcessData(uint8_t *source, uint32_t length, ListOfParameter
 
 
 
-	return TRUE;
+	return U_TRUE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -292,28 +298,28 @@ static int_fast8_t RunCommand(ListOfParameterStructureType *source)
 			{
 				if ( source->List[1].Value.i32_t[0] )
 				{
-					Led_On();
+					signal_led.On();
 				}
 				else
 				{
-					Led_Off();
+					signal_led.Off();
 				}
 
 			}
 			else
 			{
-				Led_Toggle();
+				signal_led.Toggle();
 			}
 			break;
 
 		default:
 			// undefined command
-			return FALSE;
+			return U_FALSE;
 			break;
 
 	}
 
-	return TRUE;
+	return U_TRUE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -326,11 +332,11 @@ static int_fast8_t RunCommand(ListOfParameterStructureType *source)
 int_fast8_t Terminal_Process(void)
 {
 	uint8_t SerialTempData = 0; // hold the new byte from the serial fifo
-	int_fast8_t Result = FALSE;
+	int_fast8_t Result = U_FALSE;
 
 	Result = SerialPort::GetByte(&SerialTempData);
 
-	if ( TRUE != Result )
+	if ( U_TRUE != Result )
 	{
 		return Result;
 	}
@@ -347,18 +353,18 @@ int_fast8_t Terminal_Process(void)
 		if (NumberOfByteReceived)
 		{
 			/// \todo call the process data
-			if ( TRUE == ProcessData(&Buffer[0], NumberOfByteReceived, &ParameterList) )
+			if ( U_TRUE == ProcessData(&Buffer[0], NumberOfByteReceived, &ParameterList) )
 			{
-				if(  TRUE == RunCommand(&ParameterList) )
+				if(  U_TRUE == RunCommand(&ParameterList) )
 				{
-					Result =  TRUE;
+					Result =  U_TRUE;
 				}
 
 			}
 		}
 		else
 		{
-			Result =  FALSE;
+			Result =  U_FALSE;
 		}
 	}
 	else if ( (SerialTempData >= '0' && SerialTempData <= '9') ||
@@ -370,7 +376,7 @@ int_fast8_t Terminal_Process(void)
 		{
 			Buffer[NumberOfByteReceived] = SerialTempData;
 			NumberOfByteReceived++;
-			return FALSE;
+			return U_FALSE;
 		}
 
 	}

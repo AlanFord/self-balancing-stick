@@ -1,16 +1,24 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// \file led.h
-/// Author: Ronald Sousa (@Opticalworm)
+/// Author: Alan Ford
+/// 	Derived from work by Ronald Sousa (@Opticalworm)
 ////////////////////////////////////////////////////////////////////////////////
 
 #ifndef __LED_H__
 #define __LED_H__
 
-	#include "universal.h"
+#include "universal.h"
+#include "Nodate.h"
 
-	void Led_Init(void);
-	void Led_On(void);
-	void Led_Off(void);
-	void Led_Toggle(void);
+class LED {
+	uint8_t 	led_pin;
+	GPIO_ports 	led_port;
+	bool        pin_state = false;
+public:
+	LED(GPIO_ports led_port, uint8_t led_pin);
+	void On(void);
+	void Off(void);
+	void Toggle(void);
+};
 
 #endif
