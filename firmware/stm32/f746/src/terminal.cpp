@@ -104,8 +104,7 @@ static void DisplaySystemInformation(void)
 ///////////////////////////////////////////////////////////////////////////////
 void Terminal_Init(void)
 {
-    //Led_Init();
-    Tick_init();
+    Tick::Init();
 	SerialPort::Open(115200);
 
     NumberOfByteReceived = 0;

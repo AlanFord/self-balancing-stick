@@ -13,16 +13,11 @@
 /////////////////////////////////////////////////////////////////////////
 #define TIMER_FREQUENCY_HZ 1000
 
-/////////////////////////////////////////////////////////////////////////
-/// \brief Current system tick count since boot-up.
-/// \note tick is expected to overflow.
-/////////////////////////////////////////////////////////////////////////
-static volatile uint32_t TickCounter;
 
 /////////////////////////////////////////////////////////////////////////
 /// \brief setup the ARM M0 tick counter to trigger every 1ms
 /////////////////////////////////////////////////////////////////////////
- void Tick_init(void)
+ void Tick::Init(void)
 {
     // configure the system tick so that it trigger every one ms
   //SysTick_Config(SystemCoreClock / TIMER_FREQUENCY_HZ);
@@ -47,26 +42,9 @@ static volatile uint32_t TickCounter;
 /////////////////////////////////////////////////////////////////////////
 /// \brief this is a blocking delay.
 ///
-/// \code
-/// #include "common.h"
-/// #include "MCU/led.h"
-/// #include "MCU/tick.h"
-///
-/// void main(void) {
-///
-///     Led_Init();
-///     Tick_init();
-///
-///     for( ;;) {
-///       Tick_DelayMs(1000); // delay 1s;
-///       Led_Toggle();
-///     }
-///}
-/// \endcode
-///
 /// \param delayMs how long to delay for.
 /////////////////////////////////////////////////////////////////////////
-void Tick_DelayMs(uint32_t delayMs)
+void Tick::DelayMs(uint32_t delayMs)
 {
   uint32_t StartTickValue;
 
@@ -121,7 +99,7 @@ void Tick_DelayMs(uint32_t delayMs)
 ///          0 = not reached the desire delay time.
 ///         -1 = config point is null
 /////////////////////////////////////////////////////////////////////////
-int_fast8_t Tick_DelayMs_NonBlocking(uint_fast8_t reset, TickType * config)
+int_fast8_t Tick::DelayMs_NonBlocking(uint_fast8_t reset, TickType * config)
 {
     uint32_t LapsedMs = 0;
 
@@ -146,16 +124,3 @@ int_fast8_t Tick_DelayMs_NonBlocking(uint_fast8_t reset, TickType * config)
     return U_TRUE; // time has lapsed
 
 }
-
-/////////////////////////////////////////////////////////////////////////
-/// \brief ARM M0 hardware interrupt. This should trigger every
-/// 1 ms and update TickCounter.
-///
-/// \sa TickCounter
-/////////////////////////////////////////////////////////////////////////
-/*
-void SysTick_Handler(void)
-{
-    TickCounter++;
-}
-*/
