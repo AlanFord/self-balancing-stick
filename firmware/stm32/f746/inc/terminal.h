@@ -10,4 +10,4 @@
 	void Terminal_Init(void);
 	uint_fast8_t Terminal_Process(void);
 
-#endif // __TERMINAL_H__
+#endif /* __TERMINAL_H__ */

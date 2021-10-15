@@ -2,22 +2,19 @@
 ///	\file main.c
 ///	\brief This is the main program code.
 ///
-///	\author Ronald Sousa (Opticalworm)
+///	\author Alan Ford
 /////////////////////////////////////////////////////////////////////////
 #include "universal.h"
 #include "terminal.h"
 
 
-/////////////////////////////////////////////////////////////////////////
-///	\brief the first user code function to be called after the ARM M0
-///	has initial.
-/////////////////////////////////////////////////////////////////////////
 int main(void)
 {
     Terminal_Init();
 
-    for ( ;; )
-    {
+	while (1) {
+		// Everything from here down should be non-blocking
     	Terminal_Process();
+		// Do Stuff!
     }
 }

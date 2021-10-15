@@ -27,4 +27,4 @@ public:
 	static int_fast8_t DelayMs_NonBlocking(uint_fast8_t reset, TickType * config);
 	static void DelayMs(uint32_t delayMs);
 };
-#endif
+#endif /* __TICK_H__ */
