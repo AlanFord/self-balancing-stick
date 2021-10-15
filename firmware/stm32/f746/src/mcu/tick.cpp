@@ -124,3 +124,16 @@ int_fast8_t Tick::DelayMs_NonBlocking(uint_fast8_t reset, TickType * config)
     return U_TRUE; // time has lapsed
 
 }
+
+/////////////////////////////////////////////////////////////////////////
+/// \brief return the number of mili-seconds since power up.
+///
+/// \return number of mili-seconds.
+///
+/// \note the tick counter is expected to overflow and therefore code
+/// using the tick value should take this into account.
+/////////////////////////////////////////////////////////////////////////
+uint32_t Tick::GetMs(void)
+{
+	return McuCore::getSysTick();
+}
