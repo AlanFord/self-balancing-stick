@@ -24,6 +24,7 @@ class Tick {
 	static volatile uint32_t TickCounter;
 public:
 	static void Init(void);
+	static uint32_t GetMs(void);
 	static int_fast8_t DelayMs_NonBlocking(uint_fast8_t reset, TickType * config);
 	static void DelayMs(uint32_t delayMs);
 };

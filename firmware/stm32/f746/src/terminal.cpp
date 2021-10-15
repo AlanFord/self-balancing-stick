@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// \file Terminal.c
 ///
-///	\author Ronald Sousa @Opticalworm
+///	\author Alan Ford
 ///////////////////////////////////////////////////////////////////////////////
 //#include "Nodate.h"
 #include "universal.h"
@@ -157,8 +157,11 @@ int shell_process(char *cmd_line)
 int_fast8_t Terminal_Process(void) {
 	if (serve_command_prompt(Buffer, TERMINAL_BUFFER_SIZE, "pencil> ") > 0)
 	{
-		shell_process(Buffer);
+		if (shell_process(Buffer) == SHELL_PROCESS_OK) {
+			return U_TRUE;
+		}
 	}
+	return U_FALSE;
 }
 
 

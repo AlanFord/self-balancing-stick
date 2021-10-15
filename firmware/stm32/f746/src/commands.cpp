@@ -1,3 +1,4 @@
+#include "tick.h"
 #include "commands.h"
 #include <string.h>
 
@@ -56,39 +57,39 @@ int shell_cmd_list(shell_cmd_args *args)
 		{
 			for (int i = 0; i < pencil_cmds.count; i++) // -2 -> don't list CONNECT, DISCONNECT
 			{
-				cio_printf("%s --> %s\r\n", pencil_cmds.cmds[i].cmd, pencil_cmds.cmds[i].desc);
+				//cio_printf("%s --> %s\r\n", pencil_cmds.cmds[i].cmd, pencil_cmds.cmds[i].desc);
 			}
 		}
 		else if (strcmp(args->args[0].val, "inputs") == 0)
 		{
-			for (int i = 0; i < inputs.count; i++)
-			{
-				//cio_printf("%s\r\n", inputs.elements[i].name);
-			}
+			//for (int i = 0; i < inputs.count; i++)
+			//{
+			//	//cio_printf("%s\r\n", inputs.elements[i].name);
+			//}
 
 		}
 		else if (strcmp(args->args[0].val, "outputs") == 0)
 		{
-			for (int i = 0; i < outputs.count; i++)
-			{
+			//for (int i = 0; i < outputs.count; i++)
+			//{
 				//cio_printf("%s\r\n", outputs.elements[i].name);
-			}
+			//}
 
 		}
 		else if (strcmp(args->args[0].val, "options") == 0)
 		{
-			for (int i = 0; i < options.count; i++)
-			{
+			//for (int i = 0; i < options.count; i++)
+			//{
 				//cio_printf("%s\r\n", options.elements[i].name);
-			}
+			//}
 
 		}
 		else if (strcmp(args->args[0].val, "flags") == 0)
 		{
-			for (int i = 0; i < flags.count; i++)
-			{
+			//for (int i = 0; i < flags.count; i++)
+			//{
 				//cio_printf("%s\r\n", flags.elements[i].name);
-			}
+			//}
 
 		}
 		else
@@ -102,7 +103,7 @@ int shell_cmd_list(shell_cmd_args *args)
 
 int shell_cmd_deviceinfo(shell_cmd_args *args)
 {
-	print("Device Type: F0-Discovery Demo\r\n"
+	printf("Device Type: F0-Discovery Demo\r\n"
 			  "Hardware Revision: 1.0\r\n"
 			  "Firmware Version: 1.8\r\n"
 			  "Build date: " __DATE__ "\r\n"
@@ -112,12 +113,13 @@ int shell_cmd_deviceinfo(shell_cmd_args *args)
 
 int shell_cmd_ping(shell_cmd_args *args)
 {
-	print("pong\r\n");
+	printf("pong\r\n");
 	return 0;
 }
 
 int shell_cmd_get(shell_cmd_args *args)
 {
+	/*
 	for (int i = 0; i < inputs.count; i++)
 	{
 		if (strcmp(args->args[0].val, inputs.elements[i].name) == 0)
@@ -149,33 +151,33 @@ int shell_cmd_get(shell_cmd_args *args)
 			//printf("%i\r\n", GPIO_ReadOutputDataBit(GPIO_PORT[outputs.elements[i].value], GPIO_PIN[outputs.elements[i].value]));
 			return 0;
 		}
-	}
+	} */
 	return 0;
 }
 
 int shell_cmd_enable(shell_cmd_args *args)
-{
+{ /*
 	for (int i = 0; i < options.count; i++)
 	{
-		if (strcmp(args->args[0].val, options.elements[i].name) == 0)
-		{
-			options.elements[i].value = 1;
-			return 0;
-		}
+		//if (strcmp(args->args[0].val, options.elements[i].name) == 0)
+		//{
+		//	options.elements[i].value = 1;
+		//	return 0;
+		//}
 	}
 	for (int i = 0; i < outputs.count; i++)
 	{
-		if (strcmp(args->args[0].val, outputs.elements[i].name) == 0)
-		{
-			//STM_EVAL_LEDOn(outputs.elements[i].value);
-			return 0;
-		}
-	}
+		//if (strcmp(args->args[0].val, outputs.elements[i].name) == 0)
+		//{
+		//	//STM_EVAL_LEDOn(outputs.elements[i].value);
+		//	return 0;
+		//}
+	} */
 	return 0;
 }
 
 int shell_cmd_disable(shell_cmd_args *args)
-{
+{ /*
 	for (int i = 0; i < options.count; i++)
 	{
 		if (strcmp(args->args[0].val, options.elements[i].name) == 0)
@@ -191,12 +193,12 @@ int shell_cmd_disable(shell_cmd_args *args)
 			//STM_EVAL_LEDOff(outputs.elements[i].value);
 			return 0;
 		}
-	}
+	} */
 	return 0;
 }
 
 int shell_cmd_toggle(shell_cmd_args *args)
-{
+{ /*
 	for (int i = 0; i < outputs.count; i++)
 	{
 		if (strcmp(args->args[0].val, outputs.elements[i].name) == 0)
@@ -204,12 +206,13 @@ int shell_cmd_toggle(shell_cmd_args *args)
 			//STM_EVAL_LEDToggle(outputs.elements[i].value);
 			return 0;
 		}
-	}
+	} */
 	return 0;
 }
 
 int shell_cmd_uptime(shell_cmd_args *args)
 {
+	uint32_t uptime = Tick::GetMs();
 	int seconds = ((int)(uptime)) % 60;
 	int minutes = ((int)(uptime / (60))) % 60;
 	int hours   = ((int)(uptime / (60 * 60))) % 24;
