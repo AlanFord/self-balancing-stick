@@ -9,5 +9,5 @@
 
 	void Terminal_Init(void);
 	uint_fast8_t Terminal_Process(void);
-
+	void DisplaySystemInformation(void);
 #endif /* __TERMINAL_H__ */

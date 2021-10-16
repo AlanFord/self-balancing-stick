@@ -6,11 +6,12 @@
 ///		Derived from work by Ronald Sousa (Opticalworm)
 /////////////////////////////////////////////////////////////////////////
 #include "nodate.h"
+#include "printf.h"
 #include "mcu/SerialPort.h"
 #include "fifo.h"
 
 // nucleo-f746zg
-#define ACTIVE_UART (USART_3)
+#define ACTIVE_UART USART_3
 #define UART_TX_PORT GPIO_PORT_D
 #define UART_TX_PIN  8
 #define UART_TX_AF   7
@@ -71,6 +72,7 @@ uint_fast8_t SerialPort::Open(const uint32_t baudrate)
 	if(!IsOpenFlag)
 	{
 		USART::startUart(ACTIVE_UART, UART_TX_PORT, UART_TX_PIN, UART_TX_AF, UART_RX_PORT, UART_RX_PIN, UART_RX_AF, baudrate, InterruptRead);
+		IO::setStdOutTarget(USART_3);
 		IsOpenFlag = U_TRUE;
 	}
 

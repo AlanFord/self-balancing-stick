@@ -3,7 +3,7 @@
 ///
 ///	\author Alan Ford
 ///////////////////////////////////////////////////////////////////////////////
-//#include "Nodate.h"
+#include "printf.h"
 #include "universal.h"
 #include "mcu/led.h"
 #include "MCU/SerialPort.h"
@@ -41,7 +41,7 @@ static const char SystemMessageString[] = "-----------------------------------\r
 /// \brief Send the system information to the computer. This first clear the
 ///	computer terminal screen.
 ///////////////////////////////////////////////////////////////////////////////
-static void DisplaySystemInformation(void)
+void DisplaySystemInformation(void)
 {
 	SerialPort::SendByte(0x0C);  // clear terminal
 	SerialPort::SendString(&SystemMessageString[0]);
