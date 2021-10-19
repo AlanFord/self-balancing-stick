@@ -3,13 +3,13 @@
 ///
 ///	\author Alan Ford
 ///////////////////////////////////////////////////////////////////////////////
-#include "printf.h"
 #include "universal.h"
 #include "mcu/led.h"
 #include "MCU/SerialPort.h"
 #include "MCU/tick.h"
 #include "shell.h"
 #include "commands.h"
+#include "printf.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Defines our terminal buffer size which in turn set the longest command
@@ -104,6 +104,12 @@ int serve_command_prompt(char *buffer, int bufferLength, const char *prompt)
 			printf("^[\r\n");
 			initialized = false;
 			break;
+				
+		case 0x7f: // 127, or delete
+				if (p > buffer)
+					*--p = '\0';
+				printf("%c", c);
+				break;
 
 		default:
 			if (p < buffer + bufferLength - 1 && c >= ' ' && c < 127)
@@ -113,6 +119,7 @@ int serve_command_prompt(char *buffer, int bufferLength, const char *prompt)
 				printf("%c", c);
 			}
 			else
+				// if the buffer would overflow, simply echo back to the sender
 				printf("%c", c);
 			break;
 		}
