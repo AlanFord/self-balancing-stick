@@ -1,0 +1,4 @@
+
+The I2Cdev files were converted from using the HAL library to the Nodate library.
+
+Conversion consisted of:

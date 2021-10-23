@@ -41,10 +41,16 @@ APP_CPP_FILES = $(wildcard src/*.cpp)
 APP_CPP_FILES += $(wildcard src/mcu/*.cpp)
 APP_C_FILES = $(wildcard src/*.c)
 APP_C_FILES += $(wildcard src/mcu/*.c)
+APP_C_FILES += $(wildcard lib/I2Cdev/I2Cdev/*.c)
+APP_C_FILES += $(wildcard lib/I2Cdev/MPU6050/*.c)
+APP_C_FILES += $(wildcard lib/libshell/*.c)
 LIB_INCLUDES += -I $(APPFOLDER)/inc
 LIB_INCLUDES += -I $(APPFOLDER)/inc/mcu
+LIB_INCLUDES += -I $(APPFOLDER)/lib/libshell
+LIB_INCLUDES += -I $(APPFOLDER)/lib/I2Cdev/I2Cdev
+LIB_INCLUDES += -I $(APPFOLDER)/lib/I2Cdev/MPU6050
 
-APP_FLAGS += -O0
+#APP_FLAGS += -O0
 
 
 # Set Nodate modules to enable.
