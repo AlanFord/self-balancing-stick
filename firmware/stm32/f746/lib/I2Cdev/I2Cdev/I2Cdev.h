@@ -41,14 +41,15 @@ THE SOFTWARE.
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include "nodate.h"
 
 // TODO: include depending on chip family
 //#include "stm32f1xx_hal.h"
 //#include "stm32f2xx_hal.h"
 //#include "stm32f3xx_hal.h"
-#include "stm32f4xx_hal.h"
+//#include "stm32f4xx_hal.h"
 
-typedef int bool;
+//typedef int bool;
 #define true 1
 #define false 0
 
@@ -58,6 +59,7 @@ uint16_t I2Cdev_readTimeout;
 #define I2CDEV_DEFAULT_READ_TIMEOUT     1000
 
 //void I2Cdev_init(I2C_HandleTypeDef * hi2c);
+void I2Cdev_init(I2C_devices * hi2c);
 
 uint8_t I2Cdev_readBit(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint8_t *data, uint16_t timeout);
 uint8_t I2Cdev_readBitW(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint16_t *data, uint16_t timeout);
