@@ -175,9 +175,10 @@ uint8_t I2Cdev_readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8
     uint16_t tout = timeout > 0 ? timeout : I2CDEV_DEFAULT_READ_TIMEOUT;
 
     //HAL_I2C_Master_Transmit(I2Cdev_hi2c, devAddr << 1, &regAddr, 1, tout);
-	I2C::sendToSlaveByte(I2Cdev_hi2c, regAddr);
+	//I2C::sendToSlaveByte(*I2Cdev_hi2c, regAddr);
+    I2C::sendToSlave(*I2Cdev_hi2c, &regAddr, 1);
     //if (HAL_I2C_Master_Receive(I2Cdev_hi2c, devAddr << 1, data, length, tout) == HAL_OK) return length;
-	if (I2C::receiveFromSlave(II2Cdev_hi2c, length, data) == true) return length;
+	if (I2C::receiveFromSlave(*I2Cdev_hi2c, length, data) == true) return length;
     return -1;
 }
 
@@ -194,9 +195,10 @@ uint8_t I2Cdev_readWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint1
     uint16_t tout = timeout > 0 ? timeout : I2CDEV_DEFAULT_READ_TIMEOUT;
 
     //HAL_I2C_Master_Transmit(I2Cdev_hi2c, devAddr << 1, &regAddr, 1, tout);
-	I2C::sendToSlaveByte(I2Cdev_hi2c, regAddr);
+	//I2C::sendToSlaveByte(*I2Cdev_hi2c, regAddr);
+    I2C::sendToSlave(*I2Cdev_hi2c, &regAddr, 1);
     //if (HAL_I2C_Master_Receive(I2Cdev_hi2c, devAddr << 1, (uint8_t *)data, length*2, tout) == HAL_OK)
-	if (I2C::receiveFromSlave(II2Cdev_hi2c, length*2, data) == true)
+	if (I2C::receiveFromSlave(*I2Cdev_hi2c, length*2, (uint8_t *)data) == true)
     return length;
     else
         return -1;
@@ -331,7 +333,7 @@ uint16_t I2Cdev_writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uin
 {
     //HAL_StatusTypeDef status = HAL_I2C_Mem_Write(I2Cdev_hi2c, devAddr << 1, regAddr, I2C_MEMADD_SIZE_8BIT, pData, length, 1000);
 	//return status == HAL_OK;
-	status = I2C::receiveFromSlave(I2Cdev_hi2c, length, pData);
+	bool status = I2C::receiveFromSlave(*I2Cdev_hi2c, length, pData);
 	return status == true;
 }
 
@@ -346,6 +348,6 @@ uint16_t I2Cdev_writeWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uin
 {
     //HAL_StatusTypeDef status = HAL_I2C_Mem_Write(I2Cdev_hi2c, devAddr << 1, regAddr, I2C_MEMADD_SIZE_8BIT, (uint8_t *)pData, sizeof(uint16_t) * length, 1000);
     //return status == HAL_OK;
-	status = I2C::receiveFromSlave(I2Cdev_hi2c, sizeof(uint16_t) * length, pData);
+	bool status = I2C::receiveFromSlave(*I2Cdev_hi2c, sizeof(uint16_t) * length, (uint8_t *)pData);
 	return status == true;
 }

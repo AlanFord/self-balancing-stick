@@ -39,6 +39,8 @@ OUTPUT := controller
 # Add files to include for compilation to these variables.
 APP_CPP_FILES = $(wildcard src/*.cpp) 
 APP_CPP_FILES += $(wildcard src/mcu/*.cpp)
+APP_CPP_FILES += $(wildcard lib/I2Cdev/I2Cdev/*.cpp)
+APP_CPP_FILES += $(wildcard lib/I2Cdev/MPU6050/*.cpp)
 APP_C_FILES = $(wildcard src/*.c)
 APP_C_FILES += $(wildcard src/mcu/*.c)
 APP_C_FILES += $(wildcard lib/I2Cdev/I2Cdev/*.c)

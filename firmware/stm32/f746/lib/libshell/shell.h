@@ -99,7 +99,7 @@ typedef struct {
      const char		*desc;
 
      /**
-      * Functino called when executing the commmand
+      * Function called when executing the commmand
       */
      int (*func)(shell_cmd_args *args);
 } shell_cmd;

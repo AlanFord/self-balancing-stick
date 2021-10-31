@@ -33,15 +33,11 @@ THE SOFTWARE.
 #ifndef _I2CDEV_H_
 #define _I2CDEV_H_
 
-#ifdef __cplusplus
- extern "C" {
-#endif /* __cplusplus */
 
-
+#include "nodate.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include "nodate.h"
 
 // TODO: include depending on chip family
 //#include "stm32f1xx_hal.h"
@@ -53,7 +49,7 @@ THE SOFTWARE.
 #define true 1
 #define false 0
 
-uint16_t I2Cdev_readTimeout;
+//uint16_t I2Cdev_readTimeout;
 
 // 1000ms default read timeout (modify with "I2Cdev::readTimeout = [ms];")
 #define I2CDEV_DEFAULT_READ_TIMEOUT     1000
@@ -80,8 +76,5 @@ uint16_t I2Cdev_writeBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uin
 uint16_t I2Cdev_writeWords(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint16_t *data);
 
  
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* _I2CDEV_H_ */
