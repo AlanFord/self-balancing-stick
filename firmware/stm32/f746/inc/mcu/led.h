@@ -21,4 +21,4 @@ public:
 	void Toggle(void);
 };
 
-#endif
+#endif /* __LED_H__ */

@@ -70,7 +70,7 @@ void FIFO_Initialiser(void)
 }
 
 ////////////////////////////////////////////////////////
-/// \brief Read one bute from the buffer. Return false
+/// \brief Read one byte from the buffer. Return false
 ///	if we didn't.
 ///
 ///	\param outputDataPointer pointer to return the read value.

@@ -57,4 +57,4 @@
         int8_t      i8_t[8];    ///< singed 8bit.
     }DataConverter;
 
-#endif
+#endif /* __COMMON_H__ */

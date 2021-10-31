@@ -22,5 +22,5 @@ public:
 	static uint_fast8_t    SendArray(const uint8_t *source, uint32_t length); ///< send an array of data
 };
 
-#endif
+#endif /* __SERIAL_PORT_H__ */
 
