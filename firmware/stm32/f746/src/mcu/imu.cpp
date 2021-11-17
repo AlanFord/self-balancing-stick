@@ -2,6 +2,8 @@
 #include "nodate.h"
 #include "I2Cdev.h"
 #include "imu.h"
+#define MPU6050_INCLUDE_DMP_MOTIONAPPS20
+#include "MPU6050.h"
 
 const uint8_t MPU6050_ADDR = 0xD0;
 
@@ -35,9 +37,9 @@ bool initialize_imu(void) {
 	I2C::setSlaveTarget(I2C_device, MPU6050_ADDR);
 	// initialize the I2Cdev library
 	I2Cdev_init(&I2C_device);
-	mpu_initialize();
-	if (!mpu_testConnection()) return false;
-	if (mpu.dmpInitialize() != 0) return false;                                                // load and configure the DMP
+	MPU6050_initialize();
+	if (!MPU6050_testConnection()) return false;
+	if (MPU6050_dmpInitialize() != 0) return false;                                                // load and configure the DMP
 
 	// supply your own gyro offsets here, scaled for min sensitivity
 	MPU6050_setXGyroOffset(233);
@@ -50,7 +52,7 @@ bool initialize_imu(void) {
 	dmpReady = true;                          // set our DMP Ready flag so the main loop() function knows it's okay to use it
 	packetSize = dmpGetFIFOPacketSize();  // get expected DMP packet size for later comparison
 
-	printf"IMU Setup Complete");
+	printf("IMU Setup Complete");
 	//TODO: move this after terminal initialization?
 	MPU6050_resetFIFO();
 	

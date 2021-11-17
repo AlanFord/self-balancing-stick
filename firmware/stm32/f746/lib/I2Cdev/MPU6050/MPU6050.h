@@ -45,6 +45,7 @@ THE SOFTWARE.
 #ifndef __arm__
 #include <avr/pgmspace.h>
 #else
+#include "helper_3dmath.h"
 #define PROGMEM /* empty */
 #define pgm_read_byte(x) (*(x))
 #define pgm_read_word(x) (*(x))
