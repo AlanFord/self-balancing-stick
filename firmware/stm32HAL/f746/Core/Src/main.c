@@ -23,7 +23,6 @@
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
-#include "terminal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -100,6 +99,7 @@ int main(void)
   //initialize_imu();
   //initialize_left_motor();
   //initialize_right_motor();
+  //HAL_TIM_Encoder_Start_IT(&htim1,htim1.Channel)
   /* USER CODE END 2 */
 
   /* Infinite loop */
