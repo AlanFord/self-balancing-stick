@@ -35,7 +35,13 @@ THE SOFTWARE.
 // MotionApps 2.0 DMP implementation, built using the MPU-6050EVB evaluation board
 #define MPU6050_INCLUDE_DMP_MOTIONAPPS20
 
+#include "stm32f7xx_hal.h"
 #include "MPU6050_6Axis_MotionApps20.h"
+#include <math.h>
+#include <cstring>
+#include <cstdio>
+#include <iostream>
+#define delay(x) HAL_Delay(x)
 
 // Tom Carpenter's conditional PROGMEM code
 // http://forum.arduino.cc/index.php?topic=129407.0
@@ -100,10 +106,14 @@ THE SOFTWARE.
 
 //#define DEBUG
 #ifdef DEBUG
-    #define DEBUG_PRINT(x) Serial.print(x)
-    #define DEBUG_PRINTF(x, y) Serial.print(x, y)
-    #define DEBUG_PRINTLN(x) Serial.println(x)
-    #define DEBUG_PRINTLNF(x, y) Serial.println(x, y)
+    //#define DEBUG_PRINT(x) Serial.print(x)
+    //#define DEBUG_PRINTF(x, y) Serial.print(x, y)
+    //#define DEBUG_PRINTLN(x) Serial.println(x)
+    //#define DEBUG_PRINTLNF(x, y) Serial.println(x, y)
+	#define DEBUG_PRINT(x) std::cerr << (x)
+	//#define DEBUG_PRINTF(x, y) Serial.print(x, y)
+	#define DEBUG_PRINTLN(x) std::cerr << (x) << std::endl
+	//#define DEBUG_PRINTLNF(x, y) Serial.println(x, y)
 #else
     #define DEBUG_PRINT(x)
     #define DEBUG_PRINTF(x, y)
@@ -271,7 +281,7 @@ static const unsigned char dmpMemory[MPU6050_DMP_CODE_SIZE] PROGMEM = {
 // I Simplified this:
 uint8_t MPU6050_6Axis_MotionApps20::dmpInitialize() {
 	// reset device
-	DEBUG_PRINTLN(F("\n\nResetting MPU6050..."));
+	DEBUG_PRINTLN("\n\nResetting MPU6050...");
 	reset();
 	delay(30); // wait after reset
 
@@ -287,51 +297,51 @@ uint8_t MPU6050_6Axis_MotionApps20::dmpInitialize() {
 	// get MPU hardware revision
 	setMemoryBank(0x10, true, true);
 	setMemoryStartAddress(0x06);
-	DEBUG_PRINTLN(F("Checking hardware revision..."));
-	DEBUG_PRINT(F("Revision @ user[16][6] = "));
+	DEBUG_PRINTLN("Checking hardware revision...");
+	DEBUG_PRINT("Revision @ user[16][6] = ");
 	DEBUG_PRINTLN(readMemoryByte());
-	DEBUG_PRINTLN(F("Resetting memory bank selection to 0..."));
+	DEBUG_PRINTLN("Resetting memory bank selection to 0...");
 	setMemoryBank(0, false, false);
 
 	// check OTP bank valid
-	DEBUG_PRINTLN(F("Reading OTP bank valid flag..."));
-	DEBUG_PRINT(F("OTP bank is "));
-	DEBUG_PRINTLN(getOTPBankValid() ? F("valid!") : F("invalid!"));
+	DEBUG_PRINTLN("Reading OTP bank valid flag...");
+	DEBUG_PRINT("OTP bank is ");
+	DEBUG_PRINTLN(getOTPBankValid() ? "valid!" : "invalid!");
 
 	// setup weird slave stuff (?)
-	DEBUG_PRINTLN(F("Setting slave 0 address to 0x7F..."));
+	DEBUG_PRINTLN("Setting slave 0 address to 0x7F...");
 	setSlaveAddress(0, 0x7F);
-	DEBUG_PRINTLN(F("Disabling I2C Master mode..."));
+	DEBUG_PRINTLN("Disabling I2C Master mode...");
 	setI2CMasterModeEnabled(false);
-	DEBUG_PRINTLN(F("Setting slave 0 address to 0x68 (self)..."));
+	DEBUG_PRINTLN("Setting slave 0 address to 0x68 (self)...");
 	setSlaveAddress(0, 0x68);
-	DEBUG_PRINTLN(F("Resetting I2C Master control..."));
+	DEBUG_PRINTLN("Resetting I2C Master control...");
 	resetI2CMaster();
 	delay(20);
-	DEBUG_PRINTLN(F("Setting clock source to Z Gyro..."));
+	DEBUG_PRINTLN("Setting clock source to Z Gyro...");
 	setClockSource(MPU6050_CLOCK_PLL_ZGYRO);
 
-	DEBUG_PRINTLN(F("Setting DMP and FIFO_OFLOW interrupts enabled..."));
+	DEBUG_PRINTLN("Setting DMP and FIFO_OFLOW interrupts enabled...");
 	setIntEnabled(1<<MPU6050_INTERRUPT_FIFO_OFLOW_BIT|1<<MPU6050_INTERRUPT_DMP_INT_BIT);
 
-	DEBUG_PRINTLN(F("Setting sample rate to 200Hz..."));
+	DEBUG_PRINTLN("Setting sample rate to 200Hz...");
 	setRate(4); // 1khz / (1 + 4) = 200 Hz
 
-	DEBUG_PRINTLN(F("Setting external frame sync to TEMP_OUT_L[0]..."));
+	DEBUG_PRINTLN("Setting external frame sync to TEMP_OUT_L[0]...");
 	setExternalFrameSync(MPU6050_EXT_SYNC_TEMP_OUT_L);
 
-	DEBUG_PRINTLN(F("Setting DLPF bandwidth to 42Hz..."));
+	DEBUG_PRINTLN("Setting DLPF bandwidth to 42Hz...");
 	setDLPFMode(MPU6050_DLPF_BW_42);
 
-	DEBUG_PRINTLN(F("Setting gyro sensitivity to +/- 2000 deg/sec..."));
+	DEBUG_PRINTLN("Setting gyro sensitivity to +/- 2000 deg/sec...");
 	setFullScaleGyroRange(MPU6050_GYRO_FS_2000);
 
 	// load DMP code into memory banks
-	DEBUG_PRINT(F("Writing DMP code to MPU memory banks ("));
+	DEBUG_PRINT("Writing DMP code to MPU memory banks (");
 	DEBUG_PRINT(MPU6050_DMP_CODE_SIZE);
-	DEBUG_PRINTLN(F(" bytes)"));
+	DEBUG_PRINTLN(" bytes)");
 	if (!writeProgMemoryBlock(dmpMemory, MPU6050_DMP_CODE_SIZE)) return 1; // Failed
-	DEBUG_PRINTLN(F("Success! DMP code written and verified."));
+	DEBUG_PRINTLN("Success! DMP code written and verified.");
 
 	// Set the FIFO Rate Divisor int the DMP Firmware Memory
 	unsigned char dmpUpdate[] = {0x00, MPU6050_DMP_FIFO_RATE_DIVISOR};
@@ -342,35 +352,35 @@ uint8_t MPU6050_6Axis_MotionApps20::dmpInitialize() {
 	//write start address LSB into register
 	setDMPConfig2(0x00);
 
-	DEBUG_PRINTLN(F("Clearing OTP Bank flag..."));
+	DEBUG_PRINTLN("Clearing OTP Bank flag...");
 	setOTPBankValid(false);
 
-	DEBUG_PRINTLN(F("Setting motion detection threshold to 2..."));
+	DEBUG_PRINTLN("Setting motion detection threshold to 2...");
 	setMotionDetectionThreshold(2);
 
-	DEBUG_PRINTLN(F("Setting zero-motion detection threshold to 156..."));
+	DEBUG_PRINTLN("Setting zero-motion detection threshold to 156...");
 	setZeroMotionDetectionThreshold(156);
 
-	DEBUG_PRINTLN(F("Setting motion detection duration to 80..."));
+	DEBUG_PRINTLN("Setting motion detection duration to 80...");
 	setMotionDetectionDuration(80);
 
-	DEBUG_PRINTLN(F("Setting zero-motion detection duration to 0..."));
+	DEBUG_PRINTLN("Setting zero-motion detection duration to 0...");
 	setZeroMotionDetectionDuration(0);
-	DEBUG_PRINTLN(F("Enabling FIFO..."));
+	DEBUG_PRINTLN("Enabling FIFO...");
 	setFIFOEnabled(true);
 
-	DEBUG_PRINTLN(F("Resetting DMP..."));
+	DEBUG_PRINTLN("Resetting DMP...");
 	resetDMP();
 
-	DEBUG_PRINTLN(F("DMP is good to go! Finally."));
+	DEBUG_PRINTLN("DMP is good to go! Finally.");
 
-	DEBUG_PRINTLN(F("Disabling DMP (you turn it on later)..."));
+	DEBUG_PRINTLN("Disabling DMP (you turn it on later)...");
 	setDMPEnabled(false);
 
-	DEBUG_PRINTLN(F("Setting up internal 42-byte (default) DMP packet buffer..."));
+	DEBUG_PRINTLN("Setting up internal 42-byte (default) DMP packet buffer...");
 	dmpPacketSize = 42;
 
-	DEBUG_PRINTLN(F("Resetting FIFO and clearing INT status one last time..."));
+	DEBUG_PRINTLN("Resetting FIFO and clearing INT status one last time...");
 	resetFIFO();
 	getIntStatus();
 
@@ -557,9 +567,9 @@ uint8_t MPU6050_6Axis_MotionApps20::dmpGetYawPitchRoll(float *data, Quaternion *
     data[2] = atan2(gravity -> y , gravity -> z);
     if (gravity -> z < 0) {
         if(data[1] > 0) {
-            data[1] = PI - data[1]; 
+            data[1] = M_PI - data[1];
         } else { 
-            data[1] = -PI - data[1];
+            data[1] = -M_PI - data[1];
         }
     }
     return 0;

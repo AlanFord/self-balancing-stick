@@ -5,10 +5,8 @@
  *      Author: alan
  */
 
-#include "common.h"
 #include "tim.h"
 #include "imu.hpp"
-#include "MPU6050_6Axis_motionApps20.h"
 #include <math.h>
 #include <stdio.h>
 
@@ -18,24 +16,31 @@
 #define   theta_Filter              0.7
 #define   theta_Integral_Max        3.0
 #define   theta_Speed_Filter        0.7
-float   angle_Average_Filter      = 0.970;
-float   angle_Smoothed_Filter     = 0.997;
+#define   omega_Integral_Max        3.0
+#define   omega_Speed_Filter        0.7
+float angle_Average_Filter = 0.970;
+float angle_Smoothed_Filter = 0.997;
+float theta_Kt = 0.6;
+float theta_Ktd = 0;
+float omega_Kt = 0.6;
+float omega_Ktd = 1.0;
+float theta_Zero_Filter = 0.995;
+float omega_Zero_Filter = 0.986;
+#define   omega_Filter              0.7
 
-volatile uint16_t mpuInterrupt = FALSE; // indicates whether MPU interrupt pin has gone high
-uint16_t dmpReady = FALSE;     // set true if DMP init was successful
-uint16_t packetSize;           // expected DMP packet size (default is 42 bytes)
-uint8_t fifoBuffer[64];       // FIFO storage buffer
-MPU6050 mpu;                  // Creating object 'mpu', I think
 
 // these are determined here but used by the controller
-float           theta_Zero = 0;
-float           theta_Now = 0;
-float           theta_Integral = 0;
-float           theta_Speed_Now = 0;
-float           omega_Zero = 0;
-float           omega_Now = 0;
-float           omega_Integral = 0;
-float           omega_Speed_Now = 0;
+float theta_Zero = 0;
+float theta_Now = 0;
+float theta_Integral = 0;
+float theta_Speed_Now = 0;
+float omega_Zero = 0;
+float omega_Now = 0;
+float omega_Integral = 0;
+float omega_Speed_Now = 0;
+
+
+volatile uint16_t mpuInterrupt = FALSE; // indicates whether MPU interrupt pin has gone high
 
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
@@ -46,17 +51,14 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	}
 }
 
-void IMU_init() {
-	// IMU Setup
-	//Wire.begin();       // Join I2C bus
-	//TWBR = twbr_Value;  // 12 = 400kHz I2C clock (200kHz if CPU is 8MHz)
-	mpu.initialize();   // Initialize IMU
+IMU::IMU(I2C_HandleTypeDef * hi2c, uint8_t address=MPU6050_DEFAULT_ADDRESS)
+	: mpu(hi2c, address) {
 
 	printf(
 			mpu.testConnection() ?
 					"MPU6050 connection successful\n" :
 					"MPU6050 connection failed\n"); // verify connection
-	uint8_t devStatus = mpu.dmpInitialize();               // load and configure the DMP
+	uint8_t devStatus = mpu.dmpInitialize();       // load and configure the DMP
 
 	// supply your own gyro offsets here, scaled for min sensitivity
 	mpu.setXGyroOffset(233);
@@ -75,7 +77,7 @@ void IMU_init() {
 		// 2 = DMP configuration updates failed
 		// (if it's going to break, usually the code will be 1)
 		printf("DMP Initialization failed (code ");
-		printf("%u",devStatus);
+		printf("%u", devStatus);
 		printf(")");
 	}
 }
@@ -124,23 +126,21 @@ void IMU_init() {
 //      Positive Left Motor rotation ==> couter-clockwise shaft spin  => roll to the right => positive voltage ==> positive Theta ==> positive ypr[2]
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-void get_IMU_Values() {
-	Quaternion    q;                    // [w, x, y, z]         quaternion container
-	VectorFloat   gravity;              // [x, y, z]            gravity vector
-	float         ypr[3];               // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
-	static int     p = 0;
-	static int     p_Prev = 0;
-	static float           theta_Error = 0;
-	static float           omega_Error = 0;
-	static float           theta_Smoothed = 0;
-	static float           theta_Smoothed_Speed = 0;
-	static float           omega_Smoothed = 0;
-	static float           omega_Smoothed_Speed = 0;
-	static unsigned long   imu_Time_Now = 0;
-	static float           theta_Average = 0;
-
-
-
+void IMU::get_IMU_values(void) {
+	Quaternion q;                   // [w, x, y, z]         quaternion container
+	VectorFloat gravity;              // [x, y, z]            gravity vector
+	float ypr[3]; // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
+	static int p = 0;
+	static int p_Prev = 0;
+	static float theta_Error = 0;
+	static float omega_Error = 0;
+	static float theta_Smoothed = 0;
+	static float theta_Smoothed_Speed = 0;
+	static float omega_Smoothed = 0;
+	static float omega_Smoothed_Speed = 0;
+	static unsigned long imu_Time_Now = 0;
+	static float theta_Average = 0;
+	float omega_Average = 0;
 
 	///////////////////////////////////////////////////// IMU Comms ////////////////////////////////////////////////////////////////////////
 	if (!dmpReady) {
@@ -162,8 +162,8 @@ void get_IMU_Values() {
 	uint32_t time_IMU_Dif = __MICROS() - time_IMU_Prev;
 
 	mpuInterrupt = false;                                // reset interrupt flag
-	uint8_t mpuIntStatus = mpu.getIntStatus();                    // get INT_STATUS byte
-	uint16_t fifoCount = mpu.getFIFOCount();                    // get current FIFO count
+	uint8_t mpuIntStatus = mpu.getIntStatus();            // get INT_STATUS byte
+	uint16_t fifoCount = mpu.getFIFOCount();           // get current FIFO count
 
 	if ((mpuIntStatus & 0x10) || fifoCount >= 1024) { // check for overflow (this should never happen unless our code is too inefficient)
 		mpu.resetFIFO();                     // reset so we can continue cleanly
@@ -203,8 +203,8 @@ void get_IMU_Values() {
 	////////////////////////////////////////////////////////// Theta Calcs//////////////////////////////////////////////////////////////////////////////////////////
 
 	float theta_Prev = theta_Now;
-	float theta_Now_Unfiltered = round((ypr[2] * 180 / M_PI) * angle_Rounding_Value)
-			/ angle_Rounding_Value;    //undo
+	float theta_Now_Unfiltered = round(
+			(ypr[2] * 180 / M_PI) * angle_Rounding_Value) / angle_Rounding_Value; //undo
 	float theta_Now = (1 - theta_Filter) * (theta_Now_Unfiltered)
 			+ (theta_Filter * theta_Prev); //undo
 
@@ -233,7 +233,7 @@ void get_IMU_Values() {
 
 	float theta_Zero_Prev = theta_Zero;
 	if (p == 1) {                               // Automatic setpoint adjustment
-		theta_Zero_Unfiltered = theta_Zero - theta_Kt * theta_Error
+		float theta_Zero_Unfiltered = theta_Zero - theta_Kt * theta_Error
 				- theta_Ktd * theta_Smoothed_Speed;
 		theta_Zero = (1 - theta_Zero_Filter) * theta_Zero_Unfiltered
 				+ theta_Zero_Filter * theta_Zero_Prev;
@@ -242,10 +242,10 @@ void get_IMU_Values() {
 	}
 
 	//////////////////////////////////////////////////////////////// Omega Calcs//////////////////////////////////////////////////////////////////////////////////////
-	omega_Prev = omega_Now;
+	float omega_Prev = omega_Now;
 	//  omega_Now_Unfiltered = round((-ypr[1] * 180 / M_PI) * angle_Rounding_Value) / angle_Rounding_Value;    //undo
-	omega_Now_Unfiltered = round((ypr[1] * 180 / M_PI) * angle_Rounding_Value)
-			/ angle_Rounding_Value;    //undo
+	float omega_Now_Unfiltered = round(
+			(ypr[1] * 180 / M_PI) * angle_Rounding_Value) / angle_Rounding_Value; //undo
 	omega_Now = (1 - omega_Filter) * (omega_Now_Unfiltered)
 			+ omega_Filter * (omega_Prev); //undo
 	omega_Error = omega_Now - omega_Zero;
@@ -259,31 +259,29 @@ void get_IMU_Values() {
 		omega_Integral = -omega_Integral_Max;
 	}
 
-	omega_Speed_Prev = omega_Speed_Now;
+	float omega_Speed_Prev = omega_Speed_Now;
 	omega_Speed_Now = ((1 - omega_Speed_Filter) * (omega_Now - omega_Prev)
 			/ (imu_Time_Now - imu_Time_Prev) * 1000000.)
 			+ omega_Speed_Filter * omega_Speed_Prev; // Relative to absolute zero
-	omega_Average_Prev = omega_Average;
+	float omega_Average_Prev = omega_Average;
 	omega_Average = (1 - angle_Average_Filter) * (omega_Now)
 			+ (angle_Average_Filter * omega_Average_Prev);
 
-	omega_Smoothed_Prev = omega_Smoothed;
+	float omega_Smoothed_Prev = omega_Smoothed;
 	omega_Smoothed = (1 - angle_Smoothed_Filter) * omega_Now
 			+ angle_Smoothed_Filter * omega_Smoothed_Prev;
 	omega_Smoothed_Speed = (omega_Smoothed - omega_Smoothed_Prev)
 			/ (imu_Time_Now - imu_Time_Prev) * 1000000.;
 
-	omega_Zero_Prev = omega_Zero;
+	float omega_Zero_Prev = omega_Zero;
 	if (p == 1) {                               // Automatic setpoint adjustment
-		omega_Zero_Unfiltered = omega_Zero - omega_Kt * omega_Error
+		float omega_Zero_Unfiltered = omega_Zero - omega_Kt * omega_Error
 				- omega_Ktd * omega_Smoothed_Speed;
 		omega_Zero = (1 - omega_Zero_Filter) * omega_Zero_Unfiltered
 				+ omega_Zero_Filter * omega_Zero_Prev;
 	} else {
 		omega_Zero = omega_Average;
 	}
-
-}
 
 }
 

@@ -439,7 +439,7 @@ THE SOFTWARE.
 
 class MPU6050_Base {
     public:
-        MPU6050_Base(uint8_t address=MPU6050_DEFAULT_ADDRESS, void *wireObj=0);
+        MPU6050_Base(I2C_HandleTypeDef * hi2c, uint8_t address);
 
         void initialize();
         bool testConnection();
@@ -835,7 +835,7 @@ class MPU6050_Base {
 
     protected:
         uint8_t devAddr;
-        void *wireObj;
+        I2C_HandleTypeDef * hi2c;
         uint8_t buffer[14];
         uint32_t fifoTimeout = MPU6050_FIFO_DEFAULT_TIMEOUT;
 };
