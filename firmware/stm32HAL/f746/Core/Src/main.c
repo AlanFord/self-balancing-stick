@@ -26,7 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "terminal.h"
+#include "appEntry.hpp"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -96,20 +96,13 @@ int main(void)
   MX_TIM4_Init();
   MX_TIM5_Init();
   /* USER CODE BEGIN 2 */
-  Terminal_Init();
-  //initialize_imu();
-  //initialize_left_motor();
-  //initialize_right_motor();
-  //HAL_TIM_Encoder_Start_IT(&htim1,htim1.Channel)
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	// Everything from here down should be non-blocking
-  	Terminal_Process();
-	//TODO: Do Stuff!
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

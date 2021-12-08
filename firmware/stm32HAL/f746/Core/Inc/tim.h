@@ -28,6 +28,14 @@ extern "C" {
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
+/**
+ * Note:  The timers used in this application are as follows:
+ * Timer 1: PWM signal on Channel 1 for the Right motor
+ * Timer 2: PWM signal on Channel 1 for the Left motor
+ * Timer 3: Encoder, Channels 1 and 2, for the Right motor
+ * Timer 4: Encoder, Channels 1 and 2, for the Left motor
+ * Timer 5: Clock counter in microseconds
+ */
 
 /* USER CODE END Includes */
 
