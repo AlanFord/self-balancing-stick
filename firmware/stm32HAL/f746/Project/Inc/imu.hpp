@@ -40,7 +40,7 @@ class IMU {
 	uint8_t fifoBuffer[64];       // FIFO storage buffer
 	MPU6050_6Axis_MotionApps20 mpu;                  // Creating object 'mpu', I think
 public:
-	IMU(I2C_HandleTypeDef * hi2c, uint8_t address);
+	IMU(I2C_HandleTypeDef * hi2c, uint8_t address=MPU6050_DEFAULT_ADDRESS);
 	void get_IMU_values(void);
 };
 

@@ -51,7 +51,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	}
 }
 
-IMU::IMU(I2C_HandleTypeDef * hi2c, uint8_t address=MPU6050_DEFAULT_ADDRESS)
+IMU::IMU(I2C_HandleTypeDef * hi2c, uint8_t address)
 	: mpu(hi2c, address) {
 
 	printf(
