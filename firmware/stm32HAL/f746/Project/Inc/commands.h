@@ -1,6 +1,11 @@
 #ifndef __COMMANDS_H__
 #define __COMMANDS_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include "shell.h"
 #include <stdint.h>
 //#include "nodate.h"
@@ -42,5 +47,11 @@ typedef struct {
 	 */
 	element_t elements[];
 } list_t;
+
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif /* __COMMANDS_H__ */

@@ -9,6 +9,12 @@
 
 #ifndef __SERIAL_INTERFACE_STRUCTURE_H__
 #define __SERIAL_INTERFACE_STRUCTURE_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include "common.h"
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -24,6 +30,11 @@ typedef struct {
 	int_fast8_t (*DoesReceiveBufferHaveData)(void); ///< return the state of the serial receive buffer
 	int_fast8_t (*GetByte)(uint8_t *destination); ///< get a single byte from the serial
 } SerialInterface;
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif
 
