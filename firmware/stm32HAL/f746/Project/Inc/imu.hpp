@@ -42,6 +42,7 @@ class IMU {
 public:
 	IMU(I2C_HandleTypeDef * hi2c, uint8_t address=MPU6050_DEFAULT_ADDRESS);
 	void get_IMU_values(void);
+	uint16_t get_Status(void) {return dmpReady;}
 };
 
 #endif /* INC_IMU_HPP_ */

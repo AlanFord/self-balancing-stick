@@ -12,8 +12,8 @@
 extern "C" {
 #endif
 
-void initialize_encoder(TIM_HandleTypeDef *htim);
-void deinitialize_encoder(TIM_HandleTypeDef *htim);
+HAL_StatusTypeDef initialize_encoder(TIM_HandleTypeDef *htim);
+HAL_StatusTypeDef deinitialize_encoder(TIM_HandleTypeDef *htim);
 void get_right_Encoder_Speeds(float *speed, float *accel);
 void get_left_Encoder_Speeds(float *speed, float *accel);
 

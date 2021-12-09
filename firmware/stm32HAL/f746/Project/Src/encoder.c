@@ -114,12 +114,12 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	}
 }
 
-void initialize_encoder(TIM_HandleTypeDef *htim) {
-	HAL_TIM_Encoder_Start_IT(htim, TIM_CHANNEL_ALL);
+HAL_StatusTypeDef initialize_encoder(TIM_HandleTypeDef *htim) {
+	return HAL_TIM_Encoder_Start_IT(htim, TIM_CHANNEL_ALL);
 }
 
-void deinitialize_encoder(TIM_HandleTypeDef *htim) {
-	HAL_TIM_Encoder_Stop_IT(htim, TIM_CHANNEL_ALL);
+HAL_StatusTypeDef deinitialize_encoder(TIM_HandleTypeDef *htim) {
+	return HAL_TIM_Encoder_Stop_IT(htim, TIM_CHANNEL_ALL);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
