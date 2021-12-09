@@ -6,6 +6,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 #ifndef __COMMON_H__
 #define __COMMON_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -68,5 +73,10 @@ typedef union {
 	uint8_t ui8_t[8];   ///< unsigned 8bit.
 	int8_t i8_t[8];    ///< singed 8bit.
 } DataConverter;
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
