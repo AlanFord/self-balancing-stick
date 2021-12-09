@@ -5,11 +5,11 @@
  *      Author: alan
  */
 
-#ifndef INC_CONTROLLER_H_
-#define INC_CONTROLLER_H_
+#ifndef INC_CONTROLLER_HPP_
+#define INC_CONTROLLER_HPP_
 
 int get_left_PID_Voltage_Value();
 int get_right_PID_Voltage_Value();
 
 
-#endif /* INC_CONTROLLER_H_ */
+#endif /* INC_CONTROLLER_HPP_ */

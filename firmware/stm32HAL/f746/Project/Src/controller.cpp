@@ -10,7 +10,8 @@
 //      void get_right_PID_Voltage_Value() -  sets right_PID_Voltage
 /////////////////////////////////////////////////////////
 
-#include "controller.h"
+#include <controller.hpp>
+#include <motor.hpp>
 #include "imu.hpp"
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 
@@ -25,7 +26,6 @@ float           omega_Kd = 130;
 float           omega_Ks = -25;
 
 float     friction_Value        = 10;
-int     voltage_Max = 0;
 
 int get_left_PID_Voltage_Value() {
 
