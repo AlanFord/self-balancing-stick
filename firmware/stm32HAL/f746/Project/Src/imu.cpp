@@ -28,7 +28,6 @@ float theta_Zero_Filter = 0.995;
 float omega_Zero_Filter = 0.986;
 #define   omega_Filter              0.7
 
-
 // these are determined here but used by the controller
 float theta_Zero = 0;
 float theta_Now = 0;
@@ -39,9 +38,7 @@ float omega_Now = 0;
 float omega_Integral = 0;
 float omega_Speed_Now = 0;
 
-
 volatile uint16_t mpuInterrupt = FALSE; // indicates whether MPU interrupt pin has gone high
-
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (GPIO_Pin == IMU_INT_Pin) {
@@ -51,8 +48,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	}
 }
 
-IMU::IMU(I2C_HandleTypeDef * hi2c, uint8_t address)
-	: mpu(hi2c, address) {
+IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
+		mpu(hi2c, address) {
 
 	printf(
 			mpu.testConnection() ?
@@ -283,5 +280,18 @@ void IMU::get_IMU_values(void) {
 		omega_Zero = omega_Average;
 	}
 
+}
+
+void IMU::get_theta_values(float &theta_Now, float &theta_Integral,
+		float &theta_Speed_Now) {
+	theta_Now = this->theta_Now;
+	theta_Integral = this->theta_Integral;
+	theta_Speed_Now = this->theta_Speed_Now;
+}
+void IMU::get_omega_values(float &omega_Now, float &omega_Integral,
+		float &omega_Speed_Now) {
+	omega_Now = this->omega_Now;
+	omega_Integral = this->omega_Integral;
+	omega_Speed_Now = this->omega_Speed_Now;
 }
 
