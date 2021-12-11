@@ -1,0 +1,133 @@
+The software must interface with the hardware to make all of the work together.
+
+MCU pins used to communicate with the motors, encoders, and the imu can be determined
+from the #define statements in "main.h".  While many pins are used to support peripherals
+built into the NUCLEO board, the following pins are critical to this project:
+
+Serial Port -
+USART3:
+	RX - Pin D8
+	TX - Pin D9
+	
+IMU -
+I2C1:
+	SDA - Pin B9
+	SCL - Pin B6
+GPIO:
+	Data Ready Interrupt - Pin E11
+	
+Right Motor -
+TIMER1:
+	PWM - Pin E9
+TIMER3:
+	Encoder Channel 1 - Pin A6
+	Encoder Channel 2 - Pin C7
+	
+Left Motor -
+TIMER2:
+	PWM - Pin A0
+TIMER4:
+	Encoder Channel 1 - Pin D12
+	Encoder Channel 2 - Pin D13
+	
+----------------------------------------------------
+Motor and IMU Orientation
+
+The following was extracted from the file "imu.cpp".  The sketch
+represets a top-down look at the motor and imu layout.
+
+// Discussion of IMU values and motor orientation
+//
+//   -----------------------------------
+//   |         Left Motor/Hub          |
+//   |                                 |
+//   -----------------------------------
+//                  |        IMU top,front      ------
+//                  |         -----------       |    |
+//                  |         |         |       |    |
+//              --------      |  Gy-521 |       |    |
+//              |      |      |         |       |    |
+//              |      |      -----------       |    |
+//              |      |                        |    |
+//              |      |      ----------------  |    | Right Motor/Hub
+//              --------      |              |  |    |
+//                            |              |==|    |
+//                            |              |  |    |
+//                            ----------------  |    |
+//                                              |    |
+//                                              |    |
+//                                              |    |
+//                                              |    |
+//                                              |    |
+//                                              ------
+//
+//      ypr[ ] values for pitch and roll are as follows
+//      Front Edge Pitch Down:  Negative Values of ypr[1]
+//      Front Edge Pitch Up:    Positive Values of ypr[1]
+//      Roll to the Right:      Positive Values of ypr[2]
+//      Roll to the Left:       Negative Values of ypr[2]
+//
+//      Note that "forward" motor rotations, associated with positive voltages,
+//      are alway counter-clockwise when viewed from the "shaft end", and
+//      clockwise when viewed from the motor body end.
+//
+//      Hence,
+//      Positive Right Motor rotation ==> couter-clockwise shaft spin => pitch up => positive voltage ==> positive Omega ==> positive ypr[1]
+//      Positive Left Motor rotation ==> couter-clockwise shaft spin  => roll to the right => positive voltage ==> positive Theta ==> positive ypr[2]
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+------------------------------------------------------
+Encoder Description
+
+The Pololu website states that the 25D DC motors with gearboxes have an encoder with 48 CPR.  This is based
+on counting both the rising and falling edges of both the A and B outputs.  This is a suitable value to use
+in this application because Timers 3 and 4 are configured in "TI1 and TI2" mode.
+
+>>>>>  Rising edge configuration for the timers?????  <<<<<<<<
+>>>>>  Encoder wire colors?????                       <<<<<<<<
+
+------------------------------------------------------
+Motor Driver Interface
+Pololu Dual MAX14870 Motor Driver Shield for Arduino
+https://www.pololu.com/product/2519
+PWM operation up to 50 kHz
+The required pins are:
+DIR -> 0=foward at speed PWM %
+       1=reverse at speed PWM %
+PWM -> speed %
+
+Timer Configuration:
+Assume PCLK for each motor timer is 72MHz (check this for each change in MCU!!!)
+Assume ARR = 255 (based on the controller code and motor voltage routines)
+(PSC+1)*(ARR+1) = Fclk/Fpwm = ratio = 72MHz / 50 kHz = 1440
+PSC = (ratio/(ARR+1)) -1 = (1440/256) -1 = 5.625, rounded to 6
+Check:
+Fpwm = Fclk/(ARR+1)/(PSC+1) = 72E6 / 256 / 7 = 40.1 kHz
+
+
+
+
+Assumpe PSC = 1
+(PSC+1)*(ARR+1) = Fclk/Fpwm = ratio = 72MHz / 50 kHz = 1440
+Ratio is an integer value so ARR can be exact
+ARR = (ratio/(PSC+1)) -1 = 1439
+Add 1 to ensure Fpwm is below minimum:
+ARR = ARR + 1 = 1440
+Check:
+Fpwm = Fclk/(ARR+1)/(PSC+1) = 72E6 / 1441 = 49.965 kHz
+
+______________________________________________________
+IMU Interface
+The IMU is a GY-521 board using a MPU-6050 module.
+The required pins are:
+VCC -> 3.3V/5V
+GND -> GND
+SCL -> B6
+SDA -> B9
+XDA ->
+XCL ->
+ADO ->
+INT -> E11
+
+The INT signal is an open-drain line that should be RISING when data is ready for download to the MCU.
+
