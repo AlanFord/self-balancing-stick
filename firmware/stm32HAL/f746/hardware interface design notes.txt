@@ -84,9 +84,6 @@ With a gearbox of 4.4:1, this results in 48*4.4 = 211.2 counts per shaft revoolu
 on counting both the rising and falling edges of both the A and B outputs.  This is a suitable value to use
 in this application because Timers 3 and 4 are configured in "TI1 and TI2" mode.
 
->>>>>  Rising edge configuration for the timers?????  <<<<<<<<
->>>>>  Encoder wire colors?????                       <<<<<<<<
-
 ------------------------------------------------------
 Motor Driver Interface
 Pololu Dual MAX14870 Motor Driver Shield for Arduino
@@ -104,19 +101,6 @@ Assume ARR = 255 (based on the controller code and motor voltage routines)
 PSC = (ratio/(ARR+1)) -1 = (1440/256) -1 = 5.625, rounded to 6
 Check:
 Fpwm = Fclk/(ARR+1)/(PSC+1) = 72E6 / 256 / 7 = 40.1 kHz
-
-
-
-
-Assumpe PSC = 1
-(PSC+1)*(ARR+1) = Fclk/Fpwm = ratio = 72MHz / 50 kHz = 1440
-Ratio is an integer value so ARR can be exact
-ARR = (ratio/(PSC+1)) -1 = 1439
-Add 1 to ensure Fpwm is below minimum:
-ARR = ARR + 1 = 1440
-Check:
-Fpwm = Fclk/(ARR+1)/(PSC+1) = 72E6 / 1441 = 49.965 kHz
-
 ______________________________________________________
 IMU Interface
 The IMU is a GY-521 board using a MPU-6050 module.
@@ -131,4 +115,7 @@ ADO ->
 INT -> E11
 
 The INT signal is an open-drain line that should be RISING when data is ready for download to the MCU.
-
+The MPU-6050 can accomodate I2C frequencies of up to 400 kHz.  The original Arduino design
+of this software used 100 kHz.
+The I2C rise time was set at 500 nsec, based on an average value for Std (100 kHz) operation.
+The I2C fall time was set to 150 nsec, based on an average value for Std (100 kHz) operation.
