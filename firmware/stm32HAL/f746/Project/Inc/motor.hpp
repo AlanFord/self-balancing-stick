@@ -11,11 +11,15 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include "main.h"
+#include "common.h"
 
 #ifdef __cplusplus
 }
 #endif
+
+#define MOTOR_FORWARD GPIO_PIN_RESET
+#define MOTOR_REVERSE GPIO_PIN_SET
+#define MAX_MOTOR_PWM_KHZ 50
 
 class Motor {
 	int voltage_Max = 0;

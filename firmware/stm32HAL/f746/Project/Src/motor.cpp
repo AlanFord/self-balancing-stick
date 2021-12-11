@@ -69,10 +69,10 @@ void Motor::set_voltage(int32_t voltage) { // Switched directions (0's and 1's) 
 		__HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, 0);
 	} else {
 		if (voltage < 0) {
-			HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOx, GPIO_Pin, MOTOR_REVERSE);
 		}
 		else {
-			HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOx, GPIO_Pin, MOTOR_FORWARD);
 		}
 		__HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1,
 				(abs(voltage) + voltage_Offset));

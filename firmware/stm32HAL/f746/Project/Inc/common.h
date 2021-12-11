@@ -7,14 +7,15 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include "main.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /////////////////////////////////////////////////////////////////////////
 ///	\brief	Defines the true state
