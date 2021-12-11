@@ -8,6 +8,7 @@
 #ifndef INC_CONTROLLER_HPP_
 #define INC_CONTROLLER_HPP_
 
+#include "common.h"
 #include "encoder.hpp"
 #include "imu.hpp"
 #include "motor.hpp"

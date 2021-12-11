@@ -4,13 +4,15 @@
  *  Created on: Dec 5, 2021
  *      Author: alan
  */
+#include "common.h"
+#include "tim.h"
 
 #ifndef INC_ENCODER_HPP_
 #define INC_ENCODER_HPP_
 
-#include "main.h"
-#include "tim.h"
-
+//////////////////////////////////////////////////////////////////
+//  Hardware Notes!!!
+//
 //  Note: PPR vs CPR vs CPR => taken from https://www.cuidevices.com/blog/what-is-encoder-ppr-cpr-and-lpr
 //        The Pololu 25D motor encoders are 48 counts per rev, counting both edges of both channels.
 //        This should be equivalent to 48/4 = 12. PPR
@@ -19,6 +21,11 @@
 #define   encoder_PPR               52.8 //334             // Encoder pulse per revolution (was 334 in Mike's version of the software)
 // encoder_Tick_Resolution was 10 for Mikes version
 #define   encoder_Tick_Resolution   1 //10                // Defines how many ticks to 'wait' until calculating encoder positions and time measurments. Higher values lead to decreased ISR times, but decreased encoder accuracy.
+#define   encoder_Speed_Time_Limit  100                   // Defines how long to wait for a new tick before assuming wheel is stopped [ms]
+#define   Speed_Filter         0.8
+//
+//
+//////////////////////////////////////////////////////////////////
 
 class Encoder {
 	float encoder_Resolution_Size;
@@ -65,10 +72,6 @@ extern EncoderCallbackData callbackList[];
 
 bool addCallback(TIM_HandleTypeDef *htim, Encoder *encoder);
 
-//HAL_StatusTypeDef initialize_encoder(TIM_HandleTypeDef *htim);
-//HAL_StatusTypeDef deinitialize_encoder(TIM_HandleTypeDef *htim);
-//void get_right_Encoder_Speeds(float *speed, float *accel);
-//void get_left_Encoder_Speeds(float *speed, float *accel);
 
 #ifdef __cplusplus
 }

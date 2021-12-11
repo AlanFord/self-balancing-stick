@@ -14,9 +14,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+// the callback must have "C" linkage
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
-
 #ifdef __cplusplus
 }
 #endif
@@ -27,7 +26,7 @@ class IMU {
 	uint8_t fifoBuffer[64];       // FIFO storage buffer
 	MPU6050_6Axis_MotionApps20 mpu;            // Creating object 'mpu', I think
 
-	/* these are used to pass data to the controllers */
+	/* these are used to pass data to the controllers in the "get ... values" methods*/
 	float theta_Now;
 	float theta_Zero;
 	float theta_Integral;
@@ -43,9 +42,9 @@ public:
 	IMU(I2C_HandleTypeDef *hi2c, uint8_t address = MPU6050_DEFAULT_ADDRESS);
 	void get_IMU_values(void);
 	void get_theta_values(float &theta_Now, float &theta_Integral,
-			float &theta_Speed_Now);
+			float &theta_Speed_Now, float& theta_Zero);
 	void get_omega_values(float &omega_Now, float &omega_Integral,
-			float &omega_Speed_Now);
+			float &omega_Speed_Now, float& omega_Zero);
 	uint16_t get_Status(void) {
 		return dmpReady;
 	}

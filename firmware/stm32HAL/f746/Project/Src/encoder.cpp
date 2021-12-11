@@ -20,30 +20,7 @@ bool addCallback(TIM_HandleTypeDef *htim, Encoder *encoder) {
 	return false;
 }
 
-// encoder_Tick_Resolution was 10 for Mikes version
-#define   encoder_Tick_Resolution   1 //10                // Defines how many ticks to 'wait' until calculating encoder positions and time measurments. Higher values lead to decreased ISR times, but decreased encoder accuracy.
-#define   encoder_Speed_Time_Limit  100                   // Defines how long to wait for a new tick before assuming wheel is stopped [ms]
-#define   Speed_Filter         0.8
 
-/**
- * What the interrupt callback calculates and saves:
- * - the time of the last encoder interrupt in us
- * - the elapsed time between the last two interrupts
- * - the direction the encoder was moving at last interrupt
- * - While direction and time should be sufficient to subsequently determine velocity and acceleration,
- *      the absolute time is used to ensure we aren't moving so slowly that we have overrun the clock period
- *      between encoder interrupts (possible, but unlikely unless the motor is stopped, as we are using
- *      a 32-bit timer with a period of just over an hour)
- */
-//volatile unsigned long left_Time_Now = 0; // Time at current absolute tick change, [us]
-//volatile unsigned long right_Time_Now = 0; // Time at current absolute tick change, [us]
-//volatile unsigned long left_Time_Dif = 0;
-//volatile unsigned long right_Time_Dif = 0;
-//volatile int left_Encoder_Direction; // Encoder measured direction, [-1 or 1]
-//volatile int right_Encoder_Direction; // Encoder measured direction, [-1 or 1]
-//volatile long left_Abs_Tick_Count = 0;      // Absolute total of encoder ticks
-//volatile long right_Abs_Tick_Count = 0;     // Absolute total of encoder ticks
-//float encoder_Resolution_Size; // Encoder Revolution per each encrment in resolution * 100000, calculated in setup
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	// hurry up and get the data that can change!
 	unsigned long grab_the_time = __MICROS();
@@ -112,34 +89,7 @@ HAL_StatusTypeDef Encoder::deinitEncoder() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void Encoder::get_Encoder_Speeds(float &speed, float &accel) {
-	//static int left_Encoder_Direction = 0; // Encoder measured direction, [-1 or 1]
-	//static unsigned long left_Time_Now = 0; // Time at current absolute tick change, [us]
-
-	//volatile unsigned int left_Rel_Tick_Count = 0; // Encoder ticks untill resolution
-	//volatile long left_Abs_Tick_Count = 0;    // Absolute total of encoder ticks
-	//volatile long left_Abs_Tick_Count_Prev = 0; // Previous Absolute total of encoder ticks
-	//volatile int left_Encoder_Direction_Prev = 0; // Encoder measured direction, [-1 or 1]
-	//volatile int left_Encoder_Direction_Now = 0; // Encoder measured direction, [-1 or 1]
-	//volatile int left_Encoder_Direction_Debug = 0; // Encoder measured direction, [-1 or 1]
-	//volatile unsigned long left_Time_Prev = 0; // Time at previous absolute tick change, [us]
-	//volatile unsigned long left_Time_Dif = 0;
-	//volatile unsigned long left_Time_Acc_Prev = 0; // Time at previous absolute tick change, [us]
-	//unsigned long left_Time_Age = 0; // Time at current absolute tick change, [us]
-	//unsigned long left_Time_Saved = 0; // Time at current absolute tick change, [us]
-
-	//float left_Speed_RPM_Prev = 0;
-	//float left_Speed_RPM_Alt = 0;
-	//float left_Speed_RPM_Alt_Prev = 0;
-	//float left_Acceleration = 0;
-	//int left_Current_Max = 0;
-	//int left_Current_Avg = 0;
-	//long left_Current_Total = 0;
-	//int left_Current;
-	//int left_Voltage = 0;
-
 	float Speed_RPM_Prev = Speed_RPM;
-	//left_Speed_RPM_Alt_Prev = left_Speed_RPM_Alt;
-
 	unsigned long Time_Saved = Time_Now;
 	unsigned long Time_Age = __MICROS();
 

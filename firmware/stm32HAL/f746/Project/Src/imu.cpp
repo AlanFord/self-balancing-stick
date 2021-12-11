@@ -5,80 +5,6 @@
  *      Author: alan
  */
 
-#include "tim.h"
-#include "imu.hpp"
-#include <math.h>
-#include <stdio.h>
-
-#define   right_Speed_Filter        0.8
-#define   encoder_Speed_Time_Limit  100                   // Defines how long to wait for a new tick before assuming wheel is stopped [ms]
-#define   angle_Rounding_Value      1000.                  // Defines what value to multiple by before round theta and omega. Cuts down on noise, [10 = x.1,  100 = x.x1 , 1(Default)]
-#define   theta_Filter              0.7
-#define   theta_Integral_Max        3.0
-#define   theta_Speed_Filter        0.7
-#define   omega_Integral_Max        3.0
-#define   omega_Speed_Filter        0.7
-float angle_Average_Filter = 0.970;
-float angle_Smoothed_Filter = 0.997;
-float theta_Kt = 0.6;
-float theta_Ktd = 0;
-float omega_Kt = 0.6;
-float omega_Ktd = 1.0;
-float theta_Zero_Filter = 0.995;
-float omega_Zero_Filter = 0.986;
-#define   omega_Filter              0.7
-
-// these are determined here but used by the controller
-float theta_Zero = 0;
-float theta_Now = 0;
-float theta_Integral = 0;
-float theta_Speed_Now = 0;
-float omega_Zero = 0;
-float omega_Now = 0;
-float omega_Integral = 0;
-float omega_Speed_Now = 0;
-
-volatile uint16_t mpuInterrupt = FALSE; // indicates whether MPU interrupt pin has gone high
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	if (GPIO_Pin == IMU_INT_Pin) {
-		if (__HAL_GPIO_EXTI_GET_FLAG(IMU_INT_Pin)) {
-			mpuInterrupt = TRUE;
-		}
-	}
-}
-
-IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
-		mpu(hi2c, address) {
-
-	printf(
-			mpu.testConnection() ?
-					"MPU6050 connection successful\n" :
-					"MPU6050 connection failed\n"); // verify connection
-	uint8_t devStatus = mpu.dmpInitialize();       // load and configure the DMP
-
-	// supply your own gyro offsets here, scaled for min sensitivity
-	mpu.setXGyroOffset(233);
-	mpu.setYGyroOffset(96);
-	mpu.setZGyroOffset(18);
-	mpu.setZAccelOffset(1434);          // 1688 factory default for my test chip
-
-	if (devStatus == 0) {     // make sure it worked (devStatus returns 0 if so)
-		mpu.setDMPEnabled(true);         // turn on the DMP, now that it's ready
-		mpu.getIntStatus(); // enable Arduino interrupt detection (Remove attachInterrupt function here)
-		dmpReady = true; // set our DMP Ready flag so the main loop() function knows it's okay to use it
-		packetSize = mpu.dmpGetFIFOPacketSize(); // get expected DMP packet size for later comparison
-	} else {
-		// ERROR!
-		// 1 = initial memory load failed
-		// 2 = DMP configuration updates failed
-		// (if it's going to break, usually the code will be 1)
-		printf("DMP Initialization failed (code ");
-		printf("%u", devStatus);
-		printf(")");
-	}
-}
-
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////// IMU ////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,6 +48,72 @@ IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
 //      Positive Right Motor rotation ==> couter-clockwise shaft spin => pitch up => positive voltage ==> positive Omega ==> positive ypr[1]
 //      Positive Left Motor rotation ==> couter-clockwise shaft spin  => roll to the right => positive voltage ==> positive Theta ==> positive ypr[2]
 ///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+#include "tim.h"
+#include "imu.hpp"
+#include <math.h>
+#include <stdio.h>
+
+#define   angle_Rounding_Value      1000.                  // Defines what value to multiple by before round theta and omega. Cuts down on noise, [10 = x.1,  100 = x.x1 , 1(Default)]
+#define   theta_Filter              0.7
+#define   omega_Filter              0.7
+#define   theta_Integral_Max        3.0
+#define   omega_Integral_Max        3.0
+#define   theta_Speed_Filter        0.7
+#define   omega_Speed_Filter        0.7
+float angle_Average_Filter = 0.970;
+float angle_Smoothed_Filter = 0.997;
+
+float theta_Kt = 0.6;
+float theta_Ktd = 0;
+float omega_Kt = 0.6;
+float omega_Ktd = 1.0;
+float theta_Zero_Filter = 0.995;
+float omega_Zero_Filter = 0.986;
+
+
+volatile uint16_t mpuInterrupt = FALSE; // indicates whether MPU interrupt pin has gone high
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+	if (GPIO_Pin == IMU_INT_Pin) {
+		if (__HAL_GPIO_EXTI_GET_FLAG(IMU_INT_Pin)) {
+			mpuInterrupt = TRUE;
+		}
+	}
+}
+
+IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
+		mpu(hi2c, address) {
+
+	printf(
+			mpu.testConnection() ?
+					"MPU6050 connection successful\n" :
+					"MPU6050 connection failed\n"); // verify connection
+	uint8_t devStatus = mpu.dmpInitialize();       // load and configure the DMP
+
+	// supply your own gyro offsets here, scaled for min sensitivity
+	mpu.setXGyroOffset(233);
+	mpu.setYGyroOffset(96);
+	mpu.setZGyroOffset(18);
+	mpu.setZAccelOffset(1434);          // 1688 factory default for my test chip
+
+	if (devStatus == 0) {     // make sure it worked (devStatus returns 0 if so)
+		mpu.setDMPEnabled(true);         // turn on the DMP, now that it's ready
+		mpu.getIntStatus(); // enable Arduino interrupt detection (Remove attachInterrupt function here)
+		dmpReady = true; // set our DMP Ready flag so the main loop() function knows it's okay to use it
+		packetSize = mpu.dmpGetFIFOPacketSize(); // get expected DMP packet size for later comparison
+	} else {
+		// ERROR!
+		// 1 = initial memory load failed
+		// 2 = DMP configuration updates failed
+		// (if it's going to break, usually the code will be 1)
+		printf("DMP Initialization failed (code ");
+		printf("%u", devStatus);
+		printf(")");
+	}
+}
+
 
 void IMU::get_IMU_values(void) {
 	Quaternion q;                   // [w, x, y, z]         quaternion container
@@ -283,15 +275,17 @@ void IMU::get_IMU_values(void) {
 }
 
 void IMU::get_theta_values(float &theta_Now, float &theta_Integral,
-		float &theta_Speed_Now) {
+		float &theta_Speed_Now, float& theta_Zero) {
 	theta_Now = this->theta_Now;
 	theta_Integral = this->theta_Integral;
 	theta_Speed_Now = this->theta_Speed_Now;
+	theta_Zero = this->theta_Zero;
 }
 void IMU::get_omega_values(float &omega_Now, float &omega_Integral,
-		float &omega_Speed_Now) {
+		float &omega_Speed_Now, float& omega_Zero) {
 	omega_Now = this->omega_Now;
 	omega_Integral = this->omega_Integral;
 	omega_Speed_Now = this->omega_Speed_Now;
+	omega_Zero = this->omega_Zero;
 }
 
