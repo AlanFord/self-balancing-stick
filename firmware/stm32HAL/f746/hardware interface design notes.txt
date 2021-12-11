@@ -79,7 +79,8 @@ represets a top-down look at the motor and imu layout.
 ------------------------------------------------------
 Encoder Description
 
-The Pololu website states that the 25D DC motors with gearboxes have an encoder with 48 CPR.  This is based
+The Pololu website states that the 25D DC motors with gearboxes have an encoder with 48 counts per coil revolution.  
+With a gearbox of 4.4:1, this results in 48*4.4 = 211.2 counts per shaft revoolution.  This is based
 on counting both the rising and falling edges of both the A and B outputs.  This is a suitable value to use
 in this application because Timers 3 and 4 are configured in "TI1 and TI2" mode.
 

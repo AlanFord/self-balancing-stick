@@ -13,14 +13,10 @@
 //////////////////////////////////////////////////////////////////
 //  Hardware Notes!!!
 //
-//  Note: PPR vs CPR vs CPR => taken from https://www.cuidevices.com/blog/what-is-encoder-ppr-cpr-and-lpr
-//        The Pololu 25D motor encoders are 48 counts per rev, counting both edges of both channels.
-//        This should be equivalent to 48/4 = 12. PPR
-//        However, the gear ratio must also be included.  The gear ratio is 4.4:1,
-//        so 12. PPR of the motor shaft is 12*4.4 = 52.8 PPR of the gear shaft
-#define   encoder_PPR               52.8 //334             // Encoder pulse per revolution (was 334 in Mike's version of the software)
+//  Note: See "hardware interface design notes.txt" for a derivation of encoder_PPR
+#define   encoder_PPR               211.2 //334           // Encoder pulse per revolution (was 334 in Mike's version of the software)
 // encoder_Tick_Resolution was 10 for Mikes version
-#define   encoder_Tick_Resolution   1 //10                // Defines how many ticks to 'wait' until calculating encoder positions and time measurments. Higher values lead to decreased ISR times, but decreased encoder accuracy.
+#define   encoder_Tick_Resolution   6 //10                // Defines how many ticks to 'wait' until calculating encoder positions and time measurments. Higher values lead to decreased ISR times, but decreased encoder accuracy.
 #define   encoder_Speed_Time_Limit  100                   // Defines how long to wait for a new tick before assuming wheel is stopped [ms]
 #define   Speed_Filter         0.8
 //
