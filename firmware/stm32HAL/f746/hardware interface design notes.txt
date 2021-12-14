@@ -12,13 +12,15 @@ USART3:
 IMU -
 I2C1:
 	SDA - Pin B9
-	SCL - Pin B6
+	SCL - Pin B8 (Not B6!)
 GPIO:
 	Data Ready Interrupt - Pin E11
 	
 Right Motor -
 TIMER1:
 	PWM - Pin E9
+GPIO:
+	Direction - Pin F15
 TIMER3:
 	Encoder Channel 1 - Pin A6
 	Encoder Channel 2 - Pin C7
@@ -26,6 +28,8 @@ TIMER3:
 Left Motor -
 TIMER2:
 	PWM - Pin A0
+GPIO:
+	Direction - Pin F14
 TIMER4:
 	Encoder Channel 1 - Pin D12
 	Encoder Channel 2 - Pin D13
@@ -84,6 +88,16 @@ With a gearbox of 4.4:1, this results in 48*4.4 = 211.2 counts per shaft revoolu
 on counting both the rising and falling edges of both the A and B outputs.  This is a suitable value to use
 in this application because Timers 3 and 4 are configured in "TI1 and TI2" mode.
 
+Important:  Voltage!
+The Pololu encoders require a Vcc voltage of between 3.5V and 20V.  Hence, it is necessary that 
+all of the encoder pins are 5V tolerant!
+For the NUCLEO-F746ZG -
+Function     Port/Pin        IC Pin  5V Tolerant?
+L_ENC_CH1      D12             81       FT (Yes)
+L_ENC_CH2      D13             82       FT (Yes)
+R_ENC_CH1      A6              42       FT (Yes)
+R_ENC_CH2      C7              97       FT (Yes)
+
 ------------------------------------------------------
 Motor Driver Interface
 Pololu Dual MAX14870 Motor Driver Shield for Arduino
@@ -119,3 +133,6 @@ The MPU-6050 can accomodate I2C frequencies of up to 400 kHz.  The original Ardu
 of this software used 100 kHz.
 The I2C rise time was set at 500 nsec, based on an average value for Std (100 kHz) operation.
 The I2C fall time was set to 150 nsec, based on an average value for Std (100 kHz) operation.
+
+The GY-521 uses a 3.3V level for SCL and SDA signaling.  This is compatible with 
+the STM32 NUCLEO line.
