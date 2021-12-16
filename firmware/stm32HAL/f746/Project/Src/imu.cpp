@@ -77,9 +77,7 @@ volatile uint16_t mpuInterrupt = FALSE; // indicates whether MPU interrupt pin h
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (GPIO_Pin == IMU_INT_Pin) {
-		if (__HAL_GPIO_EXTI_GET_FLAG(IMU_INT_Pin)) {
-			mpuInterrupt = TRUE;
-		}
+		mpuInterrupt = TRUE;
 	}
 }
 
@@ -194,7 +192,7 @@ void IMU::get_IMU_values(void) {
 	float theta_Prev = theta_Now;
 	float theta_Now_Unfiltered = round(
 			(ypr[2] * 180 / M_PI) * angle_Rounding_Value) / angle_Rounding_Value; //undo
-	float theta_Now = (1 - theta_Filter) * (theta_Now_Unfiltered)
+	theta_Now = (1 - theta_Filter) * (theta_Now_Unfiltered)
 			+ (theta_Filter * theta_Prev); //undo
 
 	theta_Error = theta_Now - theta_Zero;
