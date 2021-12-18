@@ -75,12 +75,26 @@ float omega_Zero_Filter = 0.986;
 
 volatile uint16_t mpuInterrupt = FALSE; // indicates whether MPU interrupt pin has gone high
 
+/*
+ * @brief external interrupt callback for gpio pins
+ * @param gpio pin number (0-15)
+ */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (GPIO_Pin == IMU_INT_Pin) {
 		mpuInterrupt = TRUE;
 	}
 }
 
+/*
+ * @brief IMU constructor
+ *
+ * - Tests the I2C connection to the IMU
+ * - Sets up the MPU-6050 gyro offsets
+ * - Clears the MPU-6050 int status bits with a call to gitIntStatus()
+ *
+ * @param hi2c I2C HAL handle
+ * @param addrress imu I2C address
+ */
 IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
 		mpu(hi2c, address) {
 
@@ -112,7 +126,15 @@ IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
 	}
 }
 
-
+/*
+ * @brief
+ *
+ * Waits for the mpu interrupt flag to be set, gets data from the imu, and calcylates yaw, pitch and roll.
+ * Theta values then calculated from the roll.  Omega value calculated from the pitch.
+ * Theta is forward/backward angle in degrees, from -180 to +180.
+ * Omega is left/right angle in degrees, from -180 to +180.
+ *
+ */
 void IMU::get_IMU_values(void) {
 	Quaternion q;                   // [w, x, y, z]         quaternion container
 	VectorFloat gravity;              // [x, y, z]            gravity vector
@@ -272,6 +294,14 @@ void IMU::get_IMU_values(void) {
 
 }
 
+/*
+ * @brief returns previously calculated theta values
+ *
+ * @param theta_Now current theta value
+ * @param theta_Integral integral of the theta error (actual - desired)
+ * @param theta_Speed_Now theta rate of changle, degrees/sec
+ * @param theta_Zero target angle
+ */
 void IMU::get_theta_values(float &theta_Now, float &theta_Integral,
 		float &theta_Speed_Now, float& theta_Zero) {
 	theta_Now = this->theta_Now;
@@ -279,6 +309,10 @@ void IMU::get_theta_values(float &theta_Now, float &theta_Integral,
 	theta_Speed_Now = this->theta_Speed_Now;
 	theta_Zero = this->theta_Zero;
 }
+
+/*
+ * @brief returns previously calculated omega values
+ */
 void IMU::get_omega_values(float &omega_Now, float &omega_Integral,
 		float &omega_Speed_Now, float& omega_Zero) {
 	omega_Now = this->omega_Now;
