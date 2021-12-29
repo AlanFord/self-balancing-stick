@@ -31,7 +31,6 @@ THE SOFTWARE.
 */
 
 #include "I2Cdev.h"
-#include <stdio.h>
 
 // Hold pointer to inited HAL I2C device
 static I2C_HandleTypeDef * I2Cdev_hi2c;
@@ -174,12 +173,10 @@ uint8_t I2Cdev_readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8
     //printf("Transmitting...\n");
     HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(I2Cdev_hi2c, devAddr << 1, &regAddr, 1, tout);
     if (status != HAL_OK) {
-    	printf("HAL Transmit error code %i\n", status);
     	return 0;
     }
     //printf("Receiving...\n");
     if (HAL_I2C_Master_Receive(I2Cdev_hi2c, devAddr << 1, data, length, tout) == HAL_OK) return length;
-	printf("HAL Receive error code %i\n", status);
     return 0;
 }
 
