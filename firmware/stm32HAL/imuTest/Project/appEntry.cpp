@@ -5,6 +5,9 @@
 #include "appEntry.hpp"
 #include "MPU6050.h"
 
+float getAccelScalingFactor(MPU6050_Base &mpu);
+float getGyroScalingFactor(MPU6050_Base &mpu);
+
 /*
  * Firmware to test the use of the MPU6050
  * References are:
@@ -12,10 +15,6 @@
  * http://www.geekmomprojects.com/mpu-6050-redux-dmp-data-fusion-vs-complementary-filter/
  * https://www.i2cdevlib.com/forums/topic/27-fifo-overflow/
  */
-int16_t ax, ay, az;
-int16_t gx, gy, gz;
-int32_t axSum, aySum, azSum;
-int32_t gxSum, gySum, gzSum;
 
 void app_entry(void) {
 	//prepare for future "unbuffered" use of printf
@@ -30,11 +29,10 @@ void app_entry(void) {
 	mpu.reset();
 	HAL_Delay(100);
 	printf("Initializing I2C devices...\n");
-	mpu.initialize();
-	mpu.setSleepEnabled(true); // thanks to Jack Elston for pointing this one out!
-	mpu.setFullScaleGyroRange(MPU6050_GYRO_FS_1000);
-	mpu.setFullScaleAccelRange(MPU6050_ACCEL_FS_2);
-	mpu.setSleepEnabled(false); // thanks to Jack Elston for pointing this one out!
+	if (!mpu.initialize()) {
+		printf("mpu initialization Failed!\n");
+		while (1){}
+	}
 
 	// test the connection
 	printf("Testing device connections...\n");
@@ -42,6 +40,20 @@ void app_entry(void) {
 			mpu.testConnection() ?
 					"MPU6050 connection successful\n" :
 					"MPU6050 connection failed\n"); // verify connection
+
+	// change the gyro and accel ranges
+	mpu.setSleepEnabled(true); // thanks to Jack Elston for pointing this one out!
+	if (!mpu.setFullScaleGyroRange(MPU6050_GYRO_FS_1000)) {
+		printf("setFullScaleGyroRange Failed!\n");
+		while (1){}
+	}
+	HAL_Delay(100);  // not sure this is necessary
+	if (!mpu.setFullScaleAccelRange(MPU6050_ACCEL_FS_2)) {
+		printf("setFullScaleAccelRange Failed!\n");
+		while (1){}
+	}
+	HAL_Delay(100);  // not sure this is necessary
+	mpu.setSleepEnabled(false); // thanks to Jack Elston for pointing this one out!
 
 	// use the code below to change accel/gyro offset values
 	printf("Updating internal sensor offsets...\n");
@@ -51,61 +63,28 @@ void app_entry(void) {
 	printf("%i\t",mpu.getXGyroOffset());
 	printf("%i\t",mpu.getYGyroOffset());
 	printf("%i\n",mpu.getZGyroOffset());
-	mpu.setXAccelOffset(__REVSH(-3405));
-	mpu.setYAccelOffset(__REVSH(339));
-	mpu.setZAccelOffset(__REVSH(1473));
-	mpu.setXGyroOffset(__REVSH(224));
-	mpu.setYGyroOffset(__REVSH(98));
-	mpu.setZGyroOffset(__REVSH(24));
+	// the following call suffers from Big/Little Endian issues
+	mpu.PrintActiveOffsets();
+	mpu.setXAccelOffset(-3405);
+	mpu.setYAccelOffset(339);
+	mpu.setZAccelOffset(1473);
+	mpu.setXGyroOffset(224);
+	mpu.setYGyroOffset(98);
+	mpu.setZGyroOffset(24);
 	printf("%i\t",mpu.getXAccelOffset());
 	printf("%i\t",mpu.getYAccelOffset());
 	printf("%i\t",mpu.getZAccelOffset());
 	printf("%i\t",mpu.getXGyroOffset());
 	printf("%i\t",mpu.getYGyroOffset());
 	printf("%i\n",mpu.getZGyroOffset());
-//	float gyro_scale = 1;
-//	printf("Gyro range set to: ");
-//	switch (mpu.getFullScaleGyroRange()) {
-//	case MPU6050_GYRO_FS_250:
-//		gyro_scale = 131;
-//		printf("+- 250 deg/s\n");
-//		break;
-//	case MPU6050_GYRO_FS_500:
-//		gyro_scale = 65.5;
-//		printf("+- 500 deg/s\n");
-//		break;
-//	case MPU6050_GYRO_FS_1000:
-//		gyro_scale = 32.8;
-//		printf("+- 1000 deg/s\n");
-//		break;
-//	case MPU6050_GYRO_FS_2000:
-//		gyro_scale = 16.4;
-//		printf("+- 2000 deg/s\n");
-//		break;
-//	}
-//
-//	mpu.setFullScaleAccelRange(MPU6050_ACCEL_FS_8);
-//	HAL_Delay(100);
-//	float accel_scale = 1;
-//	printf("Accelerometer range set to: ");
-//	switch (mpu.getFullScaleAccelRange()) {
-//	case MPU6050_ACCEL_FS_2:
-//		accel_scale = 16384;
-//		printf("+-2G\n");
-//		break;
-//	case MPU6050_ACCEL_FS_4:
-//		accel_scale = 8192;
-//		printf("+-4G\n");
-//		break;
-//	case MPU6050_ACCEL_FS_8:
-//		accel_scale = 4096;
-//		printf("+-8G\n");
-//		break;
-//	case MPU6050_ACCEL_FS_16:
-//		accel_scale = 2048;
-//		printf("+-16G\n");
-//		break;
-//	}
+	// the following call suffers from Big/Little Endian issues
+	mpu.PrintActiveOffsets();
+
+	// set the gyro scaling factor
+	float gyro_scale = getGyroScalingFactor(mpu);
+
+	// set the accelerometer scaling factor
+	float accel_scale = getAccelScalingFactor(mpu);
 //
 //	mpu.setDLPFMode(MPU6050_DLPF_BW_5);
 //	HAL_Delay(100);
@@ -133,13 +112,6 @@ void app_entry(void) {
 //		printf("5 Hz\n");
 //		break;
 //	}
-//	// calibrate gyro
-//	//printf("calibrating gyro\n");
-//	//mpu.CalibrateGyro(6);
-//	//printf("calibrating accel\n");
-//	//mpu.CalibrateAccel(6);
-//	//printf("printing offsets\n");
-//	//mpu.PrintActiveOffsets();
 //
 //	int16_t ax, ay, az;
 //	int16_t gx, gy, gz;
@@ -196,8 +168,13 @@ void app_entry(void) {
 	 */
 	printf(mpu.getAccelFIFOEnabled() ? "Acceleration is FIFO enabled\n" : "Acceleration is NOT FIFO enabled\n");
 	printf(mpu.getIntEnabled() ? "Interrupt enabled\n" : "Interrupt NOT enabled\n");
+
 	int myCounter = 0;
-	axSum = aySum = azSum = 0;;
+	int16_t ax, ay, az;
+	int16_t gx, gy, gz;
+	int32_t axSum, aySum, azSum;
+	int32_t gxSum, gySum, gzSum;
+	axSum = aySum = azSum = 0;
 	gxSum = gySum = gzSum = 0;
 	while (1) {
 		//verify data is ready to be read
@@ -230,4 +207,56 @@ void app_entry(void) {
 		}
 	}
 
+}
+
+float getAccelScalingFactor(MPU6050_Base &mpu) {
+	float accel_scale = -1;
+	printf("Accelerometer range set to: ");
+	switch (mpu.getFullScaleAccelRange()) {
+	case MPU6050_ACCEL_FS_2:
+		accel_scale = 16384;
+		printf("+-2G\n");
+		break;
+	case MPU6050_ACCEL_FS_4:
+		accel_scale = 8192;
+		printf("+-4G\n");
+		break;
+	case MPU6050_ACCEL_FS_8:
+		accel_scale = 4096;
+		printf("+-8G\n");
+		break;
+	case MPU6050_ACCEL_FS_16:
+		accel_scale = 2048;
+		printf("+-16G\n");
+		break;
+	default:
+		printf("Failed to get accel scaling factor");
+	}
+	return accel_scale;
+}
+
+float getGyroScalingFactor(MPU6050_Base &mpu) {
+	float gyro_scale = -1;
+	printf("Gyro range set to: ");
+	switch (mpu.getFullScaleGyroRange()) {
+	case MPU6050_GYRO_FS_250:
+		gyro_scale = 131;
+		printf("+- 250 deg/s\n");
+		break;
+	case MPU6050_GYRO_FS_500:
+		gyro_scale = 65.5;
+		printf("+- 500 deg/s\n");
+		break;
+	case MPU6050_GYRO_FS_1000:
+		gyro_scale = 32.8;
+		printf("+- 1000 deg/s\n");
+		break;
+	case MPU6050_GYRO_FS_2000:
+		gyro_scale = 16.4;
+		printf("+- 2000 deg/s\n");
+		break;
+	default:
+		printf("Failed to get gyro scaling factor");
+	}
+	return gyro_scale;
 }

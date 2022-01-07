@@ -441,7 +441,7 @@ class MPU6050_Base {
     public:
         MPU6050_Base(I2C_HandleTypeDef * hi2c, uint8_t address);
 
-        void initialize();
+        bool initialize();
         bool testConnection();
 
         // AUX_VDDIO register
@@ -460,7 +460,7 @@ class MPU6050_Base {
 
         // GYRO_CONFIG register
         uint8_t getFullScaleGyroRange();
-        void setFullScaleGyroRange(uint8_t range);
+        bool setFullScaleGyroRange(uint8_t range);
 
         // SELF_TEST registers
         uint8_t getAccelXSelfTestFactoryTrim();
@@ -479,7 +479,7 @@ class MPU6050_Base {
         bool getAccelZSelfTest();
         void setAccelZSelfTest(bool enabled);
         uint8_t getFullScaleAccelRange();
-        void setFullScaleAccelRange(uint8_t range);
+        bool setFullScaleAccelRange(uint8_t range);
         uint8_t getDHPFMode();
         void setDHPFMode(uint8_t mode);
 
@@ -689,13 +689,13 @@ class MPU6050_Base {
         // PWR_MGMT_1 register
         void reset();
         bool getSleepEnabled();
-        void setSleepEnabled(bool enabled);
+        bool setSleepEnabled(bool enabled);
         bool getWakeCycleEnabled();
         void setWakeCycleEnabled(bool enabled);
         bool getTempSensorEnabled();
         void setTempSensorEnabled(bool enabled);
         uint8_t getClockSource();
-        void setClockSource(uint8_t source);
+        bool setClockSource(uint8_t source);
 
         // PWR_MGMT_2 register
         uint8_t getWakeFrequency();

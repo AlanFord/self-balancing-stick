@@ -110,11 +110,13 @@ MPU6050_Base::MPU6050_Base(I2C_HandleTypeDef * hi2c, uint8_t address=MPU6050_DEF
  * the clock source to use the X Gyro for reference, which is slightly better than
  * the default internal clock source.
  */
-void MPU6050_Base::initialize() {
-    setClockSource(MPU6050_CLOCK_PLL_XGYRO);
-    setFullScaleGyroRange(MPU6050_GYRO_FS_250);
-    setFullScaleAccelRange(MPU6050_ACCEL_FS_2);
-    setSleepEnabled(false); // thanks to Jack Elston for pointing this one out!
+bool MPU6050_Base::initialize() {
+	bool status = true;
+    status &= setClockSource(MPU6050_CLOCK_PLL_XGYRO);
+    status &= setFullScaleGyroRange(MPU6050_GYRO_FS_250);
+    status &= setFullScaleAccelRange(MPU6050_ACCEL_FS_2);
+    status &= setSleepEnabled(false); // thanks to Jack Elston for pointing this one out!
+    return status;
 }
 
 /** Verify the I2C connection.
@@ -288,8 +290,13 @@ void MPU6050_Base::setDLPFMode(uint8_t mode) {
  * @see MPU6050_GCONFIG_FS_SEL_LENGTH
  */
 uint8_t MPU6050_Base::getFullScaleGyroRange() {
-    I2Cdev::readBits(devAddr, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, buffer, hi2c, I2Cdev::readTimeout);
-    return buffer[0];
+	int8_t status = I2Cdev::readBits(devAddr, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, buffer, hi2c, I2Cdev::readTimeout);
+	if (status < 0) {
+		return status;
+	}
+	else {
+		return buffer[0];
+	}
 }
 /** Set full-scale gyroscope range.
  * @param range New full-scale gyroscope range value
@@ -299,8 +306,8 @@ uint8_t MPU6050_Base::getFullScaleGyroRange() {
  * @see MPU6050_GCONFIG_FS_SEL_BIT
  * @see MPU6050_GCONFIG_FS_SEL_LENGTH
  */
-void MPU6050_Base::setFullScaleGyroRange(uint8_t range) {
-    I2Cdev::writeBits(devAddr, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, range, hi2c);
+bool MPU6050_Base::setFullScaleGyroRange(uint8_t range) {
+    return I2Cdev::writeBits(devAddr, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, range, hi2c);
 }
 
 // SELF TEST FACTORY TRIM VALUES
@@ -433,8 +440,8 @@ uint8_t MPU6050_Base::getFullScaleAccelRange() {
  * @param range New full-scale accelerometer range setting
  * @see getFullScaleAccelRange()
  */
-void MPU6050_Base::setFullScaleAccelRange(uint8_t range) {
-    I2Cdev::writeBits(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_AFS_SEL_BIT, MPU6050_ACONFIG_AFS_SEL_LENGTH, range, hi2c);
+bool MPU6050_Base::setFullScaleAccelRange(uint8_t range) {
+    return I2Cdev::writeBits(devAddr, MPU6050_RA_ACCEL_CONFIG, MPU6050_ACONFIG_AFS_SEL_BIT, MPU6050_ACONFIG_AFS_SEL_LENGTH, range, hi2c);
 }
 /** Get the high-pass filter configuration.
  * The DHPF is a filter module in the path leading to motion detectors (Free
@@ -2500,8 +2507,8 @@ bool MPU6050_Base::getSleepEnabled() {
  * @see MPU6050_RA_PWR_MGMT_1
  * @see MPU6050_PWR1_SLEEP_BIT
  */
-void MPU6050_Base::setSleepEnabled(bool enabled) {
-    I2Cdev::writeBit(devAddr, MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, enabled, hi2c);
+bool MPU6050_Base::setSleepEnabled(bool enabled) {
+    return I2Cdev::writeBit(devAddr, MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_SLEEP_BIT, enabled, hi2c);
 }
 /** Get wake cycle enabled status.
  * When this bit is set to 1 and SLEEP is disabled, the MPU-60X0 will cycle
@@ -2593,8 +2600,8 @@ uint8_t MPU6050_Base::getClockSource() {
  * @see MPU6050_PWR1_CLKSEL_BIT
  * @see MPU6050_PWR1_CLKSEL_LENGTH
  */
-void MPU6050_Base::setClockSource(uint8_t source) {
-    I2Cdev::writeBits(devAddr, MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH, source, hi2c);
+bool MPU6050_Base::setClockSource(uint8_t source) {
+    return I2Cdev::writeBits(devAddr, MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_CLKSEL_BIT, MPU6050_PWR1_CLKSEL_LENGTH, source, hi2c);
 }
 
 // PWR_MGMT_2 register
@@ -2972,7 +2979,7 @@ int16_t MPU6050_Base::getXAccelOffset() {
 }
 void MPU6050_Base::setXAccelOffset(int16_t offset) {
 	uint8_t SaveAddress = ((getDeviceID() < 0x38 )? MPU6050_RA_XA_OFFS_H:0x77); // MPU6050,MPU9150 Vs MPU6500,MPU9250
-	I2Cdev::writeWord(devAddr, SaveAddress, offset, hi2c);
+	I2Cdev::writeWord(devAddr, SaveAddress, __REVSH(offset), hi2c);
 }
 
 // YA_OFFS_* register
@@ -2984,7 +2991,7 @@ int16_t MPU6050_Base::getYAccelOffset() {
 }
 void MPU6050_Base::setYAccelOffset(int16_t offset) {
 	uint8_t SaveAddress = ((getDeviceID() < 0x38 )? MPU6050_RA_YA_OFFS_H:0x7A); // MPU6050,MPU9150 Vs MPU6500,MPU9250
-	I2Cdev::writeWord(devAddr, SaveAddress, offset, hi2c);
+	I2Cdev::writeWord(devAddr, SaveAddress, __REVSH(offset), hi2c);
 }
 
 // ZA_OFFS_* register
@@ -2996,7 +3003,7 @@ int16_t MPU6050_Base::getZAccelOffset() {
 }
 void MPU6050_Base::setZAccelOffset(int16_t offset) {
 	uint8_t SaveAddress = ((getDeviceID() < 0x38 )? MPU6050_RA_ZA_OFFS_H:0x7D); // MPU6050,MPU9150 Vs MPU6500,MPU9250
-	I2Cdev::writeWord(devAddr, SaveAddress, offset, hi2c);
+	I2Cdev::writeWord(devAddr, SaveAddress, __REVSH(offset), hi2c);
 }
 
 // XG_OFFS_USR* registers
@@ -3006,7 +3013,7 @@ int16_t MPU6050_Base::getXGyroOffset() {
     return (((int16_t)buffer[0]) << 8) | buffer[1];
 }
 void MPU6050_Base::setXGyroOffset(int16_t offset) {
-    I2Cdev::writeWord(devAddr, MPU6050_RA_XG_OFFS_USRH, offset, hi2c);
+    I2Cdev::writeWord(devAddr, MPU6050_RA_XG_OFFS_USRH, __REVSH(offset), hi2c);
 }
 
 // YG_OFFS_USR* register
@@ -3016,7 +3023,7 @@ int16_t MPU6050_Base::getYGyroOffset() {
     return (((int16_t)buffer[0]) << 8) | buffer[1];
 }
 void MPU6050_Base::setYGyroOffset(int16_t offset) {
-    I2Cdev::writeWord(devAddr, MPU6050_RA_YG_OFFS_USRH, offset, hi2c);
+    I2Cdev::writeWord(devAddr, MPU6050_RA_YG_OFFS_USRH, __REVSH(offset), hi2c);
 }
 
 // ZG_OFFS_USR* register
@@ -3026,7 +3033,7 @@ int16_t MPU6050_Base::getZGyroOffset() {
     return (((int16_t)buffer[0]) << 8) | buffer[1];
 }
 void MPU6050_Base::setZGyroOffset(int16_t offset) {
-    I2Cdev::writeWord(devAddr, MPU6050_RA_ZG_OFFS_USRH, offset, hi2c);
+    I2Cdev::writeWord(devAddr, MPU6050_RA_ZG_OFFS_USRH, __REVSH(offset), hi2c);
 }
 
 // INT_ENABLE register (DMP functions)
@@ -3440,17 +3447,17 @@ void MPU6050_Base::PrintActiveOffsets() {
 		I2Cdev::readWords(devAddr, AOffsetRegister+6, 1, (uint16_t *)Data+2, hi2c, I2Cdev::readTimeout);
 	}
 	//	A_OFFSET_H_READ_A_OFFS(Data);
-	printf("%.5f",(float)Data[0]); printf(",  ");
-	printf("%.5f",(float)Data[1]); printf(",  ");
-	printf("%.5f",(float)Data[2]); printf(",  ");
+	printf("%.5f",(float)__REVSH(Data[0])); printf(",  ");
+	printf("%.5f",(float)__REVSH(Data[1])); printf(",  ");
+	printf("%.5f",(float)__REVSH(Data[2])); printf(",  ");
     //Serial.print((float)Data[0], 5); printf(",  ");
     //Serial.print((float)Data[1], 5); printf(",  ");
     //Serial.print((float)Data[2], 5); printf(",  ");
 	I2Cdev::readWords(devAddr, 0x13, 3, (uint16_t *)Data, hi2c, I2Cdev::readTimeout);
 	//	XG_OFFSET_H_READ_OFFS_USR(Data);
-	printf("%.5f",(float)Data[0]); printf(",  ");
-	printf("%.5f",(float)Data[1]); printf(",  ");
-	printf("%.5f",(float)Data[2]); printf("\n");
+	printf("%.5f",(float)__REVSH(Data[0])); printf(",  ");
+	printf("%.5f",(float)__REVSH(Data[1])); printf(",  ");
+	printf("%.5f",(float)__REVSH(Data[2])); printf("\n");
     //Serial.print((float)Data[0], 5); printf(",  ");
     //Serial.print((float)Data[1], 5); printf(",  ");
     //Serial.print((float)Data[2], 5); printf("\n");
