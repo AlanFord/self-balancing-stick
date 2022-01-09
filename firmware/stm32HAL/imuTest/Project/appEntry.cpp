@@ -42,28 +42,21 @@ void app_entry(void) {
 					"MPU6050 connection failed\n"); // verify connection
 
 	// change the gyro and accel ranges
-	mpu.setSleepEnabled(true); // thanks to Jack Elston for pointing this one out!
+	//mpu.setSleepEnabled(true); // thanks to Jack Elston for pointing this one out!
 	if (!mpu.setFullScaleGyroRange(MPU6050_GYRO_FS_1000)) {
 		printf("setFullScaleGyroRange Failed!\n");
 		while (1){}
 	}
+	/////////////////////////////////////
 	HAL_Delay(100);  // not sure this is necessary
 	if (!mpu.setFullScaleAccelRange(MPU6050_ACCEL_FS_2)) {
 		printf("setFullScaleAccelRange Failed!\n");
 		while (1){}
 	}
 	HAL_Delay(100);  // not sure this is necessary
-	mpu.setSleepEnabled(false); // thanks to Jack Elston for pointing this one out!
 
 	// use the code below to change accel/gyro offset values
 	printf("Updating internal sensor offsets...\n");
-	printf("%i\t",mpu.getXAccelOffset());
-	printf("%i\t",mpu.getYAccelOffset());
-	printf("%i\t",mpu.getZAccelOffset());
-	printf("%i\t",mpu.getXGyroOffset());
-	printf("%i\t",mpu.getYGyroOffset());
-	printf("%i\n",mpu.getZGyroOffset());
-	// the following call suffers from Big/Little Endian issues
 	mpu.PrintActiveOffsets();
 	mpu.setXAccelOffset(-3405);
 	mpu.setYAccelOffset(339);
@@ -71,13 +64,6 @@ void app_entry(void) {
 	mpu.setXGyroOffset(224);
 	mpu.setYGyroOffset(98);
 	mpu.setZGyroOffset(24);
-	printf("%i\t",mpu.getXAccelOffset());
-	printf("%i\t",mpu.getYAccelOffset());
-	printf("%i\t",mpu.getZAccelOffset());
-	printf("%i\t",mpu.getXGyroOffset());
-	printf("%i\t",mpu.getYGyroOffset());
-	printf("%i\n",mpu.getZGyroOffset());
-	// the following call suffers from Big/Little Endian issues
 	mpu.PrintActiveOffsets();
 
 	// set the gyro scaling factor
@@ -86,32 +72,32 @@ void app_entry(void) {
 	// set the accelerometer scaling factor
 	float accel_scale = getAccelScalingFactor(mpu);
 //
-//	mpu.setDLPFMode(MPU6050_DLPF_BW_5);
-//	HAL_Delay(100);
-//	printf("Filter bandwidth set to: ");
-//	switch (mpu.getDLPFMode()) {
-//	case MPU6050_DLPF_BW_256:
-//		printf("256 Hz\n");
-//		break;
-//	case MPU6050_DLPF_BW_188:
-//		printf("188 Hz\n");
-//		break;
-//	case MPU6050_DLPF_BW_98:
-//		printf("98 Hz\n");
-//		break;
-//	case MPU6050_DLPF_BW_42:
-//		printf("42 Hz\n");
-//		break;
-//	case MPU6050_DLPF_BW_20:
-//		printf("20 Hz\n");
-//		break;
-//	case MPU6050_DLPF_BW_10:
-//		printf("10 Hz\n");
-//		break;
-//	case MPU6050_DLPF_BW_5:
-//		printf("5 Hz\n");
-//		break;
-//	}
+	mpu.setDLPFMode(MPU6050_DLPF_BW_5);
+	HAL_Delay(100);
+	printf("Filter bandwidth set to: ");
+	switch (mpu.getDLPFMode()) {
+	case MPU6050_DLPF_BW_256:
+		printf("256 Hz\n");
+		break;
+	case MPU6050_DLPF_BW_188:
+		printf("188 Hz\n");
+		break;
+	case MPU6050_DLPF_BW_98:
+		printf("98 Hz\n");
+		break;
+	case MPU6050_DLPF_BW_42:
+		printf("42 Hz\n");
+		break;
+	case MPU6050_DLPF_BW_20:
+		printf("20 Hz\n");
+		break;
+	case MPU6050_DLPF_BW_10:
+		printf("10 Hz\n");
+		break;
+	case MPU6050_DLPF_BW_5:
+		printf("5 Hz\n");
+		break;
+	}
 //
 //	int16_t ax, ay, az;
 //	int16_t gx, gy, gz;

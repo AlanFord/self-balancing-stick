@@ -291,7 +291,7 @@ void MPU6050_Base::setDLPFMode(uint8_t mode) {
  */
 uint8_t MPU6050_Base::getFullScaleGyroRange() {
 	int8_t status = I2Cdev::readBits(devAddr, MPU6050_RA_GYRO_CONFIG, MPU6050_GCONFIG_FS_SEL_BIT, MPU6050_GCONFIG_FS_SEL_LENGTH, buffer, hi2c, I2Cdev::readTimeout);
-	if (status < 0) {
+	if (status <= 0) {
 		return status;
 	}
 	else {

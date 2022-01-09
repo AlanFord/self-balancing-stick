@@ -108,7 +108,7 @@ I2Cdev::I2Cdev() {
  * @param bitNum Bit position to read (0-7)
  * @param data Container for single bit value
  * @param timeout Optional read timeout in milliseconds (0 to disable, leave off to use default class value in I2Cdev::readTimeout)
- * @return Status of read operation (true = success)
+ * @return -1 indicates failure
  */
 int8_t I2Cdev::readBit(uint8_t devAddr, uint8_t regAddr, uint8_t bitNum, uint8_t *data, I2C_HandleTypeDef * hi2c, uint16_t timeout) {
     uint8_t b;
@@ -148,7 +148,7 @@ int8_t I2Cdev::readBits(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uint
     //    010   masked
     //   -> 010 shifted
     uint8_t count, b;
-    if ((count = readByte(devAddr, regAddr, &b, hi2c, timeout)) != 0) {
+    if ((count = readByte(devAddr, regAddr, &b, hi2c, timeout)) > 0) {
         uint8_t mask = ((1 << length) - 1) << (bitStart - length + 1);
         b &= mask;
         b >>= (bitStart - length + 1);
@@ -188,7 +188,7 @@ int8_t I2Cdev::readBitsW(uint8_t devAddr, uint8_t regAddr, uint8_t bitStart, uin
  * @param regAddr Register regAddr to read from
  * @param data Container for byte value read from device
  * @param timeout Optional read timeout in milliseconds (0 to disable, leave off to use default class value in I2Cdev::readTimeout)
- * @return Status of read operation (true = success)
+ * @return Number of bytes read (-1 indicates failure)
  */
 int8_t I2Cdev::readByte(uint8_t devAddr, uint8_t regAddr, uint8_t *data, I2C_HandleTypeDef * hi2c, uint16_t timeout) {
     return readBytes(devAddr, regAddr, 1, data, hi2c, timeout);
@@ -199,7 +199,7 @@ int8_t I2Cdev::readByte(uint8_t devAddr, uint8_t regAddr, uint8_t *data, I2C_Han
  * @param regAddr Register regAddr to read from
  * @param data Container for word value read from device
  * @param timeout Optional read timeout in milliseconds (0 to disable, leave off to use default class value in I2Cdev::readTimeout)
- * @return Status of read operation (true = success)
+ * @return Number of words read (-1 indicates failure)
  */
 int8_t I2Cdev::readWord(uint8_t devAddr, uint8_t regAddr, uint16_t *data, I2C_HandleTypeDef * hi2c, uint16_t timeout) {
     return readWords(devAddr, regAddr, 1, data, hi2c, timeout);
@@ -216,7 +216,7 @@ int8_t I2Cdev::readWord(uint8_t devAddr, uint8_t regAddr, uint16_t *data, I2C_Ha
 int8_t I2Cdev::readBytes(uint8_t devAddr, uint8_t regAddr, uint8_t length, uint8_t *data, I2C_HandleTypeDef * hi2c, uint16_t timeout) {
 	uint16_t tout = timeout > 0 ? timeout : I2CDEV_DEFAULT_READ_TIMEOUT;
 
-	HAL_I2C_Master_Transmit(hi2c, devAddr << 1, &regAddr, 1, tout);
+	if (HAL_I2C_Master_Transmit(hi2c, devAddr << 1, &regAddr, 1, tout) != HAL_OK) return -1;
 	if (HAL_I2C_Master_Receive(hi2c, devAddr << 1, data, length, tout) == HAL_OK) return length;
 	return -1;
 }
