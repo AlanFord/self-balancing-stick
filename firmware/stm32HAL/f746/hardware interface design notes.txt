@@ -14,13 +14,13 @@ I2C1:
 	SDA - Pin B9
 	SCL - Pin B8 (Not B6!)
 GPIO:
-	Data Ready Interrupt - Pin E11
+	Data Ready Interrupt - Pin F15
 	
 Right Motor -
 TIMER1:
 	PWM - Pin E9
 GPIO:
-	Direction - Pin F15
+	Direction - Pin E11
 TIMER3:
 	Encoder Channel 1 - Pin A6
 	Encoder Channel 2 - Pin C7
@@ -126,7 +126,7 @@ SDA -> B9
 XDA ->
 XCL ->
 ADO ->
-INT -> E11
+INT -> F15
 
 The INT signal is an open-drain line that should be RISING when data is ready for download to the MCU.
 The MPU-6050 can accomodate I2C frequencies of up to 400 kHz.  The original Arduino design

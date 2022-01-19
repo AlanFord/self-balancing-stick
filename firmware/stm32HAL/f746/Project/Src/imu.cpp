@@ -97,7 +97,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  */
 IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
 		mpu(hi2c, address) {
-
+/*
+ *  The following aren't needed; mpu.dmpInitialize() is a substitute
+ *	mpu.reset();
+ *	HAL_Delay(100);
+ *	mpu.initialize();  // required to "wake up" the mpu
+ */
 	printf(
 			mpu.testConnection() ?
 					"MPU6050 connection successful\n" :
@@ -105,10 +110,12 @@ IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
 	uint8_t devStatus = mpu.dmpInitialize();       // load and configure the DMP
 
 	// supply your own gyro offsets here, scaled for min sensitivity
-	mpu.setXGyroOffset(233);
-	mpu.setYGyroOffset(96);
-	mpu.setZGyroOffset(18);
-	mpu.setZAccelOffset(1434);          // 1688 factory default for my test chip
+	mpu.setXGyroOffset(224);
+	mpu.setYGyroOffset(98);
+	mpu.setZGyroOffset(24);
+	mpu.setXAccelOffset(-3405);
+	mpu.setYAccelOffset(339);
+	mpu.setZAccelOffset(1473);          // 1688 factory default for my test chip
 
 	if (devStatus == 0) {     // make sure it worked (devStatus returns 0 if so)
 		mpu.setDMPEnabled(true);         // turn on the DMP, now that it's ready
