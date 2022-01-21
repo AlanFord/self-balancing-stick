@@ -30,10 +30,10 @@ void get_dmp_data(MPU6050_6Axis_MotionApps20 &mpu, uint8_t mpuIntStatus);
 
 #define _BV(n) (1 << n)
 volatile uint16_t mpuInterrupt = false; // indicates whether MPU interrupt pin has gone high
-uint16_t packetSize = 0;
+
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (GPIO_Pin == IMU_INT_Pin) {
-		// mpuInterrupt = true;
+		mpuInterrupt = true;
 	}
 }
 
@@ -134,7 +134,7 @@ void app_entry(void) {
     mpu.setDMPEnabled(true);
 
     // get expected DMP packet size for later comparison
-    packetSize = mpu.dmpGetFIFOPacketSize();
+    uint16_t packetSize = mpu.dmpGetFIFOPacketSize();
 
 	// let's check the status of the MPU6050
 	printf(mpu.getAccelFIFOEnabled() ? "Acceleration is FIFO enabled\n" : "Acceleration is NOT FIFO enabled\n");
@@ -147,17 +147,16 @@ void app_entry(void) {
 	while (1) {
 		// processing dmp data
 		//if (mpuInterrupt && fifoCount < packetSize)
-		mpuInterrupt = mpu.getIntStatus();
 		if (mpuInterrupt)
 		{
-			//mpuInterrupt = false;//reset interrupt flag
-			get_dmp_data(mpu, mpuInterrupt);
+			mpuInterrupt = false;//reset interrupt flag
+			get_dmp_data(mpu, packetSize);
 		}
 	}
 
 }
 
-void get_dmp_data(MPU6050_6Axis_MotionApps20 &mpu, uint8_t mpuIntStatus){
+void get_dmp_data(MPU6050_6Axis_MotionApps20 &mpu, uint8_t packetSize){
 
 	// MPU control/status vars
 	uint16_t fifoCount;     // count of all bytes currently in FIFO
@@ -168,7 +167,7 @@ void get_dmp_data(MPU6050_6Axis_MotionApps20 &mpu, uint8_t mpuIntStatus){
 	VectorFloat gravity;    // [x, y, z]            gravity vector
 	float ypr[3];           // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
 
-	//uint8_t mpuIntStatus = mpu.getIntStatus();
+	uint8_t mpuIntStatus = mpu.getIntStatus();
 
 	// get current FIFO count
 	fifoCount = mpu.getFIFOCount();
