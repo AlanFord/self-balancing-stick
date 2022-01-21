@@ -2,13 +2,14 @@
 #include "tim.h"
 //#include <string.h>
 #include <cstdio>
+//#include "MPU6050_6Axis_MotionApps612.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 #include "appEntry.hpp"
 
-float getAccelScalingFactor(MPU6050_6Axis_MotionApps20 &mpu);
-float getGyroScalingFactor(MPU6050_6Axis_MotionApps20 &mpu);
-void get_basic_data(MPU6050_6Axis_MotionApps20 &mpu, float gyro_scale, float accel_scale);
-void get_dmp_data(MPU6050_6Axis_MotionApps20 &mpu, uint8_t mpuIntStatus);
+float getAccelScalingFactor(MPU6050 &mpu);
+float getGyroScalingFactor(MPU6050 &mpu);
+void get_basic_data(MPU6050 &mpu, float gyro_scale, float accel_scale);
+void get_dmp_data(MPU6050 &mpu, uint8_t mpuIntStatus);
 
 /*
  * Firmware to test the use of the MPU6050
@@ -45,7 +46,7 @@ void app_entry(void) {
 	HAL_TIM_Base_Start(&htim5);
 
 	//initialize mpu6050
-	MPU6050_6Axis_MotionApps20 mpu(&hi2c1, MPU6050_DEFAULT_ADDRESS);
+	MPU6050 mpu(&hi2c1, MPU6050_DEFAULT_ADDRESS);
 	printf("Resetting I2C devices...\n");
 	//mpu.reset();
 	//HAL_Delay(100);
@@ -156,7 +157,7 @@ void app_entry(void) {
 
 }
 
-void get_dmp_data(MPU6050_6Axis_MotionApps20 &mpu, uint8_t packetSize){
+void get_dmp_data(MPU6050 &mpu, uint8_t packetSize){
 
 	// MPU control/status vars
 	uint16_t fifoCount;     // count of all bytes currently in FIFO
@@ -203,7 +204,7 @@ void get_dmp_data(MPU6050_6Axis_MotionApps20 &mpu, uint8_t packetSize){
 	}
 }
 
-void get_basic_data(MPU6050_6Axis_MotionApps20 &mpu, float gyro_scale, float accel_scale) {
+void get_basic_data(MPU6050 &mpu, float gyro_scale, float accel_scale) {
 	int16_t ax, ay, az;
 	int16_t gx, gy, gz;
 	int32_t axSum, aySum, azSum;
@@ -260,7 +261,7 @@ void get_basic_data(MPU6050_6Axis_MotionApps20 &mpu, float gyro_scale, float acc
 	printf(" deg/s\n");
 }
 
-float getAccelScalingFactor(MPU6050_6Axis_MotionApps20 &mpu) {
+float getAccelScalingFactor(MPU6050 &mpu) {
 	float accel_scale = -1;
 	printf("Accelerometer range set to: ");
 	switch (mpu.getFullScaleAccelRange()) {
@@ -286,7 +287,7 @@ float getAccelScalingFactor(MPU6050_6Axis_MotionApps20 &mpu) {
 	return accel_scale;
 }
 
-float getGyroScalingFactor(MPU6050_6Axis_MotionApps20 &mpu) {
+float getGyroScalingFactor(MPU6050 &mpu) {
 	float gyro_scale = -1;
 	printf("Gyro range set to: ");
 	switch (mpu.getFullScaleGyroRange()) {
