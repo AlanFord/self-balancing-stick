@@ -10,6 +10,9 @@
 uint32_t callBackCount = 0;
 EncoderCallbackData callbackList[maxCallBacks];
 
+/*
+ * @brief
+ */
 bool addCallback(TIM_HandleTypeDef *htim, Encoder *encoder) {
 	if (callBackCount < maxCallBacks) {
 		callbackList[callBackCount].htim = htim;
@@ -21,6 +24,9 @@ bool addCallback(TIM_HandleTypeDef *htim, Encoder *encoder) {
 }
 
 
+/*
+ * brief
+ */
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	// hurry up and get the data that can change!
 	unsigned long grab_the_time = __MICROS();
@@ -69,25 +75,37 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	}
 
 }
-
+/*
+ * @brief initalizes an encoder peripheral
+ * @param a timer peripheral handle
+ */
 Encoder::Encoder(TIM_HandleTypeDef *htim) {
 	this->htim = htim;
 	encoder_Resolution_Size =
 			(encoder_Tick_Resolution * 1000000. / encoder_PPR);
 }
 
+/*
+ * @brief starts the encoder operation
+ * @returns a HAL status
+ */
 HAL_StatusTypeDef Encoder::initEncoder() {
 	return HAL_TIM_Encoder_Start_IT(htim, TIM_CHANNEL_ALL);
 }
 
+/*
+ * @brief stops the encoder operation
+ * @returns a HAL status
+ */
 HAL_StatusTypeDef Encoder::deinitEncoder() {
 	return HAL_TIM_Encoder_Stop_IT(htim, TIM_CHANNEL_ALL);
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////  SPEED  ////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
+ * @brief calculates the motor speed and acceleration
+ * @param speed  motor speed in RPM
+ * @param accel  motor acceleration in RPM/sec
+ */
 void Encoder::get_Encoder_Speeds(float &speed, float &accel) {
 	float Speed_RPM_Prev = Speed_RPM;
 	unsigned long Time_Saved = Time_Now;

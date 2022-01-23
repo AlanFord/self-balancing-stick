@@ -11,6 +11,9 @@
 #include "common.h"
 #include "MPU6050_6Axis_motionApps20.h"
 
+#define _BV(n) (1 << n)
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -38,9 +41,11 @@ class IMU {
 	float omega_Speed_Now;
 	float right_Speed_RPM;
 
+	bool update_ypr_values(float (&ypr)[3]);
+
 public:
 	IMU(I2C_HandleTypeDef *hi2c, uint8_t address = MPU6050_DEFAULT_ADDRESS);
-	void get_IMU_values(void);
+	bool update_IMU_values(void);
 	void get_theta_values(float &theta_Now, float &theta_Integral,
 			float &theta_Speed_Now, float& theta_Zero);
 	void get_omega_values(float &omega_Now, float &omega_Integral,

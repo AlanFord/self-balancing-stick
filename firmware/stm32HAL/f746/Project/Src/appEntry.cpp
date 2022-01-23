@@ -69,19 +69,17 @@ void app_entry(void) {
 			&imu, &leftEncoder, &leftMotor, friction_Value);
 
 	Terminal_Init();
-	/////////////////////////////////////
-	//
-	//  TEST FRAMEWORK
-	//
-	leftMotor.set_voltage(50);
 
 	/////////////////////////////////////
 	while (1) {
 		// Everything from here down should be non-blocking
 		Terminal_Process();
-		rightMotor.set_voltage(rightController.get_PID_Voltage_Value());
-		leftMotor.set_voltage(leftController.get_PID_Voltage_Value());
-		//TODO: Do Stuff!
+		bool update_available = imu.update_IMU_values();
+		// don't mess with motor voltages if no new imu angles are available
+		if (update_available) {
+			rightMotor.set_voltage(rightController.get_PID_Voltage_Value());
+			leftMotor.set_voltage(leftController.get_PID_Voltage_Value());
+		}
 	}
 
 }

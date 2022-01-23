@@ -1,8 +1,24 @@
 /*
- * imu.c
+ * @file imu.cpp
+ * @author Alan Ford
+ * @date   22 feb 2022
+ * @brief Class definition for an MPU6050 inertial measurement unit (IMU)
  *
- *  Created on: Dec 6, 2021
- *      Author: alan
+ * This class definition encapulates the required functions of an MPU6050
+ * gyroscope/accelerometer.  The class methods call library functions derived
+ * from Jeff Rowberg's i2cdevlib library.
+ *
+ * The MPU6050 has a few peculiarities, chief among them is the
+ * digital motion processor (dmp) buffer.  This buffer holds the periodic
+ * results of yaw, pitch, and roll, updated approximately every 10 msec.
+ * The buffer is a ring buffer, but the size of the ring buffer is not an
+ * integral multiple of the data packet size (packet size of up to 42 bytes
+ * with a FIFO buffer of 1024 bytes as shown in MPU6050_6Axis_motionApps20.cpp.
+ * Thus, if the buffer overflows it will corrupt the oldest data in the buffer.
+ *
+ * @see https://github.com/jrowberg/i2cdevlib
+ * @see https://www.fpaynter.com/2019/10/mpu6050-fifo-buffer-management-study/
+ * @see https://github.com/ZHomeSlice/Simple_MPU6050
  */
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,9 +104,16 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 /*
  * @brief IMU constructor
  *
+ * - runs the initialization function
+ *   - sets the clock source
+ *   - sets the full scale for accel and gyro
+ *   - wakes up the imu
  * - Tests the I2C connection to the IMU
+ * - initializes the dmp
+ *   - resets the imu
+ *   - turns on the fifo overflow and data interrupts
  * - Sets up the MPU-6050 gyro offsets
- * - Clears the MPU-6050 int status bits with a call to gitIntStatus()
+ * - gets the packetSize for this configuration
  *
  * @param hi2c I2C HAL handle
  * @param addrress imu I2C address
@@ -101,8 +124,8 @@ IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
  *  The following aren't needed; mpu.dmpInitialize() is a substitute
  *	mpu.reset();
  *	HAL_Delay(100);
- *	mpu.initialize();  // required to "wake up" the mpu
  */
+	mpu.initialize();  // required to "wake up" the mpu from sleep mode
 	printf(
 			mpu.testConnection() ?
 					"MPU6050 connection successful\n" :
@@ -115,11 +138,12 @@ IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
 	mpu.setZGyroOffset(24);
 	mpu.setXAccelOffset(-3405);
 	mpu.setYAccelOffset(339);
-	mpu.setZAccelOffset(1473);          // 1688 factory default for my test chip
+	mpu.setZAccelOffset(1473);
+	mpu.PrintActiveOffsets();
 
 	if (devStatus == 0) {     // make sure it worked (devStatus returns 0 if so)
 		mpu.setDMPEnabled(true);         // turn on the DMP, now that it's ready
-		mpu.getIntStatus(); // enable Arduino interrupt detection (Remove attachInterrupt function here)
+		// mpu.getIntStatus(); // enable Arduino interrupt detection (Remove attachInterrupt function here)
 		dmpReady = true; // set our DMP Ready flag so the main loop() function knows it's okay to use it
 		packetSize = mpu.dmpGetFIFOPacketSize(); // get expected DMP packet size for later comparison
 	} else {
@@ -134,18 +158,67 @@ IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
 }
 
 /*
- * @brief
- *
- * Waits for the mpu interrupt flag to be set, gets data from the imu, and calcylates yaw, pitch and roll.
- * Theta values then calculated from the roll.  Omega value calculated from the pitch.
- * Theta is forward/backward angle in degrees, from -180 to +180.
- * Omega is left/right angle in degrees, from -180 to +180.
+ * @brief Retrieves raw ypr values from the imu if data is ready
+ * @param ypr an array of floats representin yaw, pitch, and roll in radians
+ * @returns true if new data is found, false otherwise
  *
  */
-void IMU::get_IMU_values(void) {
+
+bool IMU::update_ypr_values(float (&ypr)[3]){
 	Quaternion q;                   // [w, x, y, z]         quaternion container
 	VectorFloat gravity;              // [x, y, z]            gravity vector
-	float ypr[3]; // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
+	///////////////////////////////////////////////////// IMU Comms ////////////////////////////////////////////////////////////////////////
+	if (!dmpReady) {
+		printf("Shit failed yo\n");
+		return false;               // if programming failed, don't try to do anything
+	}
+
+	uint32_t time_IMU_Prev = __MICROS();
+	if (!mpuInterrupt) {
+		return false;
+	}
+	else {
+		uint32_t time_IMU_Dif = __MICROS() - time_IMU_Prev;
+
+		mpuInterrupt = false;                                // reset interrupt flag
+		uint8_t mpuIntStatus = mpu.getIntStatus();            // get INT_STATUS byte
+		uint16_t fifoCount = mpu.getFIFOCount();           // get current FIFO count
+
+		if ((mpuIntStatus & _BV(MPU6050_INTERRUPT_FIFO_OFLOW_BIT)) || fifoCount >= 1024) { // check for overflow (this should never happen unless our code is too inefficient)
+			mpu.resetFIFO();                     // reset so we can continue cleanly
+			printf("FIFO overflow!\n");
+		}
+
+		else if (mpuIntStatus & _BV(MPU6050_INTERRUPT_DMP_INT_BIT)) { // otherwise, check for DMP data ready interrupt (this should happen frequently)
+			while (fifoCount < packetSize) {
+				HAL_Delay(1); // wait for correct available data length, should be a VERY short wait
+				fifoCount = mpu.getFIFOCount();
+				mpuIntStatus = mpu.getIntStatus();
+			}
+			mpu.getFIFOBytes(fifoBuffer, packetSize);     // read a packet from FIFO
+			fifoCount -= packetSize; // track FIFO count here in case there is > 1 packet available (this lets us immediately read more without waiting for an interrupt)
+			mpu.dmpGetQuaternion(&q, fifoBuffer);   // display YPR angles in degrees
+			mpu.dmpGetGravity(&gravity, &q);
+			mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+		}
+
+		mpu.resetFIFO();      // ADDED BY ME!!!!!!!!!!!
+	}
+	return true;
+}
+
+
+/*
+ * @brief Converts pitch and roll into filtered values of omega and theta
+ *
+ * Theta values then calculated from the roll.  Omega value calculated from the pitch.
+ * Theta is forward/backward angle (i.e pitch) in degrees, from -180 to +180.
+ * Omega is left/right angle (i.e.roll) in degrees, from -180 to +180.
+ *
+ * @returns true if updated data is available, false otherwise
+ */
+bool IMU::update_IMU_values(void) {
+	float ypr[3]; // [yaw, pitch, roll]   yaw/pitch/roll container
 	static int p = 0;
 	static int p_Prev = 0;
 	static float theta_Error = 0;
@@ -158,49 +231,9 @@ void IMU::get_IMU_values(void) {
 	static float theta_Average = 0;
 	float omega_Average = 0;
 
-	///////////////////////////////////////////////////// IMU Comms ////////////////////////////////////////////////////////////////////////
-	if (!dmpReady) {
-		printf("Shit failed yo\n");
-		return;               // if programming failed, don't try to do anything
+	if (!update_ypr_values(ypr)) {
+		return false;
 	}
-
-	uint32_t time_IMU_Prev = __MICROS();
-
-	while (!mpuInterrupt) { // && fifoCount < packetSize) {       // wait for MPU interrupt or extra packet(s) available
-		// other program behavior stuff here
-		// if you are really paranoid you can frequently test in between other
-		// stuff to see if mpuInterrupt is true, and if so, "break;" from the
-		// while() loop to immediately process the MPU data
-		//Serial.println("Waiting in IMU function");
-
-	}
-
-	uint32_t time_IMU_Dif = __MICROS() - time_IMU_Prev;
-
-	mpuInterrupt = false;                                // reset interrupt flag
-	uint8_t mpuIntStatus = mpu.getIntStatus();            // get INT_STATUS byte
-	uint16_t fifoCount = mpu.getFIFOCount();           // get current FIFO count
-
-	if ((mpuIntStatus & 0x10) || fifoCount >= 1024) { // check for overflow (this should never happen unless our code is too inefficient)
-		mpu.resetFIFO();                     // reset so we can continue cleanly
-		printf("FIFO overflow!\n");
-	}
-
-	else if (mpuIntStatus & 0x02) { // otherwise, check for DMP data ready interrupt (this should happen frequently)
-		while (fifoCount < packetSize) {
-			HAL_Delay(1); // wait for correct available data length, should be a VERY short wait
-			fifoCount = mpu.getFIFOCount();
-			mpuIntStatus = mpu.getIntStatus();
-		}
-		mpu.getFIFOBytes(fifoBuffer, packetSize);     // read a packet from FIFO
-		fifoCount -= packetSize; // track FIFO count here in case there is > 1 packet available (this lets us immediately read more without waiting for an interrupt)
-		mpu.dmpGetQuaternion(&q, fifoBuffer);   // display YPR angles in degrees
-		mpu.dmpGetGravity(&gravity, &q);
-		mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-	}
-
-	mpu.resetFIFO();      // ADDED BY ME!!!!!!!!!!!
-
 	if (p == 1 && p_Prev == 0) { // Resets integral when balancing mode is started to avoid wide up while holding
 		theta_Integral = 0;
 		omega_Integral = 0;
@@ -298,7 +331,7 @@ void IMU::get_IMU_values(void) {
 	} else {
 		omega_Zero = omega_Average;
 	}
-
+	return true;
 }
 
 /*
@@ -319,6 +352,11 @@ void IMU::get_theta_values(float &theta_Now, float &theta_Integral,
 
 /*
  * @brief returns previously calculated omega values
+ * @param omega_Now current omega value
+ * @param omega_Integral integral of the omega error (actual - desired)
+ * @param omega_Speed_Now omega rate of changle, degrees/sec
+ * @param omega_Zero target angle
+ *
  */
 void IMU::get_omega_values(float &omega_Now, float &omega_Integral,
 		float &omega_Speed_Now, float& omega_Zero) {

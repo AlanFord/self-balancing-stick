@@ -17,10 +17,8 @@ enum Direction {
 	theta, omega
 };
 
-//int get_left_PID_Voltage_Value();
-//int get_right_PID_Voltage_Value();
-
 class Controller {
+	int PID_Voltage;
 	float angle_Kp;
 	float angle_Ki;
 	float angle_Kd;
