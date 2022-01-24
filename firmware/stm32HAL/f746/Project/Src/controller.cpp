@@ -59,9 +59,9 @@ int Controller::get_PID_Voltage_Value() {
 	float PID_Accel = P_Accel + I_Accel + D_Accel + S_Accel;
 
 	float friction = 0;
-	if (speed > 0.5) {
+	if (speed > stiction_speed_threshold) {
 		friction = friction_Value;
-	} else if (speed < -0.5) {
+	} else if (speed < -stiction_speed_threshold) {
 		friction = -friction_Value;
 	}
 

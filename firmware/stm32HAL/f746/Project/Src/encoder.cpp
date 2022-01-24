@@ -76,7 +76,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 
 }
 /*
- * @brief initalizes an encoder peripheral
+ * @brief initializes an encoder peripheral
  * @param a timer peripheral handle
  */
 Encoder::Encoder(TIM_HandleTypeDef *htim) {

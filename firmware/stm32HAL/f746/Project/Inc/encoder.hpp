@@ -14,10 +14,11 @@
 //  Hardware Notes!!!
 //
 //  Note: See "hardware interface design notes.txt" for a derivation of encoder_PPR
-#define   encoder_PPR               211.2 //334           // Encoder pulse per revolution (was 334 in Mike's version of the software)
+// Encoder pulse per revolution (was 334 in Mike's version of the software)
+#define   encoder_PPR               211.2
 // encoder_Tick_Resolution was 10 for Mikes version
-#define   encoder_Tick_Resolution   6 //10                // Defines how many ticks to 'wait' until calculating encoder positions and time measurments. Higher values lead to decreased ISR times, but decreased encoder accuracy.
-#define   encoder_Speed_Time_Limit  100                   // Defines how long to wait for a new tick before assuming wheel is stopped [ms]
+#define   encoder_Tick_Resolution   6 //10                // how many ticks to 'wait' until calculating encoder positions and time measurments. Higher values lead to decreased ISR times, but decreased encoder accuracy.
+#define   encoder_Speed_Time_Limit  100                   // how long to wait for a new tick before assuming wheel is stopped [ms]
 #define   Speed_Filter         0.8
 //
 //

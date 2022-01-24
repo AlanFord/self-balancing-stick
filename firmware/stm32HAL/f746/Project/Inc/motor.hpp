@@ -23,7 +23,11 @@ extern "C" {
 
 class Motor {
 	int voltage_Max = 0;
-	int voltage_Offset = 0; // Defines amount of voltage added to compensate for motor stiction, [0 - 255].
+	// Defines a friction offset to be added to the calculated motor voltage to compensate for motor stiction.
+	// The other option to use is the controller friction_Value.
+	// voltage_Offset is ALWAYS used, while friction_Value is applied at low speeds.
+	// friction value was used in the original source.
+	int voltage_Offset = 0;
 	int voltage = 0;
 	TIM_HandleTypeDef *htim;
 	GPIO_TypeDef *GPIOx;
