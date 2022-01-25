@@ -8,14 +8,27 @@
 #include "terminal.h"
 
 void app_entry(void) {
-	HAL_StatusTypeDef rcode;
+	//PID constants for the theta motor
+	constexpr float theta_Kp = 1200;
+	constexpr float theta_Ki = 0;
+	constexpr float theta_Kd = 130;
+	constexpr float theta_Ks = -25;
+
+	//PID constants for the omega motor
+	constexpr float omega_Kp = 1600;
+	constexpr float omega_Ki = 0;
+	constexpr float omega_Kd = 130;
+	constexpr float omega_Ks = -25;
+
+	constexpr float friction_Value = 10;  // accomodate stiction
+
 	//initialize microsecond timer
 	HAL_TIM_Base_Start(&htim5);
 
 	//initialize right motor encoder
 	Encoder rightEncoder(&htim3);
 	addCallback(&htim3, &rightEncoder);
-	rcode = rightEncoder.initEncoder();
+	HAL_StatusTypeDef rcode = rightEncoder.initEncoder();
 	if (rcode != HAL_OK) {
 		printf("motor initialization failure");
 		Error_Handler();
@@ -48,17 +61,6 @@ void app_entry(void) {
 		printf("imu initialization failure");
 		Error_Handler();
 	}
-	float theta_Kp = 1200;
-	float theta_Ki = 0;
-	float theta_Kd = 130;
-	float theta_Ks = -25;
-
-	float omega_Kp = 1600;
-	float omega_Ki = 0;
-	float omega_Kd = 130;
-	float omega_Ks = -25;
-
-	float friction_Value = 10;
 
 	//initialize right controller (omega)
 	Controller rightController(omega, omega_Kp, omega_Ki, omega_Kd, omega_Ks,

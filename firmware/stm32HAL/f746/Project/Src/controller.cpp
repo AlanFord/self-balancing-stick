@@ -28,11 +28,11 @@
 Controller::Controller(Direction angle, float Kp, float Ki, float Kd, float Ks,
 		IMU *imu, Encoder *encoder, Motor *motor, float friction) {
 	this->angle = angle;
-	angle_Kp = Kp;
-	angle_Ki = Ki;
-	angle_Kd = Kd;
-	angle_Ks = Ks;
-	friction_Value = friction;
+	this->Kp = Kp;
+	this->Ki = Ki;
+	this->Kd = Kd;
+	this->Ks = Ks;
+	this->friction_Value = friction;
 	this->imu = imu;
 	this->encoder = encoder;
 	this->motor = motor;
@@ -43,7 +43,10 @@ Controller::Controller(Direction angle, float Kp, float Ki, float Kd, float Ks,
  * @returns motor voltage (between -255 and 255)
  */
 int Controller::get_PID_Voltage_Value() {
-	float angle_Now, angle_Integral, angle_Speed_Now, angle_Zero;
+	float angle_Now;
+	float angle_Integral;
+	float angle_Speed_Now;
+	float angle_Zero;
 	if (angle == theta) {
 		imu->get_theta_values(angle_Now, angle_Integral, angle_Speed_Now, angle_Zero);
 	} else {
@@ -52,10 +55,10 @@ int Controller::get_PID_Voltage_Value() {
 	float speed;  //speed in RPM
 	float accel;
 	encoder->get_Encoder_Speeds(speed, accel);
-	float P_Accel = angle_Kp * (angle_Now - angle_Zero);
-	float I_Accel = angle_Ki * angle_Integral;
-	float D_Accel = angle_Kd * angle_Speed_Now;
-	float S_Accel = angle_Ks * speed / 1000.;
+	float P_Accel = Kp * (angle_Now - angle_Zero);
+	float I_Accel = Ki * angle_Integral;
+	float D_Accel = Kd * angle_Speed_Now;
+	float S_Accel = Ks * speed / 1000.;
 	float PID_Accel = P_Accel + I_Accel + D_Accel + S_Accel;
 
 	float friction = 0;
@@ -76,7 +79,7 @@ int Controller::get_PID_Voltage_Value() {
  * @param new value of Kp
  */
 void Controller::set_Kp(float value) {
-	angle_Kp = value;
+	Kp = value;
 }
 
 /*
@@ -84,7 +87,7 @@ void Controller::set_Kp(float value) {
  * @param new value of Ki
  */
 void Controller::set_Ki(float value) {
-	angle_Ki = value;
+	Ki = value;
 }
 
 /*
@@ -92,7 +95,7 @@ void Controller::set_Ki(float value) {
  * @param new value of Kd
  */
 void Controller::set_Kd(float value) {
-	angle_Kd = value;
+	Kd = value;
 }
 
 /*
@@ -100,7 +103,7 @@ void Controller::set_Kd(float value) {
  * @param new value of Ks
  */
 void Controller::set_Ks(float value) {
-	angle_Ks = value;
+	Ks = value;
 }
 
 /*

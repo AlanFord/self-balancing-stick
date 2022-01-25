@@ -71,15 +71,15 @@
 #include <math.h>
 #include <stdio.h>
 
-#define   angle_Rounding_Value      1000.                  // Defines what value to multiple by before round theta and omega. Cuts down on noise, [10 = x.1,  100 = x.x1 , 1(Default)]
-#define   theta_Filter              0.7
-#define   omega_Filter              0.7
-#define   theta_Integral_Max        3.0
-#define   omega_Integral_Max        3.0
-#define   theta_Speed_Filter        0.7
-#define   omega_Speed_Filter        0.7
-float angle_Average_Filter = 0.970;
-float angle_Smoothed_Filter = 0.997;
+const uint16_t angle_Rounding_Value = 1000; // Defines what value to multiple by before round theta and omega. Cuts down on noise, [10 = x.1,  100 = x.x1 , 1(Default)]
+const float theta_Filter = 0.7;
+const float omega_Filter = 0.7;
+const float theta_Integral_Max = 3.0;
+const float omega_Integral_Max = 3.0;
+const float theta_Speed_Filter = 0.7;
+const float omega_Speed_Filter = 0.7;
+const float angle_Average_Filter = 0.970;
+const float angle_Smoothed_Filter = 0.997;
 
 float theta_Kt = 0.6;
 float theta_Ktd = 0;
@@ -120,6 +120,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  */
 IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
 		mpu(hi2c, address) {
+	const int16_t xGyroOffset = 224;
+	const int16_t yGyroOffset = 98;
+	const int16_t zGyroOffset = 24;
+	const int16_t xAccelOffset = -3405;
+	const int16_t yAccelOffset = 339;
+	const int16_t zAccelOffset = 1473;
 /*
  *  The following aren't needed; mpu.dmpInitialize() is a substitute
  *	mpu.reset();
@@ -133,12 +139,12 @@ IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
 	uint8_t devStatus = mpu.dmpInitialize();       // load and configure the DMP
 
 	// supply your own gyro offsets here, scaled for min sensitivity
-	mpu.setXGyroOffset(224);
-	mpu.setYGyroOffset(98);
-	mpu.setZGyroOffset(24);
-	mpu.setXAccelOffset(-3405);
-	mpu.setYAccelOffset(339);
-	mpu.setZAccelOffset(1473);
+	mpu.setXGyroOffset(xGyroOffset);
+	mpu.setYGyroOffset(yGyroOffset);
+	mpu.setZGyroOffset(zGyroOffset);
+	mpu.setXAccelOffset(xAccelOffset);
+	mpu.setYAccelOffset(yAccelOffset);
+	mpu.setZAccelOffset(zAccelOffset);
 	mpu.PrintActiveOffsets();
 
 	if (devStatus == 0) {     // make sure it worked (devStatus returns 0 if so)
@@ -159,15 +165,15 @@ IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
 
 /*
  * @brief Retrieves raw ypr values from the imu if data is ready
- * @param ypr an array of floats representin yaw, pitch, and roll in radians
+ * @param ypr an array of floats representing yaw, pitch, and roll in radians
  * @returns true if new data is found, false otherwise
  *
  */
 
 bool IMU::update_ypr_values(float (&ypr)[3]){
-	Quaternion q;                   // [w, x, y, z]         quaternion container
-	VectorFloat gravity;              // [x, y, z]            gravity vector
-	///////////////////////////////////////////////////// IMU Comms ////////////////////////////////////////////////////////////////////////
+
+	const uint16_t fifo_buffer_size = 1024;
+
 	if (!dmpReady) {
 		printf("Shit failed yo\n");
 		return false;               // if programming failed, don't try to do anything
@@ -184,7 +190,7 @@ bool IMU::update_ypr_values(float (&ypr)[3]){
 		uint8_t mpuIntStatus = mpu.getIntStatus();            // get INT_STATUS byte
 		uint16_t fifoCount = mpu.getFIFOCount();           // get current FIFO count
 
-		if ((mpuIntStatus & _BV(MPU6050_INTERRUPT_FIFO_OFLOW_BIT)) || fifoCount >= 1024) { // check for overflow (this should never happen unless our code is too inefficient)
+		if ((mpuIntStatus & _BV(MPU6050_INTERRUPT_FIFO_OFLOW_BIT)) || fifoCount >= fifo_buffer_size) { // check for overflow (this should never happen unless our code is too inefficient)
 			mpu.resetFIFO();                     // reset so we can continue cleanly
 			printf("FIFO overflow!\n");
 		}
@@ -197,7 +203,9 @@ bool IMU::update_ypr_values(float (&ypr)[3]){
 			}
 			mpu.getFIFOBytes(fifoBuffer, packetSize);     // read a packet from FIFO
 			fifoCount -= packetSize; // track FIFO count here in case there is > 1 packet available (this lets us immediately read more without waiting for an interrupt)
+			Quaternion q;                   // [w, x, y, z]         quaternion container
 			mpu.dmpGetQuaternion(&q, fifoBuffer);   // display YPR angles in degrees
+			VectorFloat gravity;              // [x, y, z]            gravity vector
 			mpu.dmpGetGravity(&gravity, &q);
 			mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
 		}
@@ -218,9 +226,7 @@ bool IMU::update_ypr_values(float (&ypr)[3]){
  * @returns true if updated data is available, false otherwise
  */
 bool IMU::update_IMU_values(void) {
-	float ypr[3]; // [yaw, pitch, roll]   yaw/pitch/roll container
-	static int p = 0;
-	static int p_Prev = 0;
+	float ypr[3]; // [yaw, pitch, roll] in radians
 	static float theta_Error = 0;
 	static float omega_Error = 0;
 	static float theta_Smoothed = 0;
@@ -234,7 +240,8 @@ bool IMU::update_IMU_values(void) {
 	if (!update_ypr_values(ypr)) {
 		return false;
 	}
-	if (p == 1 && p_Prev == 0) { // Resets integral when balancing mode is started to avoid wide up while holding
+	//TODO: p must be managed by the terminal interface
+	if (p == 1 && p_Prev == 0) { // Resets integral when balancing mode is started to avoid wind up while holding
 		theta_Integral = 0;
 		omega_Integral = 0;
 		theta_Error = 0;
@@ -252,13 +259,17 @@ bool IMU::update_IMU_values(void) {
 	////////////////////////////////////////////////////////// Theta Calcs//////////////////////////////////////////////////////////////////////////////////////////
 
 	float theta_Prev = theta_Now;
+	//TODO: does the use of an angle_rounding_value make any sense when using floats?
+	// convert the pitch for radians to degrees and apply a digital filter
 	float theta_Now_Unfiltered = round(
 			(ypr[2] * 180 / M_PI) * angle_Rounding_Value) / angle_Rounding_Value; //undo
 	theta_Now = (1 - theta_Filter) * (theta_Now_Unfiltered)
 			+ (theta_Filter * theta_Prev); //undo
 
+	// angle error in degrees
 	theta_Error = theta_Now - theta_Zero;
 
+	// integral angle error in degree*seconds
 	theta_Integral += theta_Error * (imu_Time_Now - imu_Time_Prev) / 1000000.0;
 	if (theta_Integral > theta_Integral_Max) {
 		theta_Integral = theta_Integral_Max;
@@ -266,14 +277,18 @@ bool IMU::update_IMU_values(void) {
 		theta_Integral = -theta_Integral_Max;
 	}
 
+	// calculate the rotational velocity in degrees/sec using a digital filter
 	float theta_Speed_Prev = theta_Speed_Now;
 	theta_Speed_Now = ((1 - theta_Speed_Filter) * (theta_Now - theta_Prev)
 			/ (imu_Time_Now - imu_Time_Prev) * 1000000.)
 			+ theta_Speed_Filter * theta_Speed_Prev; // Relative to absolute zero
+
+	// again, another digital filter based on averaging the angle
 	float theta_Average_Prev = theta_Average;
 	theta_Average = (1 - angle_Average_Filter) * (theta_Now)
 			+ (angle_Average_Filter * theta_Average_Prev);
 
+	// yep, let's smooth theta  and rotational velocity one more time
 	float theta_Smoothed_Prev = theta_Smoothed;
 	theta_Smoothed = (1 - angle_Smoothed_Filter) * theta_Now
 			+ angle_Smoothed_Filter * theta_Smoothed_Prev;
@@ -308,6 +323,7 @@ bool IMU::update_IMU_values(void) {
 		omega_Integral = -omega_Integral_Max;
 	}
 
+	// calculate the angular velocity
 	float omega_Speed_Prev = omega_Speed_Now;
 	omega_Speed_Now = ((1 - omega_Speed_Filter) * (omega_Now - omega_Prev)
 			/ (imu_Time_Now - imu_Time_Prev) * 1000000.)

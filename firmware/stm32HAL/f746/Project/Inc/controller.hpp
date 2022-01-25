@@ -20,15 +20,16 @@ enum Direction {
 class Controller {
 	const float stiction_speed_threshold = 0.5;  // RPM
 	int PID_Voltage = 0;
-	float angle_Kp = 0;
-	float angle_Ki = 0;
-	float angle_Kd = 0;
-	float angle_Ks = 0;
+	float Kp = 0;
+	float Ki = 0;
+	float Kd = 0;
+	float Ks = 0;
 	// Defines amount of voltage added to compensate for motor stiction, [0 - 255].
 	// The other option to use is the motor voltage_Offset.
 	// voltage_Offset is ALWAYS used, while friction_Value is applied at low speeds.
 	// friction value was used in the original source.
 	float friction_Value = 0;
+
 	Encoder *encoder;
 	IMU *imu;
 	Motor *motor;

@@ -32,14 +32,16 @@ class IMU {
 	/* these are used to pass data to the controllers in the "get ... values" methods*/
 	float theta_Now;
 	float theta_Zero;
-	float theta_Integral;
+	float theta_Integral = 0;
 	float theta_Speed_Now;
 	float left_Speed_RPM;
 	float omega_Now;
 	float omega_Zero;
-	float omega_Integral;
+	float omega_Integral = 0;
 	float omega_Speed_Now;
 	float right_Speed_RPM;
+	int p = 0;
+	int p_Prev = 0;
 
 	bool update_ypr_values(float (&ypr)[3]);
 

@@ -6,12 +6,15 @@
  */
 #include <encoder.hpp>
 
-#define maxCallBacks 10
+const uint32_t maxCallBacks = 10;
 uint32_t callBackCount = 0;
 EncoderCallbackData callbackList[maxCallBacks];
 
 /*
- * @brief
+ * @brief adds a timer handle and associated encoder object to the callback list
+ * @param htim pointer to a timer handle
+ * @encoder pointer to an encoder object
+ * @return true if a collback list entry is made, false otherwise
  */
 bool addCallback(TIM_HandleTypeDef *htim, Encoder *encoder) {
 	if (callBackCount < maxCallBacks) {
@@ -25,7 +28,10 @@ bool addCallback(TIM_HandleTypeDef *htim, Encoder *encoder) {
 
 
 /*
- * brief
+ * @brief callback handler for timers associated with encoder objects
+ * @param htim pointer to a timer handle
+ *
+ * The timer periperal
  */
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	// hurry up and get the data that can change!
