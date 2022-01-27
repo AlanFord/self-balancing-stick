@@ -7,12 +7,17 @@
 
 shell_cmds pencil_cmds =
 {
-	.count = 4,
+	.count = 5,
 	.cmds  = {
 		{
 			.cmd     = "charge",
 			.desc    = "Control motor power",
 			.func    = shell_cmd_power,
+		},
+		{
+			.cmd     = "imu",
+			.desc    = "IMU reading",
+			.func    = shell_cmd_imu,
 		},
 		{
 			.cmd     = "balance",
@@ -78,6 +83,17 @@ list_t balance_options =
 	},
 };
 
+/*
+ * @brief report imu reading
+ */
+int shell_cmd_imu(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
+ * @brief processes the power command
+ */
 int shell_cmd_power(shell_cmd_args *args)
 {
 	for (int i = 0; i < power_options.count; i++)
@@ -96,6 +112,9 @@ int shell_cmd_power(shell_cmd_args *args)
 	return 0;
 }
 
+/*
+ * @brief process the balance command
+ */
 int shell_cmd_balance(shell_cmd_args *args)
 {
 	for (int i = 0; i < balance_options.count; i++)
@@ -114,12 +133,18 @@ int shell_cmd_balance(shell_cmd_args *args)
 	return 0;
 }
 
+/*
+ * @brief processes the deviceinfo menu option
+ */
 int shell_cmd_deviceinfo(shell_cmd_args *args)
 {
 	DisplaySystemInformation();
 	return 0;
 }
 
+/*
+ * @brief processes the uptime menu option
+ */
 int shell_cmd_uptime(shell_cmd_args *args)
 {
 	uint32_t uptime = HAL_GetTick();
