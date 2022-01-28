@@ -10,16 +10,17 @@
 
 
 
-	#ifdef __cplusplus
-		extern "C"
-		{
-	#endif
 
-		void app_entry (void);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
-	#ifdef __cplusplus
-		}
-	#endif
+void app_entry (void);
+
+#ifdef __cplusplus
+}
+#endif
 
 
 

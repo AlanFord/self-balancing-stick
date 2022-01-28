@@ -3,10 +3,10 @@
 ///
 ///	\author Alan Ford
 ///////////////////////////////////////////////////////////////////////////////
+#include <commands.hpp>
 #include "common.h"
 #include "serial.h"
 #include "shell.h"
-#include "commands.h"
 #include <stdio.h>
 #include "terminal.h"
 

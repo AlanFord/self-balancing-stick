@@ -1,11 +1,16 @@
-#include <encoder.hpp>
-#include <motor.hpp>
-#include "main.h"
-#include "tim.h"
-#include "imu.hpp"
-#include "controller.hpp"
 #include "appEntry.hpp"
 #include "terminal.h"
+#include "hardware.hpp"
+
+
+// the hardware!
+IMU imu(&hi2c1);
+Motor rightMotor(&htim1, R_MOTOR_DIR_GPIO_Port, R_MOTOR_DIR_Pin);
+Motor leftMotor(&htim2, L_MOTOR_DIR_GPIO_Port, L_MOTOR_DIR_Pin);
+Encoder leftEncoder(&htim4);
+Encoder rightEncoder(&htim3);
+bool left_controller_active = false;
+bool right_controller_active = false;
 
 void app_entry(void) {
 	//PID constants for the theta motor
@@ -26,7 +31,6 @@ void app_entry(void) {
 	HAL_TIM_Base_Start(&htim5);
 
 	//initialize right motor encoder
-	Encoder rightEncoder(&htim3);
 	addCallback(&htim3, &rightEncoder);
 	HAL_StatusTypeDef rcode = rightEncoder.initEncoder();
 	if (rcode != HAL_OK) {
@@ -35,7 +39,6 @@ void app_entry(void) {
 	}
 
 	//initialize left motor encoder
-	Encoder leftEncoder(&htim4);
 	addCallback(&htim4, &leftEncoder);
 	rcode = leftEncoder.initEncoder();
 	if (rcode != HAL_OK) {
@@ -44,19 +47,16 @@ void app_entry(void) {
 	}
 
 	//initialize right motor
-	Motor rightMotor(&htim1, R_MOTOR_DIR_GPIO_Port, R_MOTOR_DIR_Pin);
 	if (rightMotor.start() != HAL_OK) {
 		printf("motor initialization failure");
 		Error_Handler();
 	}
 	//initialize left motor
-	Motor leftMotor(&htim2, L_MOTOR_DIR_GPIO_Port, L_MOTOR_DIR_Pin);
 	if (leftMotor.start() != HAL_OK) {
 		printf("motor initialization failure");
 		Error_Handler();
 	}
 	//initialize imu
-	IMU imu(&hi2c1);
 	if (imu.get_Status() != TRUE) {
 		printf("imu initialization failure");
 		Error_Handler();
@@ -79,8 +79,10 @@ void app_entry(void) {
 		bool update_available = imu.update_IMU_values();
 		// don't mess with motor voltages if no new imu angles are available
 		if (update_available) {
-			rightMotor.set_voltage(rightController.get_PID_Voltage_Value());
-			leftMotor.set_voltage(leftController.get_PID_Voltage_Value());
+			if (left_controller_active)
+				leftMotor.set_voltage(leftController.get_PID_Voltage_Value());
+			if (right_controller_active)
+				rightMotor.set_voltage(rightController.get_PID_Voltage_Value());
 		}
 	}
 
