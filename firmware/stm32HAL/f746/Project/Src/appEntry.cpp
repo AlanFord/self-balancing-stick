@@ -4,11 +4,11 @@
 
 
 // the hardware!
-IMU imu(&hi2c1);
-Motor rightMotor(&htim1, R_MOTOR_DIR_GPIO_Port, R_MOTOR_DIR_Pin);
-Motor leftMotor(&htim2, L_MOTOR_DIR_GPIO_Port, L_MOTOR_DIR_Pin);
-Encoder leftEncoder(&htim4);
-Encoder rightEncoder(&htim3);
+IMU *imu_ptr;
+Motor *rightMotor_ptr;
+Motor *leftMotor_ptr;
+Encoder *leftEncoder_ptr;
+Encoder *rightEncoder_ptr;
 bool left_controller_active = false;
 bool right_controller_active = false;
 
@@ -31,6 +31,8 @@ void app_entry(void) {
 	HAL_TIM_Base_Start(&htim5);
 
 	//initialize right motor encoder
+	Encoder rightEncoder(&htim3);
+	rightEncoder_ptr = &rightEncoder;
 	addCallback(&htim3, &rightEncoder);
 	HAL_StatusTypeDef rcode = rightEncoder.initEncoder();
 	if (rcode != HAL_OK) {
@@ -39,6 +41,8 @@ void app_entry(void) {
 	}
 
 	//initialize left motor encoder
+	Encoder leftEncoder(&htim4);
+	leftEncoder_ptr = &leftEncoder;
 	addCallback(&htim4, &leftEncoder);
 	rcode = leftEncoder.initEncoder();
 	if (rcode != HAL_OK) {
@@ -47,16 +51,22 @@ void app_entry(void) {
 	}
 
 	//initialize right motor
+	Motor rightMotor(&htim1, R_MOTOR_DIR_GPIO_Port, R_MOTOR_DIR_Pin);
+	rightMotor_ptr = &rightMotor;
 	if (rightMotor.start() != HAL_OK) {
 		printf("motor initialization failure");
 		Error_Handler();
 	}
 	//initialize left motor
+	Motor leftMotor(&htim2, L_MOTOR_DIR_GPIO_Port, L_MOTOR_DIR_Pin);
+	leftMotor_ptr = &leftMotor;
 	if (leftMotor.start() != HAL_OK) {
 		printf("motor initialization failure");
 		Error_Handler();
 	}
 	//initialize imu
+	IMU imu(&hi2c1);
+	imu_ptr = &imu;
 	if (imu.get_Status() != TRUE) {
 		printf("imu initialization failure");
 		Error_Handler();

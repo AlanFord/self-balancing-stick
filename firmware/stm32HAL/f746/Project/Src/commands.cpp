@@ -89,14 +89,14 @@ list_t balance_options =
  */
 int shell_cmd_imu(shell_cmd_args *args)
 {
-	bool update_available = imu.update_IMU_values();
+	bool update_available = imu_ptr->update_IMU_values();
 	if (!update_available) {
 		printf("no update available \n");
 		return 0;
 	}
 	float theta, integral, speed, zero, omega;
-	imu.get_theta_values(theta, integral, speed, zero);
-	imu.get_omega_values(omega,  integral,  speed, zero);
+	imu_ptr->get_theta_values(theta, integral, speed, zero);
+	imu_ptr->get_omega_values(omega,  integral,  speed, zero);
 	printf("omega = %f, theta = %f \n", omega, theta);
 	return 0;
 }
@@ -123,18 +123,18 @@ int shell_cmd_power(shell_cmd_args *args)
 			right_controller_active = false;
 			switch (power_options.elements[i].value) {
 			case 0:
-				leftMotor.set_voltage(0);
-				rightMotor.set_voltage(0);
+				leftMotor_ptr->set_voltage(0);
+				rightMotor_ptr->set_voltage(0);
 				break;
 			case 1:
-				leftMotor.set_voltage(voltage);
+				leftMotor_ptr->set_voltage(voltage);
 				break;
 			case 2:
-				rightMotor.set_voltage(voltage);
+				rightMotor_ptr->set_voltage(voltage);
 				break;
 			case 3:
-				leftMotor.set_voltage(voltage);
-				rightMotor.set_voltage(voltage);
+				leftMotor_ptr->set_voltage(voltage);
+				rightMotor_ptr->set_voltage(voltage);
 				break;
 			}
 			printf("voltage set to %i \n", voltage);
