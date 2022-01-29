@@ -1,6 +1,7 @@
 //#include "tick.h"
-#include "commands.h"
+#include <commands.hpp>
 #include "terminal.h"
+#include "hardware.hpp"
 #include "stm32f7xx_hal.h"
 #include <string.h>
 #include <stdio.h>
@@ -47,15 +48,15 @@ list_t power_options =
 		},
 		{
 			.name     = "left",
-			.value    = 0,
+			.value    = 1,
 		},
 		{
 			.name     = "right",
-			.value    = 0,
+			.value    = 2,
 		},
 		{
 			.name     = "both",
-			.value    = 0,
+			.value    = 3,
 		},
 	},
 };
@@ -88,6 +89,15 @@ list_t balance_options =
  */
 int shell_cmd_imu(shell_cmd_args *args)
 {
+	bool update_available = imu.update_IMU_values();
+	if (!update_available) {
+		printf("no update available \n");
+		return 0;
+	}
+	float theta, integral, speed, zero, omega;
+	imu.get_theta_values(theta, integral, speed, zero);
+	imu.get_omega_values(omega,  integral,  speed, zero);
+	printf("omega = %f, theta = %f \n", omega, theta);
 	return 0;
 }
 
@@ -96,15 +106,38 @@ int shell_cmd_imu(shell_cmd_args *args)
  */
 int shell_cmd_power(shell_cmd_args *args)
 {
+	int voltage = 0;
+	if (args->count != 2) {
+		printf("Invalid power option arguments\n");
+		return 0;
+	}
+	else {
+		voltage = atoi(args->args[1].val);
+	}
 	for (int i = 0; i < power_options.count; i++)
 	{
 		if (strcmp(args->args[0].val, power_options.elements[i].name) == 0)
 		{
-			for (int i = 0; i < power_options.count; i++) {
-				power_options.elements[i].value = 0;
+			// deactivate the controllers before setting fixed voltages for the motors
+			left_controller_active = false;
+			right_controller_active = false;
+			switch (power_options.elements[i].value) {
+			case 0:
+				leftMotor.set_voltage(0);
+				rightMotor.set_voltage(0);
+				break;
+			case 1:
+				leftMotor.set_voltage(voltage);
+				break;
+			case 2:
+				rightMotor.set_voltage(voltage);
+				break;
+			case 3:
+				leftMotor.set_voltage(voltage);
+				rightMotor.set_voltage(voltage);
+				break;
 			}
-			power_options.elements[i].value = 1;
-			printf("Power option was %s \n",args->args[0].val);
+			printf("voltage set to %i \n", voltage);
 			return 0;
 		}
 	}

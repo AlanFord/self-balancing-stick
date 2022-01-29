@@ -11,6 +11,7 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
 
 void Terminal_Init(void);
 int_fast8_t Terminal_Process(void);

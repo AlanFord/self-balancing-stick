@@ -14,6 +14,7 @@ int shell_cmd_power(shell_cmd_args *args);
 int shell_cmd_balance(shell_cmd_args *args);
 int shell_cmd_deviceinfo(shell_cmd_args *args);
 int shell_cmd_uptime(shell_cmd_args *args);
+int shell_cmd_imu(shell_cmd_args *args);
 
 extern shell_cmds pencil_cmds;
 
