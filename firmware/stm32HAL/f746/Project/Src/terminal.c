@@ -46,9 +46,9 @@ void DisplaySystemInformation(void) {
 	SerialPort.SendString(&SystemMessageString[0]);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-/// \brief Init the terminal program
-///////////////////////////////////////////////////////////////////////////////
+/*
+ * @brief Init the terminal program
+ */
 void Terminal_Init(void) {
 	//Tick::Init();
 	SerialPort.Open();
@@ -57,6 +57,14 @@ void Terminal_Init(void) {
 	DisplaySystemInformation();
 }
 
+/*
+ * @brief intercepts characters from serial stream and returns a complete command string
+ * @return length of command string or 0
+ *
+ * prints a command prompt and then reads characters from the serial buffer.
+ * if buffer is empty, does not block, rather returns 0.  Upon receiving
+ * a newline, returns command string length.
+ */
 int serve_command_prompt(char *buffer, int bufferLength, const char *prompt) {
 	uint8_t SerialTempData = 0; // hold the new byte from the serial fifo
 
@@ -122,6 +130,9 @@ int serve_command_prompt(char *buffer, int bufferLength, const char *prompt) {
 	return 0;
 }
 
+/*
+ * @brief checks return codes from the shell and prints appropriate messages
+ */
 int shell_process(char *cmd_line) {
 	int ret = shell_process_cmds(&pencil_cmds, cmd_line);
 
