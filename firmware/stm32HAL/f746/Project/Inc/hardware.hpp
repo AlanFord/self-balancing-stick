@@ -17,11 +17,11 @@
 #include "controller.hpp"
 
 // the hardware!
-extern IMU imu;
-extern Motor rightMotor;
-extern Motor leftMotor;
-extern Encoder leftEncoder;
-extern Encoder rightEncoder;
+extern IMU *imu_ptr;
+extern Motor *rightMotor_ptr;
+extern Motor *leftMotor_ptr;
+extern Encoder *leftEncoder_ptr;
+extern Encoder *rightEncoder_ptr;
 
 extern bool left_controller_active;
 extern bool right_controller_active;
