@@ -71,6 +71,8 @@
 #include <math.h>
 #include <stdio.h>
 
+#define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
+
 const uint16_t angle_Rounding_Value = 1000; // Defines what value to multiple by before round theta and omega. Cuts down on noise, [10 = x.1,  100 = x.x1 , 1(Default)]
 const float theta_Filter = 0.7;
 const float omega_Filter = 0.7;
@@ -170,49 +172,29 @@ IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
  *
  */
 
-bool IMU::update_ypr_values(float (&ypr)[3]){
+bool IMU::update_ypr_values(float (&ypr)[3], uint32_t *timestamp){
 
-	const uint16_t fifo_buffer_size = 1024;
-
+	// if programming failed, don't try to do anything
 	if (!dmpReady) {
 		printf("Shit failed yo\n");
-		return false;               // if programming failed, don't try to do anything
+		return false;
 	}
-
-	uint32_t time_IMU_Prev = __MICROS();
+	// if no interrupt has been received, quit now
 	if (!mpuInterrupt) {
 		return false;
 	}
-	else {
-		uint32_t time_IMU_Dif = __MICROS() - time_IMU_Prev;
-
+	if (GetCurrentFIFOPacket(fifoBuffer, packetSize, timestamp)){
 		mpuInterrupt = false;                                // reset interrupt flag
-		uint8_t mpuIntStatus = mpu.getIntStatus();            // get INT_STATUS byte
-		uint16_t fifoCount = mpu.getFIFOCount();           // get current FIFO count
-
-		if ((mpuIntStatus & _BV(MPU6050_INTERRUPT_FIFO_OFLOW_BIT)) || fifoCount >= fifo_buffer_size) { // check for overflow (this should never happen unless our code is too inefficient)
-			mpu.resetFIFO();                     // reset so we can continue cleanly
-			printf("FIFO overflow!\n");
-		}
-
-		else if (mpuIntStatus & _BV(MPU6050_INTERRUPT_DMP_INT_BIT)) { // otherwise, check for DMP data ready interrupt (this should happen frequently)
-			while (fifoCount < packetSize) {
-				HAL_Delay(1); // wait for correct available data length, should be a VERY short wait
-				fifoCount = mpu.getFIFOCount();
-				mpuIntStatus = mpu.getIntStatus();
-			}
-			mpu.getFIFOBytes(fifoBuffer, packetSize);     // read a packet from FIFO
-			fifoCount -= packetSize; // track FIFO count here in case there is > 1 packet available (this lets us immediately read more without waiting for an interrupt)
-			Quaternion q;                   // [w, x, y, z]         quaternion container
-			mpu.dmpGetQuaternion(&q, fifoBuffer);   // display YPR angles in degrees
-			VectorFloat gravity;              // [x, y, z]            gravity vector
-			mpu.dmpGetGravity(&gravity, &q);
-			mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-		}
-
-		mpu.resetFIFO();      // ADDED BY ME!!!!!!!!!!!
+		Quaternion q;                   // [w, x, y, z]         quaternion container
+		mpu.dmpGetQuaternion(&q, fifoBuffer);   // display YPR angles in degrees
+		VectorFloat gravity;              // [x, y, z]            gravity vector
+		mpu.dmpGetGravity(&gravity, &q);
+		mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+		return true;
+	} else {
+		// tried to retrieve data too early or possible time-out
+		return false;
 	}
-	return true;
 }
 
 
@@ -233,11 +215,14 @@ bool IMU::update_IMU_values(void) {
 	static float theta_Smoothed_Speed = 0;
 	static float omega_Smoothed = 0;
 	static float omega_Smoothed_Speed = 0;
-	static unsigned long imu_Time_Now = 0;
+	static uint32_t imu_Time_Now = 0;
 	static float theta_Average = 0;
 	float omega_Average = 0;
 
-	if (!update_ypr_values(ypr)) {
+	// hold the last valid ypr timestamp before updating (to permit calculaton of velocities)
+	unsigned long imu_Time_Prev = imu_Time_Now;
+
+	if (!update_ypr_values(ypr, &imu_Time_Now)) {
 		return false;
 	}
 	//TODO: p must be managed by the terminal interface
@@ -253,8 +238,6 @@ bool IMU::update_IMU_values(void) {
 	}
 
 	p_Prev = p;
-	unsigned long imu_Time_Prev = imu_Time_Now;
-	imu_Time_Now = __MICROS();
 
 	////////////////////////////////////////////////////////// Theta Calcs//////////////////////////////////////////////////////////////////////////////////////////
 
@@ -380,5 +363,50 @@ void IMU::get_omega_values(float &omega_Now, float &omega_Integral,
 	omega_Integral = this->omega_Integral;
 	omega_Speed_Now = this->omega_Speed_Now;
 	omega_Zero = this->omega_Zero;
+}
+
+/**
+ @brief Get latest byte from FIFO buffer no matter how much time has passed.
+*/
+/* ================================================================
+ * ===                  GetCurrentFIFOPacket                    ===
+ * ================================================================
+ * Returns 1) when nothing special was done
+ *         0) when no valid data is available
+ * ================================================================ */
+ bool IMU::GetCurrentFIFOPacket(uint8_t *data, uint8_t length, uint32_t *timestamp) { // overflow proof
+	 int16_t fifoC;
+	 // This section of code is for when we allowed more than 1 packet to be acquired
+	 uint32_t BreakTimer = __MICROS();
+	 do {
+		 if ((fifoC = mpu.getFIFOCount())  > length) {
+
+			 if (fifoC > 200) { // if you waited to get the FIFO buffer to > 200 bytes it will take longer to get the last packet in the FIFO Buffer than it will take to  reset the buffer and wait for the next to arrive
+				 mpu.resetFIFO(); // Fixes any overflow corruption
+				 fifoC = 0;
+				 //TODO: eliminate this blocking issue
+				 //printf("Blocked\n");
+				 while (!(fifoC = mpu.getFIFOCount()) && ((__MICROS() - BreakTimer) <= (11000))); // Get Next New Packet
+			 } else { //We have more than 1 packet but less than 200 bytes of data in the FIFO Buffer
+				 uint8_t Trash[I2CDEVLIB_WIRE_BUFFER_LENGTH];
+				 while ((fifoC = mpu.getFIFOCount()) > length) {  // Test each time just in case the MPU is writing to the FIFO Buffer
+					 fifoC = fifoC - length; // Save the last packet
+					 uint16_t  RemoveBytes;
+					 while (fifoC) { // fifo count will reach zero so this is safe
+						 RemoveBytes = MIN((int)fifoC, I2CDEVLIB_WIRE_BUFFER_LENGTH); // Buffer Length is different than the packet length this will efficiently clear the buffer
+                        mpu.getFIFOBytes(Trash, (uint8_t)RemoveBytes);
+						 fifoC -= RemoveBytes;
+					 }
+				 }
+			 }
+		 }
+		 if (!fifoC) return false; // Called too early no data or we timed out after FIFO Reset
+		 // We have 1 packet
+		 if ((__MICROS() - BreakTimer) > (11000)) return false;
+	 } while (fifoC != length);
+	 // keep the following two lines together so the timestamp is valid!
+	 mpu.getFIFOBytes(data, length);     // read a packet from FIFO
+	 *timestamp = __MICROS();
+return true;
 }
 

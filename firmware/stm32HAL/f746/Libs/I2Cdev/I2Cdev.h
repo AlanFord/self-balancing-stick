@@ -123,6 +123,9 @@ THE SOFTWARE.
     #elif defined(SERIAL_BUFFER_SIZE)
         // Arduino SAMD core Wire uses this
         #define I2CDEVLIB_WIRE_BUFFER_LENGTH SERIAL_BUFFER_SIZE
+	#elif defined (HAL_I2C_MODULE_ENABLED)
+        // STM32
+        #define I2CDEVLIB_WIRE_BUFFER_LENGTH 1024U
     #else
         // should be a safe fallback, though possibly inefficient
         #define I2CDEVLIB_WIRE_BUFFER_LENGTH 32
