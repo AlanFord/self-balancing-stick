@@ -1,3 +1,7 @@
+% arara: pdflatex
+% arara: nomencl
+% arara: pdflatex
+
 \documentclass[12pt,letterpaper]{article}
 \usepackage{amsmath}
 \usepackage[colorlinks]{hyperref} 
@@ -6,7 +10,27 @@
 \usepackage{caption}
 \usepackage{listings}
 \usepackage{titlesec}
+\usepackage{todonotes}
+\usepackage[intoc]{nomencl}
+
+%% This code creates the groups
+% -----------------------------------------
+\usepackage{etoolbox}
+\renewcommand\nomgroup[1]{%
+  \item[\bfseries
+  \ifstrequal{#1}{A}{Physics constants}{%
+  \ifstrequal{#1}{B}{Transfer Functions}{%
+  \ifstrequal{#1}{O}{Other symbols}{}}}%
+]}
+% -----------------------------------------
+
+\makenomenclature
+
+\renewcommand{\nomname}{List of Symbols}
+\renewcommand{\nompreamble}{The next list describes several symbols that will be later used within the body of the document}
+
 \newcommand{\sectionbreak}{\clearpage}
+
 \begin{document}
 
 \title{Oh, What a Bot!}
@@ -14,7 +38,9 @@
 \date{}
 \maketitle
 
+\tableofcontents
 
+\printnomenclature[0.5in]
 
 \section{Introduction}
 This article describes the development of a control system model for an reaction wheel pendulum, shown in Figure \ref{sketchOfPendulum}.  A reaction wheel pendulum is a variation of a simple pendulum, balanced upright, with rotating wheels
@@ -27,7 +53,7 @@ flywheel is comprised of a motor mount, a DC brushed motor, and a reaction wheel
 the top of the rod at right angles to each other and the rod.  The DC motors are wired to a motor controller and an Arduino.  The Arduino is also wired
 to the accelerometer, which is located at the top of the rod.
 
-The basics of the pendulum control system is outlined in Figure \ref{fig.basicControlSystem}.  The system
+\todo{needs a figure number}The basics of the pendulum control system is outlined in Figure \ref{fig.basicControlSystem}.  The system
 can be controlled by adjusting the voltage.  An additional input F is included to describe random environmental forces that may affect the pendulum.  The random forces may result in the desired angle of the pendulum not being achieved.  More accurate control will result from feeding the resulting pendulum angle back into the control system so that the input voltage is continuously adjusted until the desired pendulum angle is achieved.  This is shown in Figure \ref{basicControl}.
 
 In this case, however, the goal is for the pendulum to remain vertical with as little wobble as possible.
@@ -67,15 +93,15 @@ The model dynamics can be summarized as
     m g l \sin \theta + F - I_{c}\ddot{\theta}  = I_{f}\ddot{\phi}
 \end{equation}
 %
-where: \\
-$ m =$ total mass of inverted pendulum (kg)\\
-$g =$ gravitational constant  (m s\textsuperscript{-2}) \\
-$l =$ distance from the pivot point to the center of pendulum mass (m)\\
-$\theta =$ pendulum angle (rad) \\
-$F =$ environmental forces on the pendulum\\
-$I_{c} =$ moment of inertia of the pendulum (kg m\textsuperscript{2}) \\
-$I_{f} =$ moment of inertia of the reaction wheel (kg m\textsuperscript{2}) \\
-$\phi =$ flywheel angle (rad) \\
+
+\nomenclature[O]{\(m\)}{Total mass of inverted pendulum (kg)}
+\nomenclature[A]{\(g\)}{Gravitational constant (m s\textsuperscript{-2})}
+\nomenclature[O]{\(l\)}{distance from the pivot point to the center of pendulum mass (m)}
+\nomenclature[O]{\(\theta\)}{pendulum angle (rad)}
+\nomenclature[O]{\(F\)}{environmental forces on the pendulum}
+\nomenclature[O]{\(I_{c}\)}{moment of inertia of the pendulum (kg m\textsuperscript{2})}
+\nomenclature[O]{\(I_{f}\)}{moment of inertia of the reaction wheel (kg m\textsuperscript{2})}
+\nomenclature[O]{\(\phi\)}{flywheel angle (rad)}
 
 Other references may have alternate formulations using different definitions for $\theta$ and $\phi$.\footnote{Reference \cite{monograph} has a slightly different formulation for the model dynamics; 
 the sign of the gravitational term is positive rather than negative.  This difference is caused 
@@ -132,11 +158,12 @@ Reference \cite{reactionWheel} models the motor as
     I_{f} \, \ddot{\phi} \, \eta_{m} \, \eta_{g}  = K_{t} \, i
 \end{equation}
 %
-where: \\
-$\eta_{m} =$ motor efficiency \\
-$\eta_{g} =$ gear efficiency \\
-$K_{t} =$ motor torque constant (N m A\textsuperscript{-1}) \\
-$i =$ motor current \\
+
+\nomenclature[O]{\(\eta_{m}\)}{motor efficiency}
+\nomenclature[O]{\(\eta_{g}\)}{gear efficiency}
+\nomenclature[O]{\(K_{t}\)}{motor torque constant (N m A\textsuperscript{-1})}
+\nomenclature[O]{\(i\)}{motor current (A)}
+
 
 This formulation appears to have problems, as a reduction in the motor and gear efficiencies results in a 
 greater flywheel acceleration for a given motor current.  Similarly, the gear ratio above unity would 
@@ -169,12 +196,12 @@ reformulated as
     T = K_{t} \, i
 \end{equation}
 %
-where \\
-$T =$ the total motor torque \\
-$T_{shaft} =$ torque available to the flywheel \\
-$T_{friction} =$ torque lost to motor and gear friction \\
-$A =$ coulomb friction coefficient \\
-$B =$ rotational friction coefficient \\
+
+\nomenclature[O]{\(T\)}{the total motor torque (N m)}
+\nomenclature[O]{\(T_{shaft}\)}{torque available to the flywheel (N m)}
+\nomenclature[O]{\(T_{friction}\)}{torque lost to motor and gear friction (N m)}
+\nomenclature[O]{\(A\)}{coulomb friction coefficient (N m)}
+\nomenclature[O]{\(B\)}{rotational friction coefficient(N m rad\textsuperscript{-1} s)}
 
 Combining equations and adding the reduction gear ratio,
 %
@@ -207,12 +234,12 @@ Reference \cite{monograph} give the relationship between motor current and volta
     l \, \frac{di}{dt} + r \,i = v - K_{v} \, \omega
 \end{equation}
 %
-where: \\
-$l =$ armature inductance (henry) \\
-$r =$ armature resistance (ohm) \\
-$v =$ voltage supplied to the motor (volt) \\
-$K_{v} =$ motor voltage constant (V  rad\textsuperscript{-1} sec) \\
-$\omega =$ motor rotation speed (rad sec\textsuperscript{-1}) \\
+
+\nomenclature[O]{\(I\)}{armature inductance (H)}
+\nomenclature[O]{\(r\)}{armature resistance ($\Omega$)}
+\nomenclature[O]{\(v\)}{voltage supplied to the motor (V) }
+\nomenclature[O]{\(K_{v}\)}{motor voltage constant (V rad\textsuperscript{-1} s)}
+\nomenclature[O]{\(\omega\)}{motor rotation speed (rad s\textsuperscript{-1})}
 
 Normally the inductance of the motor is much lower than the resistance, such that $l/r \sim 0.001$.  
 In such cases it is acceptable to ignore the time dependence of the current and write
@@ -294,7 +321,14 @@ open loop transfer function
 \begin{equation}
     T(s) = P(s) C(s) M(s) R(s)
 \end{equation}
-where $P(s)$ is the pendulum transfer function, $C(s)$ is the control function, $M(s)$ is the motor transfer function, and $R(s)$ is the rotor transfer function.  
+
+\nomenclature[B]{\(P(s)\)}{pendulum transfer function}
+\nomenclature[B]{\(C(s)\)}{control function}
+\nomenclature[B]{\(M(s)\)}{motor transfer function}
+\nomenclature[B]{\(R(s)\)}{rotor transfer function}
+\nomenclature[B]{\(T(s)\)}{open loop transfer function}
+
+
 The control system in terms of these transfer functions is shown in Figure \ref{transferFunction}.\\
 
 
@@ -401,8 +435,7 @@ Here we modify \eqref{motor} to include the feedback from the rotor velocity:
     r \,i = v +K_{\omega}\omega - K_{v} \, \omega \label{motorUpdated}
 \end{equation}
 
-where: \\
-$ K_{\omega} =$ rotor velocity feedback gain.\\
+\nomenclature[O]{\(K_{\omega}\)}{rotor velocity feedback gain}
 
 Solving for i,
 \begin{equation}
@@ -415,7 +448,7 @@ and
     \label{rondoMucho}
 \end{equation} 
 
-Using \eqref{EQ.simpleController}, \eqref{franco}, \eqref{groucho}, and \eqref{rondoMucho}, the open loop transfer function is now
+\todo{the control function is missing}Using \eqref{EQ.simpleController}, \eqref{franco}, \eqref{groucho}, and \eqref{rondoMucho}, the open loop transfer function is now
 \begin{equation}
 	T(s) =\frac{-(\frac{K} {I_{c}r})s}
 	{s^3 + (\frac{B r-K K_{\omega}+K^2}{I_{f}r})s^2 - (\frac{m g l}{I_{c}})s - (\frac{Br-K K_{\omega}+K^2}{I_{f}r} - \frac{m g l}{I_{c}})}
@@ -612,11 +645,11 @@ to work with either an Arduino Uno or an Arduino Mega. The motor wiring describe
 referrs to the wiring of the Pololu 25D 4.4:1 metal gear motor.  The output is in position change 
 per second, where the motor has 211.2 counts/rev of gearbox shaft. \\
 
-\lstinputlisting{../motor_testing/rpm/rpm.ino}
+\lstinputlisting{../determining_motor_constants/rpm/rpm.ino}
 
 \section{Reaction Wheel Design Options}
 
-The initial reaction wheel design was modeled after XXXX, with modifications to allow the reaction wheel
+The initial reaction wheel design was modeled after XXXX\todo{fix this}, with modifications to allow the reaction wheel
 to mate properly with a Pololu motor hub.  The reaction wheel is shown in Figure \ref{reactionWheel}.
 The reaction wheel body is aluminum an outer diameter of 90 mm, a width of 18 mm, and an annular thickness of 7 mm. 
 Fusion 360 reports the mass of the reaction wheel to be 0.09391 kg (assuming a density of 2.7 g/cc).
