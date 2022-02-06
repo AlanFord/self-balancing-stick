@@ -27,7 +27,7 @@
 \makenomenclature
 
 \renewcommand{\nomname}{List of Symbols}
-\renewcommand{\nompreamble}{The next list describes several symbols that will be later used within the body of the document}
+\renewcommand{\nompreamble}{The following list describes several symbols that will be used later within the body of the document}
 
 \newcommand{\sectionbreak}{\clearpage}
 
@@ -44,7 +44,7 @@
 
 \section{Introduction}
 This article describes the development of a control system model for an reaction wheel pendulum, shown in Figure \ref{sketchOfPendulum}.  A reaction wheel pendulum is a variation of a simple pendulum, balanced upright, with rotating wheels
-at the top in place of the pendulum bob. Each wheel is driven by a separate motor.The pendulum is inherently unstable in the upright position - gravity will pull the pendulum over if it is not perfectly balanced.  Thus, a control system is needed to accelerate the reaction wheels, applying torques
+at the top in place of the pendulum bob. Each wheel is driven by a separate motor.  The pendulum is inherently unstable in the upright position - gravity will pull the pendulum over if it is not perfectly balanced.  Thus, a control system is needed to accelerate the reaction wheels, applying torques
 as needed to the pendulum so as to keep it upright. The reaction wheels are mounted at right angles to each other, providing the ability to 
 correct the alignment of the pendulum in any direction.
 
@@ -60,7 +60,7 @@ In this case, however, the goal is for the pendulum to remain vertical with as l
 The real control comes into play when correcting for the stray forces on the system.  Hence, the control
 system can be reformulated as shown in Figure \ref{fig.regulatorControlSystem}, commonly known as
 a Regulator Problem.  This structure emphasizes the environmental forces as the primary input into the
-system and that the feedback is primarily intended to compensate for those forces.
+system and that the feedback is primarily intended to compensate for those forces.\todo{Figure 3 is missing a feedback arrow}
 
 \includegraphics[width=\textwidth]{images/pencil.png} 
     \captionof{figure}{Sketch of the Pendulum}  
@@ -94,7 +94,7 @@ The model dynamics can be summarized as
 \end{equation}
 %
 
-\nomenclature[O]{\(m\)}{Total mass of inverted pendulum (kg)}
+\nomenclature[O]{\(m\)}{total mass of inverted pendulum (kg)}
 \nomenclature[A]{\(g\)}{Gravitational constant (m s\textsuperscript{-2})}
 \nomenclature[O]{\(l\)}{distance from the pivot point to the center of pendulum mass (m)}
 \nomenclature[O]{\(\theta\)}{pendulum angle (rad)}
@@ -117,7 +117,7 @@ the transfer function for the pendulum is then
     m \,g \,l \theta + F - I_{c}\ddot{\theta}  = I_{f}\ddot{\phi}
 \end{equation}
 %
-The reaction wheel can be continuously revolving, making the reaction wheel angle, $\phi$, less useful as a control parameter.
+The reaction wheel can be continuously revolving, making the reaction wheel angle $\phi$ less useful as a control parameter.
 In its place we will use $\omega = \dot{\phi}$.
 %
 \begin{equation}
@@ -131,11 +131,11 @@ For ease of use in later analysis, it is beneficial to split \eqref{bigOne} into
 \end{equation}
 %
 \begin{equation}
-    u(t) = F - I_{f}\dot{\omega}\label{oddOne}
+    u(t) = F - I_{f}\dot{\omega}\label{eq.oddOne}
 \end{equation}
 %
 where $u(t)$ is the net torque applied to the pendulum.  The sign convention is important; a positive torque $u(t)$
-will accelerate the pendulum in the direction of the positive pendulum angle.  However the sign convention in 
+will accelerate the pendulum in the direction of the positive pendulum angle.  However, the sign convention in 
 \eqref{oddOne} indicates that  a positive acceleration of the rotor will result in a \textit{negative} acceleration of the pendulum.
 
 Note that if the pendulum is not vertical (i.e. $\theta = 0$) gravity will begin to pull the pendulum over.  Correcting this requires accelerating the flywheel to apply torque to the pendulum.  A flywheel turning at a constant velocity applies no torque to the pendulum and will not alter the movement of the pendulum.
@@ -167,7 +167,7 @@ Reference \cite{reactionWheel} models the motor as
 
 This formulation appears to have problems, as a reduction in the motor and gear efficiencies results in a 
 greater flywheel acceleration for a given motor current.  Similarly, the gear ratio above unity would 
-decrease the flywheel acceleration for a specified motor current/torque, which is non-physical.  The equation can be altered
+decrease the flywheel acceleration for a specified motor current/torque, which is non-physical.  \todo{what gear ratio?}The equation can be altered
 to correct these issues, resulting in the following:
 %
 \begin{equation}
@@ -197,7 +197,7 @@ reformulated as
 \end{equation}
 %
 
-\nomenclature[O]{\(T\)}{the total motor torque (N m)}
+\nomenclature[O]{\(T\)}{total motor torque (N m)}
 \nomenclature[O]{\(T_{shaft}\)}{torque available to the flywheel (N m)}
 \nomenclature[O]{\(T_{friction}\)}{torque lost to motor and gear friction (N m)}
 \nomenclature[O]{\(A\)}{coulomb friction coefficient (N m)}
@@ -248,14 +248,14 @@ In such cases it is acceptable to ignore the time dependence of the current and 
     r \,i = v - K_{v} \, \omega \label{motor}
 \end{equation}
 %
-Note that, provided mks units are used, $K_{v}$ and $K_{t}$ will have the same magnitude.  This can be seen by equating the 
+Note that, provided SI units are used, $K_{v}$ and $K_{t}$ will have the same magnitude.  This can be seen by equating the 
 mechanical and electrical power
 %
 \begin{equation}
     T \omega = v i
 \end{equation}
 %
-where $T =$ is the motor torque.
+where $T$ is the motor torque.
 Rearranging,
 %
 \begin{equation}
@@ -286,15 +286,15 @@ Rearranging,
     I_{f} \, \dot{\omega} + \left( B+\frac{K_{t} K_{v}}{r} \right) \omega +A \, sgn(\omega)= \left(\frac{K_{t}} {r}\right)v 
 \end{equation}
 
-Recognizing that $K_{t} = K_{v}$ and replacing them with $K$,
+Recognizing that $K_{t} = K_{v}$,
 \begin{equation}
-    I_{f} \, \dot{\omega} + \left( B+\frac{K^2}{r} \right) \omega +A \, sgn(\omega)= \left(\frac{K} {r}\right)v\label{eq.motorFinal} 
+    I_{f} \, \dot{\omega} + \left( B+\frac{K_{v}^2}{r} \right) \omega +A \, sgn(\omega)= \left(\frac{K_{v}} {r}\right)v\label{eq.motorFinal} 
 \end{equation}
 
 Not all of the voltage results in acceleration of the reaction wheel.  As the reaction wheel velocity increases, an
-increasing amount of the voltage (and the resulting torque) is consumed by friction and the back EMF.
+increasing amount of the voltage (and the resulting torque) is consumed by friction and the back EMF.\\
 
-We will assume that the control function can adjust the demand voltage by adding or subtracting a constant, depending on the current spin direction of the reaction wheel.  This means that $-A\,sgn(\dot{\phi})$ is folded
+It is useful to assume that the control function can adjust the demand voltage by adding or subtracting a constant, depending on the current spin direction of the reaction wheel.  This means that $-A\,sgn(\dot{\phi})$ is folded
 into $v$ for the purposes of this analysis.  
 
 
@@ -308,11 +308,11 @@ into $v$ for the purposes of this analysis.
 \section{Modeling in the Frequency Domain}
 
 
-The primary objectives of a control system for the pendulum should be to stabilize the upright position of the pendulum and recovering from external forces on the pendulum.  In addition, the control system should be design to deal with a number
+The primary objectives of a control system for the pendulum should be to stabilize the upright position of the pendulum and recovering from external forces on the pendulum.  In addition, the control system should be designed to deal with a number
 of physical limitations of the physical components of the pendulum.  Specifically,
 \begin{itemize}
     \item the motor voltage is limited to maximum value,
-    \item The rotor velocity has a practical upper limit.
+    \item the rotor velocity has a practical upper limit.
 \end{itemize}
 
 
@@ -349,15 +349,15 @@ The pendulum transfer function can be derived from \eqref{eq.pendulum}
     m \,g \,l \theta(s) + u(s) = I_{c}\theta(s) s^{2}
 \end{equation}
 
-The rotor transfer function can be derived by noting that the torque generated by the flywheel is
-\begin{equation}
-    u(s) = F(s) - I_{f}\omega(s) s
-\end{equation}
-%
-Ignoring the environmental forces, the pendulum transfer functions are 
+Ignoring the environmental forces, the pendulum transfer function is 
 \begin{equation}
     P(s) = \frac{\theta(s)}{u(s)}= \frac{1}{I_{c} s^{2} - m g l }
     \label{franco}
+\end{equation}
+%
+The rotor transfer function can be derived from \eqref{eq.oddOne} by noting that the torque generated by the flywheel is
+\begin{equation}
+    u(s) = F(s) - I_{f}\omega(s) s
 \end{equation}
 %
 \begin{equation}
@@ -370,23 +370,24 @@ junction shown in Figure \ref{transferFunction}, this produces a negative feedba
  
 
 
-From \eqref{eq.motorFinal} the transfer function for the motor is:
+The motor transfer function can be derived from \eqref{eq.motorFinal} as
 \begin{equation}
-    I_{f} \, \omega(s) s + \left( B+\frac{K^2}{r} \right) \omega(s) = \left(\frac{K} {r}\right)v(s)
+    I_{f} \, \omega(s) s + \left( B+\frac{K_{v}^2}{r} \right) \omega(s) = \left(\frac{K_{v}} {r}\right)v(s)
 \end{equation}
+%
 \begin{equation}
-    M(s) = \frac{\omega(s)}{v(s)} =  \frac{\left(\frac{K} {r}\right)}{I_{f} s + (\frac{K^2}{r}+B)}
+    M(s) = \frac{\omega(s)}{v(s)} =  \frac{\left(\frac{K_{v}} {r}\right)}{I_{f} s + (\frac{K_{v}^2}{r}+B)}
     \label{rondo}
 \end{equation} 
 
 Using \eqref{EQ.simpleController}, \eqref{franco}, \eqref{groucho}, and \eqref{rondo} results in 
 %
 \begin{equation}
-	T(s) =\frac{-(\frac{1} {I_{f}I_{c}})(\frac{K}{r})s}
-	{(s^2-\frac{m g l}{I_{c}})(s+(\frac{K^2}{r I_{f}}+\frac{B}{I_{f}}))}
+	T(s) =\frac{-(\frac{1} {I_{c}})(\frac{K_{v}}{r})s}
+	{(s^2-\frac{m g l}{I_{c}})(s+(\frac{K_{v}^2}{r I_{f}}+\frac{B}{I_{f}}))}
 \end{equation}
 
-Substituting in values from the appendixes, the transfer function for the pendulum is
+Substituting in values from the appendixes, the transfer function for the pendulum is\todo{check the numbers}
 \begin{equation}
 	T(s) =\frac{-0.2464 s}{s^3 + 4.73 s^2 -34.8 s -164.6}
 \end{equation}
@@ -396,41 +397,42 @@ $(s-5.8993) (s+5.8993) (s+4.7303)$.
 
 Using the root locus technique and the open loop transfer function, Figure \ref{rootLocus} shows the
 behavior of the closed loop poles as a function of feedback gain.  Note that one pole is always in the right
-half of the plane, indicating that the system is unstable regardless of the magnitude of the gain.
+half of the plane, indicating that the system is unstable regardless of the magnitude of the gain. \\
 
-One possible method of stabilizing the system would be to use both proportional and derivative, or PD, feedback.  The control function would be.
+
+The system might be stabilized by using both proportional and derivative, or PD, feedback.  The control function would be:
 \begin{equation}
 	C(s) = 1 + p s
 \end{equation}
 Rearranging,
 \begin{equation}
-	C(s) = \frac{s+\frac{1}{p}}{p}
+	C(s) = p\left(s+\frac{1}{p}\right)\label{pd}
 \end{equation}
 
-indicating a zero at $1/p$ and a gain of $1/p$.
+indicating a zero at $1/p$ and a gain of $p$.
 The results are sensitive to the placement of the zero.  Placing the zero to the right of the pole at -5.8993 
-eliminates any oscillation, but does not remediate the pole in the right half of the plane.  Placing the zero to the left of the pole at -5.8993 results in a much faster response, but can result in oscillations (Figure \ref{rootLocusPD}).  Again, the pole in the right half of the plane is not remediated. \\
+eliminates any oscillation but does not remediate the pole in the right half of the plane.  Placing the zero to the left of the pole at -5.8993 results in a much faster response but can result in oscillations (Figure \ref{rootLocusPD}).  Again, the pole in the right half of the plane is not remediated. \\
 
 
-One possibility for resolving the issue of the zero at the origin would be to implement a PID controller.
+One additional possibility for resolving the issue of the zero at the origin would be to implement a PID controller.
 \begin{equation}
 	C(s) = 1 + \frac{q}{s} + p s
 \end{equation}
 Rearranging,
 \begin{equation}
-	C(s) = \frac{ps^2+s+q}{s}
+	C(s) = p\left(\frac{s^2+\frac{s}{p}+\frac{q}{p}}{s}\right)
 \end{equation}
 
 This controller would have two zeros that can be placed as required and a pole that would cancel
 the zero at the origin.  If the zeros are placed to the left of the pole at -4.7303, then the system may stabilize.
 However, in the real world the original zero may not be exactly at the origin and the poles in the left side of the axis may not be exactly where they are expected (due to nonlinearities, etc.) 
-leading to a less-than robust control system. \\
+leading to a less-than robust control system. \todo{verify this}\\
 
 Finally, it is possible to include feedback from the other monitored and controlled variable, the rotor velocity.
 Unfortunately, to continue to evaluate the system using a root locus analysis, the feedback from
 the rotor velocity will have to be directly factored into the transfer function.  \\
 
-Here we modify \eqref{motor} to include the feedback from the rotor velocity:
+Modifying \eqref{motor} to include the feedback from the rotor velocity,
 \begin{equation}
     r \,i = v +K_{\omega}\omega - K_{v} \, \omega \label{motorUpdated}
 \end{equation}
@@ -439,18 +441,18 @@ Here we modify \eqref{motor} to include the feedback from the rotor velocity:
 
 Solving for i,
 \begin{equation}
-    i = \frac{v}{r} - \frac{(K-K_{\omega}) \, \omega}{r}
+    i = \frac{v}{r} - \frac{(K_{v}-K_{\omega}) \, \omega}{r}
 \end{equation}
 
-and
+resulting in
 \begin{equation}
     M(s) = \frac{\omega(s)}{v(s)} =  \frac{\left(\frac{K} {I_{f}r}\right)}{s + (\frac{1}{I_{f}})(\frac{K^2}{r}-\frac{K K_{\omega}}{r}+B)}
     \label{rondoMucho}
 \end{equation} 
 
-\todo{the control function is missing}Using \eqref{EQ.simpleController}, \eqref{franco}, \eqref{groucho}, and \eqref{rondoMucho}, the open loop transfer function is now
+Using \eqref{pd}, \eqref{franco}, \eqref{groucho}, and \eqref{rondoMucho}, the open loop transfer function is now
 \begin{equation}
-	T(s) =\frac{-(\frac{K} {I_{c}r})s}
+	T(s) =\frac{-(\frac{Kp} {I_{c}r})(s+\frac{1}{p})s}
 	{s^3 + (\frac{B r-K K_{\omega}+K^2}{I_{f}r})s^2 - (\frac{m g l}{I_{c}})s - (\frac{Br-K K_{\omega}+K^2}{I_{f}r} - \frac{m g l}{I_{c}})}
 \end{equation}
 
@@ -486,6 +488,7 @@ Figure \ref{rootLocusFull} shows the root locus with $p = 1/4.5$ and $K_{\omega}
 \bibitem{reactionWheel} \href{http://www.diva-portal.se/smash/get/diva2:916271/FULLTEXT01.pdf}{Ramm, A., and Sjostedt, M. (2015). Reaction wheel balanced robot, Design and Sensor Analysis of Inverted Pendulum Robot. Technical Report, KTH Royal Institute of Technology.}
 \bibitem{balanceBot} \href{https://kth.diva-portal.org/smash/get/diva2:916184/FULLTEXT01.pdf}{Hellman, H. and Sunnerman, H, (2015).  Two-Wheeled Self-Balancing Robot. Technical report, KTH Royal Institute of Technology.}
 \bibitem{twoWheeled} \href{http://geoffrey.chauveau.free.fr/pendulum/reports/final_report.pdf}{Chauveau, G., Chazal, D., Nakayama, D., Olsen, E., and Palm, S., (2005).  Controlling the Reaction Wheel Pendulum.}
+\bibitem{hackaday} \href{https://hackaday.com/2016/08/11/stick-balances-itself-with-reaction-wheels/}{"Stick Balances Itself With Reaction Wheels" by Gerrit Coetzee}
 \end{thebibliography}
 
 \begin{appendices}
@@ -649,7 +652,7 @@ per second, where the motor has 211.2 counts/rev of gearbox shaft. \\
 
 \section{Reaction Wheel Design Options}
 
-The initial reaction wheel design was modeled after XXXX\todo{fix this}, with modifications to allow the reaction wheel
+The initial reaction wheel design was modeled after Reference \cite{hackaday} , with modifications to allow the reaction wheel
 to mate properly with a Pololu motor hub.  The reaction wheel is shown in Figure \ref{reactionWheel}.
 The reaction wheel body is aluminum an outer diameter of 90 mm, a width of 18 mm, and an annular thickness of 7 mm. 
 Fusion 360 reports the mass of the reaction wheel to be 0.09391 kg (assuming a density of 2.7 g/cc).
