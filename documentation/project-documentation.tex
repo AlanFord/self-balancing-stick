@@ -280,7 +280,7 @@ Combining with \eqref{wheel}
 \begin{equation}
     I_{f} \, \dot{\omega}  =  K_{t} \, \left( \frac{v}{r} - \frac{ K_{v} \, \omega}{R} \right) - A \, sgn(\omega ) - B \omega
 \end{equation}
-Rearranging,
+Rearranging,\todo{should that be a small R?}
 
 \begin{equation}
     I_{f} \, \dot{\omega} + \left( B+\frac{K_{t} K_{v}}{r} \right) \omega +A \, sgn(\omega)= \left(\frac{K_{t}} {r}\right)v 
@@ -306,7 +306,7 @@ into $v$ for the purposes of this analysis.
 
 
 \section{Modeling in the Frequency Domain}
-
+\label{sec:Modeling}
 
 The primary objectives of a control system for the pendulum should be to stabilize the upright position of the pendulum and recovering from external forces on the pendulum.  In addition, the control system should be designed to deal with a number
 of physical limitations of the physical components of the pendulum.  Specifically,
@@ -453,7 +453,7 @@ resulting in
 Using \eqref{pd}, \eqref{franco}, \eqref{groucho}, and \eqref{rondoMucho}, the open loop transfer function is now
 \begin{equation}
 	T(s) =\frac{-(\frac{Kp} {I_{c}r})(s+\frac{1}{p})s}
-	{s^3 + (\frac{B r-K K_{\omega}+K^2}{I_{f}r})s^2 - (\frac{m g l}{I_{c}})s - (\frac{Br-K K_{\omega}+K^2}{I_{f}r} - \frac{m g l}{I_{c}})}
+	{s^3 + (\frac{B r-K K_{\omega}+K^2}{I_{f}r})s^2 - (\frac{m g l}{I_{c}})s - (\frac{Br-K K_{\omega}+K^2}{I_{f}r} - \frac{m g l}{I_{c}})}\label{eq.openLoop}
 \end{equation}
 
 Figure \ref{rootLocusFull} shows the root locus with $p = 1/4.5$ and $K_{\omega} = 0.075$.  With a system gain of 266 the controlling poles are at -11.5205, -1.5353, and -0.999.\\
@@ -474,7 +474,35 @@ Figure \ref{rootLocusFull} shows the root locus with $p = 1/4.5$ and $K_{\omega}
     \captionof{figure}{Root Locus Plot With PD and Rotor Velocity Feedback}  
     \label{rootLocusFull}
 
+\section{Implementation Details}
 
+In \autoref{sec:Modeling} the necessary constants for the control system were developed.  However those constants
+need to be adjusted for the reaction wheel pendulum.
+
+The constants developed in autoref{sec:Modeling} took the form
+\begin{equation}
+	C(s) = G(1 + \frac{q}{s} + p s)
+\end{equation}
+where G is the system gain, q is the integral constant, and p is the derivative constant.  However the software requires
+constants in the form of 
+\begin{itemize}
+    \item the proportional coefficient $K_{p}$
+    \item the integral coefficient $K_{i}$
+    \item the derivative coefficient $K_{d}$
+    \item the rotor velocity coefficient $K_{s}$
+\end{itemize}
+
+$K_{s}$ is simply $K_{\omega}$.  To generate the other required constants, the controller equation is first restructured as
+\begin{equation}
+	C(s) = G + \frac{Gq}{s} + Gps
+\end{equation}
+From this it can be seen that $K_{i} = Gq$ and $K_{d} = Gp$.  The proportional constant requires a little more work.
+Recall from \eqref{eq.openLoop} the physical system has a gain of \todo{discuss required closed loop constants}
+
+Another item to note in the control system implementation is that the feedback should be \textit{positive} as shown in Figure \ref{transferFunction}.  This reflects the fact that the rotor transfer function in \eqref{groucho} is negative.  This can also be seen in Figure \ref{modelOfPendulum}, where accelerating the rotor in the direction of positive $\theta$ results in a negative change in $\phi$.
+
+Finally, units matter.  This documentation was created with SI units, eliminating the need to incorporate a multitude of conversion factors.  However, software is frequently constructed in more common units, for example rotor velocity in RPM, angles in degrees, and time in milliseconds or microseconds.  Hence numerical values developed in this document may need to
+be converted to other units prior to use.
 
 
 
@@ -496,7 +524,7 @@ Figure \ref{rootLocusFull} shows the root locus with $p = 1/4.5$ and $K_{\omega}
 \section{Motor and Gear Set Data}
 
 Key to much of the work so far are the constants associated with the motor and gear set, $K_{t}$, $K_{v}$, $R$, and $L$.
-Here we are using a \href{https://www.pololu.com/product/3237}{Pololu  4.4:1 metal gear motor}.  
+The following work is based on a \href{https://www.pololu.com/product/3237}{Pololu  4.4:1 metal gear motor}.  
 
 Pololu gives the following parameters for the 4.4:1 gear motor: \\
 weight = 95g \\
@@ -550,7 +578,7 @@ The motor was driven with a 12 V power supply.  The current was measured by the 
 
 $\omega$ was measured using the motor's encoder and an Arduino.  The encoder measured the shaft speed, not the gear-set speed.  However, a conversion coefficient of 211.2 counts/revolution was used to convert the encoder pulse rate to gear set rotation speed.
 
-The following table shows the results for three different loads.  The first load was just rotor friction.  The second load added the Pololu hub adapter.  The third load included a plastic wheel attached to a propeller to increase the drag.
+The following table shows the results for three different loads.  The first load was simply rotor friction.  The second load added the Pololu hub adapter.  The third load included a plastic wheel attached to a propeller to increase the drag.
 The resulting measured values are as follows: \\
 
 \begin{tabular}{|c|c|c|c|c|c|}
@@ -631,7 +659,7 @@ The encoder speed, in pulses/sec, was converted to RPM using the encoder frequen
 counts/revolution.
 
 The Excel regression function was used to fit the $\mu$Current current measurement as a function
-of the speed in radians/sec.  The regression intercept represents the fixed Coulomb friction and the
+of the speed in radians/sec.  The regression intercept represents the fixed Coulomb friction, and the
 slope represents the viscous friction.  The regression results were 2.47E-3 N m and 1.20E-5 N m/(radian/sec),
 after converting from current using $K_{t}$.  The coulomb friction represents approximately 3\% of the 
 motor stall torque.  At the motor's no-load speed the viscous friction would double the total friction to 
@@ -652,7 +680,7 @@ per second, where the motor has 211.2 counts/rev of gearbox shaft. \\
 
 \section{Reaction Wheel Design Options}
 
-The initial reaction wheel design was modeled after Reference \cite{hackaday} , with modifications to allow the reaction wheel
+The initial reaction wheel design was modeled after Reference \cite{hackaday}, with modifications to allow the reaction wheel
 to mate properly with a Pololu motor hub.  The reaction wheel is shown in Figure \ref{reactionWheel}.
 The reaction wheel body is aluminum an outer diameter of 90 mm, a width of 18 mm, and an annular thickness of 7 mm. 
 Fusion 360 reports the mass of the reaction wheel to be 0.09391 kg (assuming a density of 2.7 g/cc).
@@ -661,7 +689,7 @@ The moment of inertia around the centerline is 1.562E-4 kg/m2.
 An alternate, simpler design (although less elegant) is shown in Figure \ref{simpleReactionWheel}.
 Fashioned from carbon steel with a density of  7.85 g/cc, the diameter of the wheel is 90 mm and the
 thickness is 3.175 mm (1/8").  The reaction wheel mass is 0.175 kg and the moment of inertia 
-around the centerline is 1.605E04 kg/m2.  The simpler design with only a small change in the moment
+around the centerline is 1.605E04 kg/m2\todo{sign error?}.  The simpler design with only a small change in the moment
 of inertia permits an easier fabrication at a cost of a doubling of the reaction wheel mass.
 
 
