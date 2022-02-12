@@ -4,11 +4,18 @@ function [totalMass, length, rInertia, inertia] = pendulum()
 
 %% Section 1 Input Data
 
+% Logic Flags
+simpleRotor = false;
+
 % Masses
 mmountMass = 0.00615; %[kg] - mass of a single motor mount
 motorMass = 0.0943; %[kg] - mass of a single brushed motor
 hubMass = 0.00625; %[kg] - mass of the motor adapter hub
-wheelMass = 0.0939136; %[kg] - mass of a single reaction wheel
+if ~simpleRotor   
+    wheelMass = 0.0939136; %[kg] - mass of a single normal reaction wheel
+else
+    wheelMass = 0.175; %[kg] - mass of a single simple reaction wheel
+end
 rodMass = 0.0144; %[kg] - mass of the shaft
 gmountMass = 0.0024; %[kg] - mass of the gyro mount
 gblockMass = 0.0363; %[kg] - mass of the gripper block
@@ -18,6 +25,11 @@ gyroMass = 0.003; %[kg] - mass of the gyro pcb, Adafruit estimate
 
 % Inertial Data from Fusion360
 wInertia = 1.562E-4; %[kg m^2] inertia of a single rotor wheel around the midline
+if ~simpleRotor   
+    wInertia = 1.562E-4; %[kg m^2] inertia of a single normal rotor wheel around the midline
+else
+    wInertia = 1.605E-4; %[kg m^2] inertia of a single simple rotor wheel around the midline
+end
 
 % Dimensions
 motorLength = 0.05; %[m] length of motor and gearbox assembly
