@@ -167,8 +167,8 @@ Reference \cite{reactionWheel} models the motor as
 
 
 This formulation appears to have problems, as a reduction in the motor and gear efficiencies results in a 
-greater flywheel acceleration for a given motor current.  Similarly, the gear ratio above unity would 
-decrease the flywheel acceleration for a specified motor current/torque, which is non-physical.  \todo{what gear ratio?}The equation can be altered
+greater flywheel acceleration for a given motor current.  Similarly, a gear ratio above unity would 
+decrease the flywheel acceleration for a specified motor current/torque, which is non-physical.  The equation can be altered
 to correct these issues, resulting in the following:
 %
 \begin{equation}
@@ -176,10 +176,12 @@ to correct these issues, resulting in the following:
 \end{equation}
 %
 However, this format may not be the easiest to implement, as the motor and gear efficiencies are not known.  Reference \cite{monograph}
-takes a different approach,
+takes a different approach,\footnote{Note that there is no term in \eqref{simpleShaft} that represents torque associated
+with external work done by the shaft.  Hence this formulation is limited to flywheels that are reasonably aerodynamic (e.g. not something that
+acts as a propeller).}
 %
 \begin{equation}
-    I_{f} \, \ddot{\phi} = T_{shaft}
+    I_{f} \, \ddot{\phi} = T_{shaft}\label{simpleShaft}
 \end{equation}
 %
 Where the earlier format dealt with motor/gear efficiencies using $\eta_{m}$ and $\eta_{g}$, Reference \cite{monograph} develops a correlation of friction in terms of torque required to maintain a given $\dot{\phi}$.  Here the torque will be
@@ -204,7 +206,7 @@ reformulated as
 \nomenclature[O]{\(A\)}{coulomb friction coefficient (N m)}
 \nomenclature[O]{\(B\)}{rotational friction coefficient(N m rad\textsuperscript{-1} s)}
 
-Combining equations and adding the reduction gear ratio,
+Combining equations,
 %
 \begin{equation}
     I_{f} \, \ddot{\phi}  = K_{t} \, i - A \, sgn(\dot{\phi} ) - B \dot{\phi}
@@ -217,7 +219,7 @@ Again, using the notation $\omega = \dot{\phi}$,
 \end{equation}
 %
 
-As will be seen, this equation is easier to implement because $K_{t}$, $A$, and $B$ can be measured experimentally (see Appendixes \ref{appendix:measure} and \ref{appendix:friction}).
+As will be seen, this equation is easier to implement because $K_{t}$, $A$, and $B$ can be measured experimentally (see Appendixes \ref{appendix:measure} and \ref{appendix:friction}).  
 
 
 
@@ -473,7 +475,7 @@ Using \eqref{pd}, \eqref{franco}, \eqref{groucho}, and \eqref{rondoMucho}, the o
 	{s^3 + (\frac{B r-K K_{\omega}+K^2}{I_{f}r})s^2 - (\frac{m g l}{I_{c}})s - (\frac{Br-K K_{\omega}+K^2}{I_{f}r} - \frac{m g l}{I_{c}})}\label{eq.openLoop}
 \end{equation}
 
-Figure \ref{rootLocusFull} shows the root locus with $p = 1/4.5$ and $K_{\omega} = 0.075$.  With a system gain of 266 the controlling close loop poles are at -11.5205, -1.5353, and -0.999.\\
+Figure \ref{rootLocusFull} shows the root locus with $p = 1/4.5$ and $K_{\omega} = 0.075$.  With a controller gain\footnote{The gain given here is in addition to the system gain modeled in \eqref{eq.openLoop}. } of 266 the controlling close loop poles are at -11.5205, -1.5353, and -0.999.\\
 
 \includegraphics[width=\textwidth]{images/transferFunction.eps}
     \captionof{figure}{Control System Modeled as Transfer Functions}
@@ -496,11 +498,11 @@ Figure \ref{rootLocusFull} shows the root locus with $p = 1/4.5$ and $K_{\omega}
 In \autoref{sec:Modeling} the necessary constants for the control system were developed.  However those constants
 need to be adjusted for the reaction wheel pendulum.
 
-The constants developed in autoref{sec:Modeling} took the form
+The constants developed in \autoref{sec:Modeling} took the form
 \begin{equation}
 	C(s) = G(1 + \frac{q}{s} + p s)
 \end{equation}
-where G is the system gain, q is the integral constant, and p is the derivative constant.  However the software requires
+where G is the controller gain, q is the integral constant, and p is the derivative constant.  However the software requires
 constants in the form of 
 \begin{itemize}
     \item the proportional coefficient $K_{p}$
@@ -514,9 +516,13 @@ $K_{s}$ is simply $K_{\omega}$.  To generate the other required constants, the c
 	C(s) = G + \frac{Gq}{s} + Gps
 \end{equation}
 From this it can be seen that $K_{i} = Gq$ and $K_{d} = Gp$.  The proportional constant requires a little more work.
-Recall from \eqref{eq.openLoop} the physical system has a gain of \todo{discuss required closed loop constants}
+Recall from \eqref{eq.openLoop} the system has a gain of $Kp/I_{c}r$.  All of these terms, with the exception of $p$ are a inherent to the hardware; p
+is the derivative constant. $K_{p}$ is then
+\begin{equation}
+K_{p} = \frac{G} {p}
+\end{equation}
 
-Another item to note in the control system implementation is that the feedback should be \textit{positive} as shown in Figure \ref{transferFunction}.  This reflects the fact that the rotor transfer function in \eqref{groucho} is negative.  This can also be seen in Figure \ref{modelOfPendulum}, where accelerating the rotor in the direction of positive $\theta$ results in a negative change in $\phi$.
+Another item to note in the control system implementation is that the feedback should be \textit{positive} as shown in Figure \ref{transferFunction}.  This reflects the fact that the rotor transfer function in \eqref{groucho} is negative.  This can also be seen in Figure \ref{modelOfPendulum}, where accelerating the rotor in the direction of positive $\theta$ results in a negative change in $\phi$.\\
 
 Finally, units matter.  This documentation was created with SI units, eliminating the need to incorporate a multitude of conversion factors.  However, software is frequently constructed in more common units, for example rotor velocity in RPM, angles in degrees, and time in milliseconds or microseconds.  Hence numerical values developed in this document may need to
 be converted to other units prior to use.
@@ -555,13 +561,16 @@ Encoder frequency = 211.2 counts/rev of gearbox shaft\\
 A number of the motor constants can be calculated from the published Pololu parameters.  However, it
 should  be noted that, for inexpensive motors, the actual motor parameters may vary from the 
 published data.  In any event, the motor constants will be calculated here and then later compared
-with measured data.
+with measured data.\\
 
 $K_{f}$ can be calculated directly from the stall current, gear ratio, and torque: $K_{f}$ = 0.07768 Nm /  2.1 A = 
-0.0370 Nm/A.  $K_{v}$ can be set equal to $K_{f}$, or 0.0370 Vs.
+0.0370 Nm/A.  $K_{v}$ can be set equal to $K_{f}$, or 0.0370 Vs.\\
 
 The motor winding resistance can be determined from the rated voltage and the stall current, as no back-EMF is occurring at stall
-conditions.  Thus, $R$ = 12 V / 2.1 A = 5.7 ohms.
+conditions.  Thus, $R$ = 12 V / 2.1 A = 5.7 ohms.\\
+
+Motor wiring is effected via the provided 0.1"-pitch connector.
+\includegraphics[width=\textwidth]{images/connector.png} 
 
 
 
