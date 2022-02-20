@@ -234,17 +234,17 @@ motor by adjusting the motor voltage via a PWM signal.  The equivalent, average 
 Reference \cite{monograph} give the relationship between motor current and voltage as
 %
 \begin{equation}
-    l \, \frac{di}{dt} + r \,i = v - K_{v} \, \omega
+    L\, \frac{di}{dt} + r \,i = v - K_{v} \, \omega
 \end{equation}
 %
 
-\nomenclature[O]{\(I\)}{armature inductance (H)}
+\nomenclature[O]{\(L\)}{armature inductance (H)}
 \nomenclature[O]{\(r\)}{armature resistance ($\Omega$)}
 \nomenclature[O]{\(v\)}{voltage supplied to the motor (V) }
 \nomenclature[O]{\(K_{v}\)}{motor voltage constant (V rad\textsuperscript{-1} s)}
 \nomenclature[O]{\(\omega\)}{motor rotation speed (rad s\textsuperscript{-1})}
 
-Normally the inductance of the motor is much lower than the resistance, such that $l/r \sim 0.001$.  
+Normally the inductance of the motor is much lower than the resistance, such that $L/r \sim 0.001$.  
 In such cases it is acceptable to ignore the time dependence of the current and write
 %
 \begin{equation}
@@ -555,16 +555,16 @@ gear ratio = 4.4:1 \\
 No-load speed @ 12V = 1700 rpm (178 rad/sec)\\
 No-load current @ 12V = 0.2 A \\
 Stall current @ 12V = 2.1 A \\
-Stall torque @ 12V = 11 oz in (0.07768 Nm)\\
-Encoder frequency = 211.2 counts/rev of gearbox shaft\\
+Stall torque @ 12V (at the gearbox shaft) = 11 oz in (0.07768 Nm)\\
+Encoder frequency = 211.2 counts/rev of gearbox shaft\footnote{The encoder has a frequency of 48 counts per revolution when counting both edges of both channels. With a gear ratio of 4.4:1, the encoder frequency relative to the shaft rotation is 48*4.4 counts/rev, or 211.2 counts per shaft revolution when counting both edges of both channels.}\\
 
 A number of the motor constants can be calculated from the published Pololu parameters.  However, it
 should  be noted that, for inexpensive motors, the actual motor parameters may vary from the 
 published data.  In any event, the motor constants will be calculated here and then later compared
 with measured data.\\
 
-$K_{f}$ can be calculated directly from the stall current, gear ratio, and torque: $K_{f}$ = 0.07768 Nm /  2.1 A = 
-0.0370 Nm/A.  $K_{v}$ can be set equal to $K_{f}$, or 0.0370 Vs.\\
+$K_{t}$ can be calculated directly from the stall current and torque: $K_{t}$ = 0.07768 Nm /  2.1 A = 
+0.0370 Nm/A.  $K_{v}$ can be set equal to $K_{t}$, or 0.0370 Vs.\\
 
 The motor winding resistance can be determined from the rated voltage and the stall current, as no back-EMF is occurring at stall
 conditions.  Thus, $R$ = 12 V / 2.1 A = 5.7 ohms.\\
@@ -590,114 +590,71 @@ $g$ & 9.81 m s\textsuperscript{-2} \\
 
 \section{Measuring Motor Constants}
 \label{appendix:measure}
-Measurements were made to determine a number of motor constants, including $r$, $l$, and $K_{v}$.  
+Measurements were made to determine a number of motor constants, including $A$, $B$, $r$, $l$, and $K_{v}$, remembering that $K_{t} = K_{v}$ provided that SI units are used.  Not all of these motor constants can be directly measured.  The resistance and inductance of the motor windings can be measured with an LCR meter.
+Motor voltage, current, and RPM can be measured by connecting the motor to a power supply and varying the voltage.  The RPM can be measured either with a microcontroller monitoring the encoder or using a tachometer.\\
 
-$r$ was measured using an EXTEC LCR meter, on the $R_{DC}$ setting, as 5.82 $\Omega$. $l$ was 
-measured with the same instrument as 5.994 mH at 1kHz.  This gives a motor electrical time constant $l/r$ of 0.001 sec.  This is the time taken by the current in the motor to go from rest to 63\% of the final steady-state current.
+$\frac{A}{K_{t}}$ and $\frac{B}{K_{t}}$ can be determined from \eqref{wheel} by ensuring that the motor speed is constant.  Then
+\begin{equation}
+    i = \frac{A}{K_{t}}sgn(\omega) + \frac{B}{K_{t}} \omega
+\end{equation}
+Measuring $I$ at various values of $\omega$ permits estimating both $\frac{A}{K_{t}}$ and $\frac{B}{K_{t}}$ by linear
+regression.  Optimally this should be performed using the rotor mounted on the motor. This ensures that
+the weight of the rotor is accurately accounted for in the gearbox friction.\\
 
-$K_{v}$ was measured by driving a motors with a constant voltage and
-varying loads while measuring $V$, $i$, and $\omega$.  
+The next step is to determine values for $K_{v}$ (and hence $K_{t}$) and $R$.  Substituting \eqref{wheel} into \eqref{motor} and assuming a constant velocity we get
+\begin{equation}
+    v = r\frac{A}{K_{t}}sgn(\omega) + (r\frac{B}{K_{t}}+K_{v}) \omega
+\end{equation}
+Knowing $\frac{A}{K_{t}}$ and $\frac{B}{K_{t}}$ from the earlier regression, $r$ and $K_{v}$ can be determined by a linear regression of $v$ as a function of $K_{v}$.  Setting $K_{t}$ equal to $K_{v}$, values for $A$ and $B$ can then be resolved.\\
 
+Measurements of $i$, $v$, and $\omega$ were performed with the motor driven by a 12 V power supply.  Current measurements were made with a  a $\mu$Current DVM adapter and voltage measurements were 
+performed at the motor input leads.  Rotor angular velocity was measured with a hand-held tachometer.  The following table list the resulting measurements:
 
-The motor was driven with a 12 V power supply.  The current was measured by the power supply.  Measuring current in this manner can have larger uncertainties, but comparing with measurements from a $\mu$Current DVM adapter indicated that the power supply current measurement was reasonable.  
-
-
-$\omega$ was measured using the motor's encoder and an Arduino.  The encoder measured the shaft speed, not the gear-set speed.  However, a conversion coefficient of 211.2 counts/revolution was used to convert the encoder pulse rate to gear set rotation speed.
-
-The following table shows the results for three different loads.  The first load was simply rotor friction.  The second load added the Pololu hub adapter.  The third load included a plastic wheel attached to a propeller to increase the drag.
-The resulting measured values are as follows: \\
-
-\begin{tabular}{|c|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|cl}
 \hline
-Case & $v$ & $i$ & speed & $\omega$ & $\omega$ \\
-      & (V) &  (A) & (counts/sec) & (RPM) & (sec\textsuperscript{-1}) \\
+Case & $v$ & $i$ & $\omega$ & $\omega$ \\
+      & (V) &  (A) & (RPM) & (rad/s) \\
 \hline
-1    & 11.95 & 0.0675 & 5,942.2   & 1,688.1   & 176.74 \\
-2    & 11.95 & 0.075   & 5,923.58 & 1,682.83 & 176.19 \\ 
-3    & 11.95 & 0.153   & 5,574.88 & 1583.77  & 165.82 \\
-\hline
-\end{tabular}
-
-Calculating $K_{v}$ can be approached two ways.  The first is to solve \eqref{motor} using the measured
-value of $R$.  The resulting values of $K_{v}$, one for each case, are:
-
-\begin{tabular}{|c|c|}
-\hline
-Case & $K_{v}$  \\
-         & (V sec) \\
-\hline
-1    & 0.0654  \\
-2    & 0.0653  \\
-3    & 0.0667  \\
-\hline
-\end{tabular}
-
-A second approach is to use two cases in \eqref{motor} and solve simultaneously for $R$ and $K_{v}$.
-Cases 1 and 3 were chosen because of the largest difference in $i$, attempting to ensure that the two
-cases are independent.  This results in a values of $r$ = 8.24 $\Omega$ and $K_{v}$ = 0.0645 V sec.
-
-The value of $K_{v}$ is fairly consistent with the values determined in the first approach, but the value
-of $r$ appears to be high.  This may be caused by the limited change in $i$ in the data.  Use of a larger
-load torque might result in a larger value of $i$ and a better estimate of $r$.  However, for the purposes
-of this work the following values will be used:
-
-\begin{tabular}{|c|c|c|}
-\hline
-r                   & $K_{v}$  & $K_{t}$ \\
-($\Omega$)   & (V sec)   & (N m A) \\
-\hline
-5.82    & 0.0667  & 0.0667  \\
+1	& 0.722	& 0.0543	& 49.6	& 5.19 \\
+2	& 1.02	& 0.0591	& 80.4	& 8.42 \\
+3	& 1.487	& 0.0589	& 146	& 15.29 \\
+4	& 2.012	& 0.0599	& 230	& 24.09 \\
+5	& 2.532	& 0.0631	& 307	& 32.15 \\
+6	& 3.086	& 0.065	& 386	& 40.42 \\
+7	& 3.549	& 0.067	& 454	& 47.54 \\
+8	& 3.948	& 0.0682	& 511	& 53.51 \\
+9	& 4.56	& 0.0721	& 601	& 62.94 \\
+10	& 5.03	& 0.073	& 668	& 69.95 \\
+11	& 5.94	& 0.0751	& 807	& 84.51 \\
+12	& 6.84	& 0.0751	& 940	& 98.44 \\
+13	& 7.4	        & 0.0765	& 1021	& 106.92 \\
+14	& 8.44	& 0.08	& 1175	& 123.05 \\
+15	& 9.46	& 0.082	& 1323	& 138.54 \\
+16	& 10.42	& 0.0839	& 1460	& 152.89 \\
 \hline
 \end{tabular}
 
-\section{Measuring Motor Friction Constants}
-\label{appendix:friction}
-Friction in the motor was evaluated by measuring the supply current as a function of motor speed.
-The friction force is related to the motor current as $F = K_{t} i$.  The measurement was performed
-by using a power supply with a variable current limit.  For various currents the speed of the motor
-was measured by monitoring the motor encoder output with an Arduino.  The current was measured
-both at the power supply as well as with a $\mu$Current DVM adapter.
+Linear regression analysis results in the following values for the motor constants:\\
+$A$ = 0.00363 N m\\
+$B$ = 1.2E-5 N m/(radian/sec)\\
+$r$ = 7.9 $\Omega$\\
+$K_{v}$ = 0.0636 V sec\\
 
-The following data was collected:
-
-\begin{tabular}{|c|c|c|c|c|c|}
-Supply Voltage & Supply Current & $\mu$Current & Speed & Speed & Speed\\
-(V) & (A) & (A) & (pulse/sec) & (rpm) & radians/sec\\
-\hline
-10.90 & 0.068 & 0.0676 & 5417 & 1538.9 & 161.16\\
-10.04 & 0.063 & 0.0627 & 5001 & 1420.7 & 148.78\\
-9.09 & 0.058 & 0.0596 & 4520 & 1284.1 & 134.47\\
-7.93 & 0.056 & 0.0562 & 3937 & 1118.5 & 117.13\\
-6.99 & 0.055 & 0.0550 & 3465 & 984.4 & 103.08\\
-6.00 & 0.051 & 0.0521 & 2953 & 838.9 & 87.85\\
-5.00 & 0.047 & 0.0500 & 2437 & 692.3 & 72.50\\
-4.04 & 0.046 & 0.0483 & 1960 & 556.8 & 58.31\\
-3.57 & 0.046 & 0.0486 & 1701 & 483.2 & 50.60\\
-3.02 & 0.047 & 0.0481 & 1421 & 403.7 & 42.27\\
-2.52 & 0.045 & 0.0459 & 1169 & 332.1 & 34.78\\
-2.02 & 0.042 & 0.0437 & 910 & 258.5 & 27.07\\
-1.51 & 0.039 & 0.0409 & 662 & 188.1 & 19.69\\
-1.02 & 0.034 & 0.0366 & 414 & 117.6 & 12.32\\
-0.47 & 0.031 & 0.0328 & 148 & 42.0 & 4.40\\
-\end{tabular}
-
-The encoder speed, in pulses/sec, was converted to RPM using the encoder frequency of 211.2
-counts/revolution.
-
-The Excel regression function was used to fit the $\mu$Current current measurement as a function
-of the speed in radians/sec.  The regression intercept represents the fixed Coulomb friction, and the
-slope represents the viscous friction.  The regression results were 2.47E-3 N m and 1.20E-5 N m/(radian/sec),
-after converting from current using $K_{t}$.  The coulomb friction represents approximately 3\% of the 
+The coulomb friction represents approximately 5\% of the 
 motor stall torque.  At the motor's no-load speed the viscous friction would double the total friction to 
-approximately 6\% of the motor stall torque.  The viscous friction coefficient is significantly larger than
+approximately 7\% of the motor stall torque.  The viscous friction coefficient is significantly larger than
 the value of 9.06E-7 N m/(radian/sec) measured in Reference \cite{twoWheeled}.  This may be due to
 the gearbox associated with the motor used in the current work.  In any event, the friction will be included
-in the system modeling.
+in the system modeling.\\
+
+$l$ was 
+measured with the same instrument as 6.004 mH at 1kHz.  This gives a motor electrical time constant $l/r$ of 7.6E-4 sec.  This is the time taken by the current in the motor to go from rest to 63\% of the final steady-state current.\\
+
 
 
 \section{Arduino Code for Measuring RPM}
 
-The following is an Arduino sketch used to monitor the speed of a dc motor.  The sketch is designed
+The following is an Arduino sketch can be used to monitor the speed of a dc motor in lieu of a tachometer.  The sketch is designed
 to work with either an Arduino Uno or an Arduino Mega. The motor wiring described in the comments
 referrs to the wiring of the Pololu 25D 4.4:1 metal gear motor.  The output is in position change 
 per second, where the motor has 211.2 counts/rev of gearbox shaft. \\
