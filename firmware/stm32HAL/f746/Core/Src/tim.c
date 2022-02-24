@@ -44,7 +44,7 @@ void MX_TIM1_Init(void)
 
   /* USER CODE BEGIN TIM1_Init 1 */
 
-  //TODO:  Check and see if IC1Filter and IC2Filter should be larger (15?)
+  //FIXME:  Check and see if IC1Filter and IC2Filter should be larger (15?)
   // See: https://community.st.com/s/question/0D50X00009XkWCY/using-timer-in-encoder-mode-with-interrupts-on-value-change
 
   /* USER CODE END TIM1_Init 1 */
@@ -243,7 +243,7 @@ void MX_TIM5_Init(void)
 
   /* USER CODE BEGIN TIM5_Init 1 */
 
-  //TODO: Set the Prescaler to produce a 1 usec clock.  A value of 72 works for
+  //FIXME: Set the Prescaler to produce a 1 usec clock.  A value of 72 works for
   // a 72 MHz timer clock
 
   /* USER CODE END TIM5_Init 1 */

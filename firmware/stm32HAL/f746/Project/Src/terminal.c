@@ -18,7 +18,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief signaling LED
 ///////////////////////////////////////////////////////////////////////////////
-// TODO: should this somehow be in the "mcu" folder?
+// FIXME: should this somehow be in the "mcu" folder?
 //static LED signal_led(GPIO_PORT_B, 0);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -161,7 +161,7 @@ int shell_process(char *cmd_line) {
 ///
 ///	\return TRUE success. FALSE no error
 ///
-///	\todo update the document return state value. need to implement
+///	\FIXME update the document return state value. need to implement
 ///////////////////////////////////////////////////////////////////////////////
 int_fast8_t Terminal_Process(void) {
 	if (serve_command_prompt(Buffer, TERMINAL_BUFFER_SIZE, "pencil> ") > 0) {

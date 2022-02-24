@@ -225,7 +225,7 @@ bool IMU::update_IMU_values(void) {
 	if (!update_ypr_values(ypr, &imu_Time_Now)) {
 		return false;
 	}
-	//TODO: p must be managed by the terminal interface
+	//FIXME: p must be managed by the terminal interface
 	if (p == 1 && p_Prev == 0) { // Resets integral when balancing mode is started to avoid wind up while holding
 		theta_Integral = 0;
 		omega_Integral = 0;
@@ -242,7 +242,7 @@ bool IMU::update_IMU_values(void) {
 	////////////////////////////////////////////////////////// Theta Calcs//////////////////////////////////////////////////////////////////////////////////////////
 
 	float theta_Prev = theta_Now;
-	//TODO: does the use of an angle_rounding_value make any sense when using floats?
+	//FIXME: does the use of an angle_rounding_value make any sense when using floats?
 	// convert the pitch for radians to degrees and apply a digital filter
 	float theta_Now_Unfiltered = round(
 			(ypr[2] * 180 / M_PI) * angle_Rounding_Value) / angle_Rounding_Value; //undo
@@ -384,7 +384,7 @@ void IMU::get_omega_values(float &omega_Now, float &omega_Integral,
 			 if (fifoC > 200) { // if you waited to get the FIFO buffer to > 200 bytes it will take longer to get the last packet in the FIFO Buffer than it will take to  reset the buffer and wait for the next to arrive
 				 mpu.resetFIFO(); // Fixes any overflow corruption
 				 fifoC = 0;
-				 //TODO: eliminate this blocking issue
+				 //FIXME: eliminate this blocking issue
 				 //printf("Blocked\n");
 				 while (!(fifoC = mpu.getFIFOCount()) && ((__MICROS() - BreakTimer) <= (11000))); // Get Next New Packet
 			 } else { //We have more than 1 packet but less than 200 bytes of data in the FIFO Buffer

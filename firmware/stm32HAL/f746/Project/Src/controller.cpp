@@ -67,7 +67,7 @@ int Controller::get_PID_Voltage_Value() {
 	} else if (speed < -stiction_speed_threshold) {
 		friction = -friction_Value;
 	}
-
+	//FIXME: figure out where this equation came from
 	float voltage = (PID_Accel + 0.30 * speed + friction) / 9.4; // Equation measured from Acceleration Motor Tests
 	int voltage_limit = motor->get_max_voltage();
 	PID_Voltage = round(constrain(voltage, -voltage_limit, voltage_limit));

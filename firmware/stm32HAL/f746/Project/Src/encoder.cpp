@@ -57,7 +57,7 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 		if (__HAL_TIM_IS_TIM_COUNTING_DOWN(htim)) {
 			Encoder_Direction_Now = -1;
 		} else {
-			//TODO: verify "UP" is +1 in old code
+			//FIXME: verify "UP" is +1 in old code
 			Encoder_Direction_Now = +1;
 		}
 

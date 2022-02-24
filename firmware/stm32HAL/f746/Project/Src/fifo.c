@@ -49,7 +49,7 @@ static uint32_t ReadPosition = 0;
 ///	\brief return the number of bytes in buffer
 ////////////////////////////////////////////////////////
 uint32_t FIFO_CounnterBufferCount(void) {
-	/// \todo Implement interrupt save code. ie enable and disable interrupt
+	/// \FIXME Implement interrupt save code. ie enable and disable interrupt
 
 	return BufferCurrentSize;
 }
