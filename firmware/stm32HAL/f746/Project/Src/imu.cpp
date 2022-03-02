@@ -74,14 +74,15 @@
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 const uint16_t angle_Rounding_Value = 1000; // Defines what value to multiple by before round theta and omega. Cuts down on noise, [10 = x.1,  100 = x.x1 , 1(Default)]
-const float theta_Filter = 0.7;
-const float omega_Filter = 0.7;
 const float theta_Integral_Max = 3.0;
 const float omega_Integral_Max = 3.0;
 const float theta_Speed_Filter = 0.7;
 const float omega_Speed_Filter = 0.7;
 const float angle_Average_Filter = 0.970;
 const float angle_Smoothed_Filter = 0.997;
+const float theta_Filter = 0.7;
+const float omega_Filter = 0.7;
+
 
 float theta_Kt = 0.6;
 float theta_Ktd = 0;
@@ -121,7 +122,15 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  * @param addrress imu I2C address
  */
 IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
-		mpu(hi2c, address) {
+		mpu(hi2c, address),
+		thetaFilter((float) theta_Filter),
+		thetaSpeedFilter((float) theta_Speed_Filter),
+		thetaAverageFilter((float) angle_Average_Filter),
+		thetaSmoothedFilter((float) angle_Smoothed_Filter),
+		thetaZeroFilter((float) theta_Zero_Filter),
+		omegaFilter((float) omega_Filter),
+		omegaSpeedFilter((float) omega_Speed_Filter) {
+
 	const int16_t xGyroOffset = 224;
 	const int16_t yGyroOffset = 98;
 	const int16_t zGyroOffset = 24;
@@ -244,10 +253,10 @@ bool IMU::update_IMU_values(void) {
 	float theta_Prev = theta_Now;
 	//FIXME: does the use of an angle_rounding_value make any sense when using floats?
 	// convert the pitch for radians to degrees and apply a digital filter
+	// FIXME : validate filtering
 	float theta_Now_Unfiltered = round(
 			(ypr[2] * 180 / M_PI) * angle_Rounding_Value) / angle_Rounding_Value; //undo
-	theta_Now = (1 - theta_Filter) * (theta_Now_Unfiltered)
-			+ (theta_Filter * theta_Prev); //undo
+	theta_Now = thetaFilter.filter(theta_Now_Unfiltered);
 
 	// angle error in degrees
 	theta_Error = theta_Now - theta_Zero;
@@ -261,29 +270,21 @@ bool IMU::update_IMU_values(void) {
 	}
 
 	// calculate the rotational velocity in degrees/sec using a digital filter
-	float theta_Speed_Prev = theta_Speed_Now;
-	theta_Speed_Now = ((1 - theta_Speed_Filter) * (theta_Now - theta_Prev)
-			/ (imu_Time_Now - imu_Time_Prev) * 1000000.)
-			+ theta_Speed_Filter * theta_Speed_Prev; // Relative to absolute zero
+	// FIXME validate more filtering
+	theta_Speed_Now = thetaSpeedFilter.filter((theta_Now - theta_Prev) / (imu_Time_Now - imu_Time_Prev) * 1000000.);
 
 	// again, another digital filter based on averaging the angle
-	float theta_Average_Prev = theta_Average;
-	theta_Average = (1 - angle_Average_Filter) * (theta_Now)
-			+ (angle_Average_Filter * theta_Average_Prev);
+	theta_Average = thetaAverageFilter.filter(theta_Now);
 
 	// yep, let's smooth theta  and rotational velocity one more time
 	float theta_Smoothed_Prev = theta_Smoothed;
-	theta_Smoothed = (1 - angle_Smoothed_Filter) * theta_Now
-			+ angle_Smoothed_Filter * theta_Smoothed_Prev;
-	theta_Smoothed_Speed = (theta_Smoothed - theta_Smoothed_Prev)
-			/ (imu_Time_Now - imu_Time_Prev) * 1000000.;
+	theta_Smoothed = thetaSmoothedFilter.filter(theta_Now);
+	theta_Smoothed_Speed = (theta_Smoothed - theta_Smoothed_Prev) / (imu_Time_Now - imu_Time_Prev) * 1000000.;
 
-	float theta_Zero_Prev = theta_Zero;
 	if (p == 1) {                               // Automatic setpoint adjustment
 		float theta_Zero_Unfiltered = theta_Zero - theta_Kt * theta_Error
 				- theta_Ktd * theta_Smoothed_Speed;
-		theta_Zero = (1 - theta_Zero_Filter) * theta_Zero_Unfiltered
-				+ theta_Zero_Filter * theta_Zero_Prev;
+		theta_Zero = thetaZeroFilter.filter(theta_Zero_Unfiltered);
 	} else {
 		theta_Zero = theta_Average;
 	}
