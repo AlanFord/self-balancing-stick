@@ -10,6 +10,7 @@
 
 #include "common.h"
 #include "MPU6050_6Axis_motionApps20.h"
+#include "filters.hpp"
 
 #define _BV(n) (1 << n)
 
@@ -28,6 +29,14 @@ class IMU {
 	uint16_t packetSize;       // expected DMP packet size (default is 42 bytes)
 	uint8_t fifoBuffer[64];       // FIFO storage buffer
 	MPU6050_6Axis_MotionApps20 mpu;            // Creating object 'mpu', I think
+	ExponentialFilter thetaFilter;
+	ExponentialFilter thetaSpeedFilter;
+	ExponentialFilter omegaFilter;
+	ExponentialFilter omegaSpeedFilter;
+	ExponentialFilter thetaAverageFilter;
+	ExponentialFilter thetaSmoothedFilter;
+	ExponentialFilter thetaZeroFilter;
+
 
 	/* these are used to pass data to the controllers in the "get ... values" methods*/
 	float theta_Now;

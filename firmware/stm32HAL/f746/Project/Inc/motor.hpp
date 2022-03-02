@@ -8,14 +8,7 @@
 #ifndef INC_MOTOR_HPP_
 #define INC_MOTOR_HPP_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 #include "common.h"
-
-#ifdef __cplusplus
-}
-#endif
 
 #define MOTOR_FORWARD GPIO_PIN_RESET
 #define MOTOR_REVERSE GPIO_PIN_SET

@@ -14,7 +14,7 @@
 #include "imu.hpp"
 #include <encoder.hpp>
 #include <motor.hpp>
-#include "controller.hpp"
+//#include "controller.hpp"
 
 // the hardware!
 extern IMU *imu_ptr;

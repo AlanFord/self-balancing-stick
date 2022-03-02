@@ -8,6 +8,11 @@
 #ifndef INC_APPENTRY_HPP_
 #define INC_APPENTRY_HPP_
 
+//#include "hardware.hpp"
+#include "controller.hpp"
+
+Controller *rightController_ptr;
+Controller *leftController_ptr;
 
 
 

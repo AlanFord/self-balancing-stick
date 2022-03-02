@@ -1,6 +1,7 @@
 #include "appEntry.hpp"
 #include "terminal.h"
 #include "hardware.hpp"
+#include "controller.hpp"
 
 
 // the hardware!
@@ -71,14 +72,17 @@ void app_entry(void) {
 		printf("imu initialization failure");
 		Error_Handler();
 	}
+	// FIXME : wait for, and check, for a functional imu
 
 	//initialize right controller (omega)
 	Controller rightController(omega, omega_Kp, omega_Ki, omega_Kd, omega_Ks,
 			&imu, &rightEncoder, &rightMotor, friction_Value);
+	rightController_ptr = &rightController;
 
 	//initialize left controller (theta)
 	Controller leftController(theta, theta_Kp, theta_Ki, theta_Kd, theta_Ks,
 			&imu, &leftEncoder, &leftMotor, friction_Value);
+	leftController_ptr = &leftController;
 
 	Terminal_Init();
 
@@ -89,10 +93,21 @@ void app_entry(void) {
 		bool update_available = imu.update_IMU_values();
 		// don't mess with motor voltages if no new imu angles are available
 		if (update_available) {
+			float theta_Now, theta_integral, theta_speed, theta_zero;
+			float omega_Now, omega_integral, omega_speed, omega_zero;
+			imu.get_theta_values( theta_Now,  theta_integral,
+					 theta_speed,  theta_zero);
+			imu.get_omega_values( omega_Now,  omega_integral,
+					 omega_speed,  omega_zero);
+			printf("%f, %f\n", theta_Now, omega_Now);
 			if (left_controller_active)
 				leftMotor.set_voltage(leftController.get_PID_Voltage_Value());
 			if (right_controller_active)
 				rightMotor.set_voltage(rightController.get_PID_Voltage_Value());
+		}
+		else{
+			printf("negatory---\n");
+
 		}
 	}
 
