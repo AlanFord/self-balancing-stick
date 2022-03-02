@@ -14,7 +14,7 @@
 #ifdef __cplusplus
  extern "C" {
 #endif
-
+// FIXME : is this still needed if we switch to a simpler printf implementation?
 int __io_putchar(int ch) {
   //HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 0xFFFF);
   //while (!(instance.regs->ISR & USART_ISR_TXE)) {};
