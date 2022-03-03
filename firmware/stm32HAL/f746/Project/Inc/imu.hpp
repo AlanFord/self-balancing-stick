@@ -25,7 +25,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 #endif
 
 class IMU {
-	uint16_t dmpReady = FALSE;     // set true if DMP init was successful
+	uint16_t dmpReady = false;     // set true if DMP init was successful
 	uint16_t packetSize;       // expected DMP packet size (default is 42 bytes)
 	uint8_t fifoBuffer[64];       // FIFO storage buffer
 	MPU6050_6Axis_MotionApps20 mpu;            // Creating object 'mpu', I think

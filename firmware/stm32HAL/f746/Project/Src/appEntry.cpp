@@ -70,7 +70,7 @@ void app_entry(void) {
 	//initialize imu
 	IMU imu(&hi2c1);
 	imu_ptr = &imu;
-	if (imu.get_Status() != TRUE) {
+	if (imu.get_Status() != true) {
 		printf("imu initialization failure");
 		Error_Handler();
 	}

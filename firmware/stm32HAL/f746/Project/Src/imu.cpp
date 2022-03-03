@@ -92,7 +92,7 @@ float theta_Zero_Filter = 0.995;
 float omega_Zero_Filter = 0.986;
 
 
-volatile uint16_t mpuInterrupt = FALSE; // indicates whether MPU interrupt pin has gone high
+volatile uint16_t mpuInterrupt = false; // indicates whether MPU interrupt pin has gone high
 
 /*
  * @brief external interrupt callback for gpio pins
@@ -100,7 +100,7 @@ volatile uint16_t mpuInterrupt = FALSE; // indicates whether MPU interrupt pin h
  */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (GPIO_Pin == IMU_INT_Pin) {
-		mpuInterrupt = TRUE;
+		mpuInterrupt = true;
 	}
 }
 

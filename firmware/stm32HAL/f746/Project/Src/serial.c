@@ -12,14 +12,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Keeps track if the serial port is configure and open
 ///////////////////////////////////////////////////////////////////////////////
-static uint_fast8_t IsOpenFlag = FALSE;
+static IO_RESULT IsOpenFlag = IO_FALSE;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief return the serial open state
 ///
 /// \return true = the serial port is open else false
 ///////////////////////////////////////////////////////////////////////////////
-static uint_fast8_t IsSerialOpen(void) {
+static IO_RESULT IsSerialOpen(void) {
 	return IsOpenFlag;
 }
 
@@ -31,7 +31,7 @@ static void Close(void) {
 	LL_USART_Disable(USART3);
 	NVIC_DisableIRQ(USART3_IRQn);
 	FIFO_Deinitialize();
-	IsOpenFlag = FALSE;
+	IsOpenFlag = IO_FALSE;
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -40,12 +40,12 @@ static void Close(void) {
 ///
 ///	\return TRUE = Busy else false
 /////////////////////////////////////////////////////////////////////////
-static uint_fast8_t IsWriteBusy(void) {
+static IO_RESULT IsWriteBusy(void) {
 	if (LL_USART_IsActiveFlag_TXE(USART3)) {
-		return FALSE;
+		return IO_FALSE;
 	}
 
-	return TRUE;
+	return IO_TRUE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ static uint_fast8_t IsWriteBusy(void) {
 ///
 /// \return true = success else port is already open
 ///////////////////////////////////////////////////////////////////////////////
-static uint_fast8_t Open(void) {
+static IO_RESULT Open(void) {
 
 	if (!IsOpenFlag) {
 		// reset the FIFO
@@ -70,11 +70,11 @@ static uint_fast8_t Open(void) {
 			MX_USART3_UART_Init();
 		}
 
-		IsOpenFlag = TRUE;
+		IsOpenFlag = IO_TRUE;
 		LL_USART_EnableIT_RXNE(USART3);
-		return TRUE;
+		return IO_TRUE;
 	}
-	return FALSE;
+	return IO_FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -82,37 +82,37 @@ static uint_fast8_t Open(void) {
 ///
 ///	\param source the character to send via serial
 ///
-/// \return true = success else port is not open
+/// \return IO_TRUE = success else port is not open
 ///////////////////////////////////////////////////////////////////////////////
-static uint_fast8_t SendByte(const uint8_t source) {
+static IO_RESULT SendByte(const uint8_t source) {
 	if (IsOpenFlag) {
 		while (IsWriteBusy())
 			;
 
 		LL_USART_TransmitData8(USART3, source);
 
-		return TRUE;
+		return IO_TRUE;
 	}
 
-	return FALSE;
+	return IO_FALSE;
 }
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief return the serial receive byte buffer state
 ///
-/// \return      1 = we have data
-///              0 = no data to read
-///             ERROR = Port is not open
+/// \return      IO_TRUE = we have data
+///              IO_FALSE = no data to read
+///              IO_ERROR = Port is not open
 ///////////////////////////////////////////////////////////////////////////////
-static int_fast8_t DoesReceiveBufferHaveData(void) {
+static IO_RESULT DoesReceiveBufferHaveData(void) {
 	if (IsOpenFlag) {
 		if (FIFO_CounnterBufferCount()) {
-			return TRUE;
+			return IO_TRUE;
 		} else {
-			return FALSE;
+			return IO_FALSE;
 		}
 	}
 
-	return ERROR;
+	return IO_ERROR;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -128,10 +128,10 @@ static int_fast8_t DoesReceiveBufferHaveData(void) {
 ///												or if the data is corrupted (ie, framing error or buffer overflow)
 ///					ERROR_INVALID_POINTER Invalid pointer
 ///////////////////////////////////////////////////////////////////////////////
-static int_fast8_t GetByte(uint8_t *destination) {
-	int_fast8_t Result = ERROR;
+static IO_RESULT GetByte(uint8_t *destination) {
+	IO_RESULT Result = IO_ERROR;
 
-	if (IsOpenFlag) {
+	if (IsOpenFlag == IO_TRUE) {
 		Result = FIFO_Read(destination);
 	}
 
@@ -171,20 +171,20 @@ inline void InterruptRead(void) {
 ///
 /// \param source pointer to the string to write. must end with null
 ///
-/// \return true = success else either the port is not open or the pointer
+/// \return IO_TRUE = success else either the port is not open or the pointer
 /// to the array is invalid.
 ///////////////////////////////////////////////////////////////////////////////
-static uint_fast8_t SendString(const char *source) {
-	if (IsOpenFlag && source) {
+static IO_RESULT SendString(const char *source) {
+	if ((IsOpenFlag == IO_TRUE) && source) {
 		while (*source) {
 			if (!SendByte(*source)) {
-				return FALSE;
+				return IO_FALSE;
 			}
 			source++;
 		}
-		return TRUE;
+		return IO_TRUE;
 	}
-	return FALSE;
+	return IO_FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -193,20 +193,20 @@ static uint_fast8_t SendString(const char *source) {
 /// \param source pointer to the array to transmit.
 /// \param length is the size of the array
 ///
-/// \return true = success else either the port is not open or the pointer
+/// \return IO_TRUE = success else either the port is not open or the pointer
 /// to the array is invalid.
 ///////////////////////////////////////////////////////////////////////////////
-static uint_fast8_t SendArray(const uint8_t *source, uint32_t length) {
-	if (IsOpenFlag && source) {
+static IO_RESULT SendArray(const uint8_t *source, uint32_t length) {
+	if ((IsOpenFlag == IO_TRUE) && source) {
 		for (; length; length--) {
-			if (!SendByte(*source)) {
-				return FALSE;
+			if (SendByte(*source) != IO_TRUE) {
+				return IO_FALSE;
 			}
 			source++;
 		}
-		return TRUE;
+		return IO_TRUE;
 	}
-	return FALSE;
+	return IO_FALSE;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

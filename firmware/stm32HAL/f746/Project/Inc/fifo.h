@@ -12,12 +12,12 @@ extern "C" {
 #endif
 
 
-uint_fast8_t IsFifoInitialized(void);
+IO_RESULT IsFifoInitialized(void);
 void FIFO_Initialize(void);
 void FIFO_Deinitialize(void);
 uint32_t FIFO_CounnterBufferCount(void);
-uint_fast8_t FIFO_Write(uint8_t inputData);
-uint_fast8_t FIFO_Read(uint8_t *outputDataPointer);
+IO_RESULT FIFO_Write(uint8_t inputData);
+IO_RESULT FIFO_Read(uint8_t *outputDataPointer);
 
 
 #ifdef __cplusplus

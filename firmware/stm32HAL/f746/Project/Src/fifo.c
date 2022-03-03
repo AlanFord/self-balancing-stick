@@ -10,7 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Keeps track if the serial port is configure and open
 ///////////////////////////////////////////////////////////////////////////////
-static uint_fast8_t IsInitializedFlag = FALSE;
+static IO_RESULT IsInitializedFlag = IO_FALSE;
 
 ////////////////////////////////////////////////////////
 ///	\brief defines the fifo buffer max size.
@@ -59,7 +59,7 @@ uint32_t FIFO_CounnterBufferCount(void) {
 ///
 /// \return true = the serial port is open else false
 ///////////////////////////////////////////////////////////////////////////////
-static uint_fast8_t IsFifoInitialized(void) {
+static IO_RESULT IsFifoInitialized(void) {
 	return IsInitializedFlag;
 }
 
@@ -80,7 +80,7 @@ void FIFO_Initialize(void) {
 				BufferIndex++) {
 			Buffer[BufferIndex] = 0;
 		}
-		IsInitializedFlag = TRUE;
+		IsInitializedFlag = IO_TRUE;
 	}
 }
 
@@ -89,7 +89,7 @@ void FIFO_Initialize(void) {
 ///
 ////////////////////////////////////////////////////////
 void FIFO_Deinitialize(void) {
-	IsInitializedFlag = FALSE;
+	IsInitializedFlag = IO_FALSE;
 }
 
 ////////////////////////////////////////////////////////
@@ -103,8 +103,8 @@ void FIFO_Deinitialize(void) {
 ///			ERROR_INVALID_POINTER = Invalid outputDataPointer pointer
 ///
 ////////////////////////////////////////////////////////
-uint_fast8_t FIFO_Read(uint8_t *outputDataPointer) {
-	uint_fast8_t Result = FALSE;
+IO_RESULT FIFO_Read(uint8_t *outputDataPointer) {
+	IO_RESULT Result = IO_FALSE;
 
 	// check pointer is valid and not set to zero
 	if (outputDataPointer) {
@@ -122,7 +122,7 @@ uint_fast8_t FIFO_Read(uint8_t *outputDataPointer) {
 				ReadPosition = 0;
 			}
 
-			Result = TRUE;
+			Result = IO_TRUE;
 		}
 	} else {
 		// pointer error
@@ -137,11 +137,11 @@ uint_fast8_t FIFO_Read(uint8_t *outputDataPointer) {
 ///
 ///	\param inputData copy of the data we want to store
 ///
-///	\return TRUE = successfully writing data to our buffer
-///			FALSE = No space in buffer
+///	\return IO_TRUE = successfully writing data to our buffer
+///			IO_FALSE = No space in buffer
 ////////////////////////////////////////////////////////
-uint_fast8_t FIFO_Write(uint8_t inputData) {
-	uint_fast8_t Result = FALSE;
+IO_RESULT FIFO_Write(uint8_t inputData) {
+	IO_RESULT Result = IO_FALSE;
 
 	if (BufferCurrentSize < FIFO_BUFFER_MAX_SIZE) {
 		// We have space
@@ -158,7 +158,7 @@ uint_fast8_t FIFO_Write(uint8_t inputData) {
 			WritePosition = 0;
 		}
 
-		Result = TRUE;
+		Result = IO_TRUE;
 	}
 
 	return Result;

@@ -4,11 +4,11 @@
 ///	\author Alan Ford
 ///////////////////////////////////////////////////////////////////////////////
 #include <commands.hpp>
-#include "common.h"
 #include "serial.h"
 #include "shell.h"
 #include <stdio.h>
 #include "terminal.h"
+#include "stdbool.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Defines our terminal buffer size which in turn set the longest command
@@ -65,20 +65,20 @@ void Terminal_Init(void) {
  * if buffer is empty, does not block, rather returns 0 (FALSE).  Upon receiving
  * a newline, returns command string length.
  */
-int serve_command_prompt(char *buffer, int bufferLength, const char *prompt) {
+IO_RESULT serve_command_prompt(char *buffer, int bufferLength, const char *prompt) {
 	uint8_t SerialTempData = 0; // hold the new byte from the serial fifo
 
-	static char initialized = FALSE;
+	static IO_RESULT initialized = IO_FALSE;
 	static char *p;
 
 	if (!initialized) {
 		p = buffer;
 		*p = '\0';
 		printf("%s", prompt);
-		initialized = TRUE;
+		initialized = IO_TRUE;
 	}
 
-	while (TRUE == SerialPort.GetByte(&SerialTempData)) {
+	while (IO_TRUE == SerialPort.GetByte(&SerialTempData)) {
 		char c = SerialTempData;
 		switch (c) {
 		// https://en.wikipedia.org/wiki/ASCII#ASCII_control_characters
@@ -87,7 +87,7 @@ int serve_command_prompt(char *buffer, int bufferLength, const char *prompt) {
 
 		case '\n':
 			printf("\r\n");
-			initialized = FALSE;
+			initialized = IO_FALSE;
 			return shell_str_len(buffer);
 
 		case '\b':
@@ -106,7 +106,7 @@ int serve_command_prompt(char *buffer, int bufferLength, const char *prompt) {
 
 		case '\e': // ESC
 			printf("^[\r\n");
-			initialized = FALSE;
+			initialized = IO_FALSE;
 			break;
 
 		case 0x7f: // 127, or delete
@@ -127,7 +127,7 @@ int serve_command_prompt(char *buffer, int bufferLength, const char *prompt) {
 		}
 	}
 
-	return FALSE;
+	return IO_FALSE;
 }
 
 /*
@@ -163,12 +163,12 @@ int shell_process(char *cmd_line) {
 ///
 ///	\FIXME update the document return state value. need to implement
 ///////////////////////////////////////////////////////////////////////////////
-int_fast8_t Terminal_Process(void) {
-	if (serve_command_prompt(Buffer, TERMINAL_BUFFER_SIZE, "pencil> ") > 0) {
+IO_RESULT Terminal_Process(void) {
+	if (serve_command_prompt(Buffer, TERMINAL_BUFFER_SIZE, "pencil> ") == IO_TRUE) {
 		if (shell_process(Buffer) == SHELL_PROCESS_OK) {
-			return TRUE;
+			return IO_TRUE;
 		}
 	}
-	return FALSE;
+	return IO_FALSE;
 }
 
