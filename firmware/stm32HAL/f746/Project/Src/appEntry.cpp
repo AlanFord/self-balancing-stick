@@ -10,6 +10,8 @@ Motor *rightMotor_ptr;
 Motor *leftMotor_ptr;
 Encoder *leftEncoder_ptr;
 Encoder *rightEncoder_ptr;
+Controller *rightController_ptr;
+Controller *leftController_ptr;
 bool left_controller_active = false;
 bool right_controller_active = false;
 
