@@ -19,6 +19,11 @@
 
 #include "shell.h"
 
+/*
+ * @brief calculates the length of a c string
+ * @param str pointer to a c string
+ * @return integer length of the c string
+ */
 int shell_str_len(char *str)
 {
      int i = 0;
@@ -28,6 +33,16 @@ int shell_str_len(char *str)
      return i - 1;
 }
 
+/*
+ * @brief compares two c strings
+ * @param str1 pointer to the first c string
+ * @param str2 pointer to the second c string
+ * @param len1 length of the first c string
+ * @param len2 length of the second c string
+ * @return 1 if str1 is longer than str2,
+ *         2 if str1 and str2 don't match (excluding trailing blanks in str2)
+ *         0 if str1 and str2 match (ignoring trailing blanks in str2)
+ */
 int shell_str_cmp(char *str1, char *str2, int len1, int len2)
 {
      int i;

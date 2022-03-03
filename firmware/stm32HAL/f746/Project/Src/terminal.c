@@ -62,7 +62,7 @@ void Terminal_Init(void) {
  * @return length of command string or 0
  *
  * prints a command prompt and then reads characters from the serial buffer.
- * if buffer is empty, does not block, rather returns 0.  Upon receiving
+ * if buffer is empty, does not block, rather returns 0 (FALSE).  Upon receiving
  * a newline, returns command string length.
  */
 int serve_command_prompt(char *buffer, int bufferLength, const char *prompt) {
@@ -127,7 +127,7 @@ int serve_command_prompt(char *buffer, int bufferLength, const char *prompt) {
 		}
 	}
 
-	return 0;
+	return FALSE;
 }
 
 /*

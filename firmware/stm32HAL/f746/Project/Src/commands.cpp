@@ -284,7 +284,7 @@ int shell_cmd_set_theta_kp(shell_cmd_args *args)
 		printf("Invalid zero option arguments\n");
 		return 0;
 	}
-	float newVal = strtol(args->args[1].val,NULL,10);
+	float newVal = strtof(args->args[1].val,NULL);
 	leftController_ptr->set_Kp(newVal);
 	return 0;
 }
@@ -298,7 +298,7 @@ int shell_cmd_set_theta_ki(shell_cmd_args *args)
 		printf("Invalid zero option arguments\n");
 		return 0;
 	}
-	float newVal = strtol(args->args[1].val,NULL,10);
+	float newVal = strtof(args->args[1].val,NULL);
 	leftController_ptr->set_Ki(newVal);
 	return 0;
 }
@@ -312,7 +312,7 @@ int shell_cmd_set_theta_kd(shell_cmd_args *args)
 		printf("Invalid zero option arguments\n");
 		return 0;
 	}
-	float newVal = strtol(args->args[1].val,NULL,10);
+	float newVal = strtof(args->args[1].val,NULL);
 	leftController_ptr->set_Kd(newVal);
 	return 0;
 }
@@ -326,7 +326,7 @@ int shell_cmd_set_theta_ks(shell_cmd_args *args)
 		printf("Invalid zero option arguments\n");
 		return 0;
 	}
-	float newVal = strtol(args->args[1].val,NULL,10);
+	float newVal = strtof(args->args[1].val,NULL);
 	leftController_ptr->set_Ks(newVal);
 	return 0;
 }
@@ -349,7 +349,7 @@ int shell_cmd_set_omega_kp(shell_cmd_args *args)
 		printf("Invalid zero option arguments\n");
 		return 0;
 	}
-	float newVal = strtol(args->args[1].val,NULL,10);
+	float newVal = strtof(args->args[1].val,NULL);
 	rightController_ptr->set_Kp(newVal);
 	return 0;
 }
