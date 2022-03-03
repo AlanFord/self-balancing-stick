@@ -40,8 +40,8 @@ title(['p=' num2str(p) ', q=' num2str(q) ', Kw=' num2str(Kw)]);
 
 %Re-plot the root locus using a PD feedback constant r = 1/4.5
 
-%r = 1/4.5;   % PD zero location at 1/4, gain of r
-p = 1/3.5;    % PD zero location at 1/4, gain of r
+p = 1/4.5;   % PD zero location at 1/4, gain of r
+%p = 1/3.5;    % PD zero location at 1/4, gain of r
 Ctf = 1+(q/s)+(p*s);
 sysBackward = Rtf*Ctf*Mtf;
 sys = sysForward*sysBackward
@@ -56,8 +56,8 @@ title(['p=' num2str(p) ', q=' num2str(q) ', Kw=' num2str(Kw)]);
 %Re-plot the root locus using a PD feedback constant r = 1/4.5
 % and a rotor velocity coefficient of 0.075
 
-% Kw=0.075;   % rotor feedback
-Kw=-0.1;       % rotor feedback
+Kw=0.075;   % rotor feedback
+% Kw=-0.1;       % rotor feedback
 %Mtf = (Kt/R)/(s*rotor_inertia + ((Kt^2)/R -(Kt*Kw)/R + frictionFactor));
 Mtf = (Kt/R/rotor_inertia)/(s + ((1/rotor_inertia)*((Kt^2)/R -(Kt*Kw)/R + frictionFactor)));
 sysBackward = Rtf*Ctf*Mtf;
@@ -73,5 +73,5 @@ pause
 
 
 close all
-rr=rlocus(sys,680)
+rr=rlocus(sys,370)
 %[k, poles] = rlocfind(sys)

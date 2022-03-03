@@ -7,7 +7,7 @@
 #ifndef INC_ENCODER_HPP_
 #define INC_ENCODER_HPP_
 
-#include "common.h"
+//#include "common.h"
 #include "tim.h"
 
 

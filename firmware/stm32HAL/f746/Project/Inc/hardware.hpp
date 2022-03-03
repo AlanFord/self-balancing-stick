@@ -22,6 +22,8 @@ extern Motor *rightMotor_ptr;
 extern Motor *leftMotor_ptr;
 extern Encoder *leftEncoder_ptr;
 extern Encoder *rightEncoder_ptr;
+extern Controller *rightController_ptr;
+extern Controller *leftController_ptr;
 
 extern bool left_controller_active;
 extern bool right_controller_active;

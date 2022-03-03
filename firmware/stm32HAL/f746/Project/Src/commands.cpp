@@ -2,28 +2,140 @@
 #include <commands.hpp>
 #include "terminal.h"
 #include "hardware.hpp"
+#include "appEntry.hpp"
 #include "stm32f7xx_hal.h"
 #include <string.h>
+//#include <string>
 #include <stdio.h>
-
+// FIXME : flesh out the commands (similar to original arduino program?)
 shell_cmds pencil_cmds =
 {
-	.count = 5,
+	.count = 28,
 	.cmds  = {
 		{
-			.cmd     = "charge",
-			.desc    = "Control motor power",
-			.func    = shell_cmd_power,
+			.cmd     = "y",
+			.desc    = "Charge left motor",
+			.func    = shell_cmd_charge_left,
 		},
 		{
-			.cmd     = "imu",
-			.desc    = "IMU reading",
-			.func    = shell_cmd_imu,
+			.cmd     = "h",
+			.desc    = "Charge right motor",
+			.func    = shell_cmd_charge_right,
 		},
 		{
-			.cmd     = "balance",
-			.desc    = "Balance with left, right or both motors",
-			.func    = shell_cmd_balance,
+			.cmd     = "n",
+			.desc    = "Charge both motors",
+			.func    = shell_cmd_charge_both,
+		},
+		{
+			.cmd     = "u",
+			.desc    = "Balance with left motor",
+			.func    = shell_cmd_balance_left,
+		},
+		{
+			.cmd     = "j",
+			.desc    = "Balance with right motor",
+			.func    = shell_cmd_balance_right,
+		},
+		{
+			.cmd     = "m",
+			.desc    = "Balance with both motors",
+			.func    = shell_cmd_balance_both,
+		},
+		{
+			.cmd     = "z",
+			.desc    = "Change zeros",
+			.func    = shell_cmd_change_zeros,
+		},
+		{
+			.cmd     = "q",
+			.desc    = "Set theta Kp",
+			.func    = shell_cmd_set_theta_kp,
+		},
+		{
+			.cmd     = "w",
+			.desc    = "Set theta Ki",
+			.func    = shell_cmd_set_theta_ki,
+		},
+		{
+			.cmd     = "e",
+			.desc    = "Set theta Kd",
+			.func    = shell_cmd_set_theta_kd,
+		},
+		{
+			.cmd     = "r",
+			.desc    = "Set theta Ks",
+			.func    = shell_cmd_set_theta_ks,
+		},
+		{
+			.cmd     = "o",
+			.desc    = "Set theta Kt",
+			.func    = shell_cmd_set_theta_kt,
+		},
+		{
+			.cmd     = "a",
+			.desc    = "Set omega Kp",
+			.func    = shell_cmd_set_omega_kp,
+		},
+		{
+			.cmd     = "s",
+			.desc    = "Set omega Ki",
+			.func    = shell_cmd_set_omega_ki,
+		},
+		{
+			.cmd     = "d",
+			.desc    = "Set omega Kd",
+			.func    = shell_cmd_set_omega_kd,
+		},
+		{
+			.cmd     = "f",
+			.desc    = "Set omega Ks",
+			.func    = shell_cmd_set_omega_ks,
+		},
+		{
+			.cmd     = "l",
+			.desc    = "Set omega Kt",
+			.func    = shell_cmd_set_omega_kt,
+		},
+		{
+			.cmd     = "t",
+			.desc    = "Set left Target Voltage",
+			.func    = shell_cmd_set_left_target_voltage,
+		},
+		{
+			.cmd     = "g",
+			.desc    = "Set right Target Voltage",
+			.func    = shell_cmd_set_right_target_voltage,
+		},
+		{
+			.cmd     = "1",
+			.desc    = "Set the angle average filter",
+			.func    = shell_cmd_set_angle_average_filter,
+		},
+		{
+			.cmd     = "2",
+			.desc    = "Set the theta zero filter",
+			.func    = shell_cmd_set_theta_zero_filter,
+		},
+		{
+			.cmd     = "3",
+			.desc    = "Set the omega zero filter",
+			.func    = shell_cmd_set_omega_zero_filter,
+		},
+		{
+			.cmd     = "4",
+			.desc    = "Set the angle smoothed filter",
+			.func    = shell_cmd_set_angle_smoothed_filter,
+		},
+		{
+			.cmd     = "9",
+			.desc    = "Set the friction value",
+			.func    = shell_cmd_set_friction_value,
+		},
+		{
+			.cmd     = "p",
+			.desc    = "Show extended data",
+			.func    = shell_cmd_show_extended_data,
 		},
 		{
 			.cmd     = "deviceinfo",
@@ -31,97 +143,115 @@ shell_cmds pencil_cmds =
 			.func    = shell_cmd_deviceinfo,
 		},
 		{
+			.cmd     = "help",
+			.desc    = "Show commands",
+			.func    = shell_cmd_show_help,
+		},
+		{
 			.cmd     = "uptime",
-			.desc    = "Tell how long the system has been running.",
+			.desc    = "Show uptime",
 			.func    = shell_cmd_uptime,
 		},
 	},
 };
 
-list_t power_options =
+list_t zero_options =
 {
-	.count    = 4,
+	.count    = 5,
 	.elements = {
 		{
-			.name     = "none",
+			.name     = "z",
 			.value    = 0,
 		},
 		{
-			.name     = "left",
+			.name     = "x",
 			.value    = 1,
 		},
 		{
-			.name     = "right",
+			.name     = "c",
 			.value    = 2,
 		},
 		{
-			.name     = "both",
+			.name     = "o",
 			.value    = 3,
 		},
-	},
-};
-
-list_t balance_options =
-{
-	.count    = 4,
-	.elements = {
 		{
-			.name     = "none",
-			.value    = 0,
-		},
-		{
-			.name     = "left",
-			.value    = 0,
-		},
-		{
-			.name     = "right",
-			.value    = 0,
-		},
-		{
-			.name     = "both",
-			.value    = 0,
+			.name     = "l",
+			.value    = 4,
 		},
 	},
 };
 
 /*
- * @brief report imu reading
+ * @brief power up the left motor
  */
-int shell_cmd_imu(shell_cmd_args *args)
+int shell_cmd_charge_left(shell_cmd_args *args)
 {
-	bool update_available = imu_ptr->update_IMU_values();
-	if (!update_available) {
-		printf("no update available \n");
-		return 0;
-	}
-	float theta, integral, speed, zero, omega;
-	imu_ptr->get_theta_values(theta, integral, speed, zero);
-	imu_ptr->get_omega_values(omega,  integral,  speed, zero);
-	printf("omega = %f, theta = %f \n", omega, theta);
 	return 0;
 }
 
 /*
- * @brief processes the power command
+ * @brief power up the right motor
  */
-int shell_cmd_power(shell_cmd_args *args)
+int shell_cmd_charge_right(shell_cmd_args *args)
 {
+	return 0;
+}
+
+/*
+ * @brief power up both motors
+ */
+int shell_cmd_charge_both(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
+ * @brief balance using left motor
+ */
+int shell_cmd_balance_left(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
+ * @brief balance using right motor
+ */
+int shell_cmd_balance_right(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
+ * @brief balance using both motors
+ */
+int shell_cmd_balance_both(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
+ * @brief processes the zero command
+ */
+int shell_cmd_change_zeros(shell_cmd_args *args)
+{
+	// FIXME: sort out the secondary options
 	int voltage = 0;
 	if (args->count != 2) {
-		printf("Invalid power option arguments\n");
+		printf("Invalid zero option arguments\n");
 		return 0;
 	}
 	else {
 		voltage = atoi(args->args[1].val);
 	}
-	for (int i = 0; i < power_options.count; i++)
+	for (int i = 0; i < zero_options.count; i++)
 	{
-		if (strcmp(args->args[0].val, power_options.elements[i].name) == 0)
+		if (strcmp(args->args[0].val, zero_options.elements[i].name) == 0)
 		{
 			// deactivate the controllers before setting fixed voltages for the motors
 			left_controller_active = false;
 			right_controller_active = false;
-			switch (power_options.elements[i].value) {
+			switch (zero_options.elements[i].value) {
 			case 0:
 				leftMotor_ptr->set_voltage(0);
 				rightMotor_ptr->set_voltage(0);
@@ -146,8 +276,184 @@ int shell_cmd_power(shell_cmd_args *args)
 }
 
 /*
+ * @brief set the theta Kp value
+ */
+int shell_cmd_set_theta_kp(shell_cmd_args *args)
+{
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	float newVal = strtol(args->args[1].val,NULL,10);
+	leftController_ptr->set_Kp(newVal);
+	return 0;
+}
+
+/*
+ * @brief set the theta Ki value
+ */
+int shell_cmd_set_theta_ki(shell_cmd_args *args)
+{
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	float newVal = strtol(args->args[1].val,NULL,10);
+	leftController_ptr->set_Ki(newVal);
+	return 0;
+}
+
+/*
+ * @brief set the theta Kd value
+ */
+int shell_cmd_set_theta_kd(shell_cmd_args *args)
+{
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	float newVal = strtol(args->args[1].val,NULL,10);
+	leftController_ptr->set_Kd(newVal);
+	return 0;
+}
+
+/*
+ * @brief set the theta Ks value
+ */
+int shell_cmd_set_theta_ks(shell_cmd_args *args)
+{
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	float newVal = strtol(args->args[1].val,NULL,10);
+	leftController_ptr->set_Ks(newVal);
+	return 0;
+}
+
+/*
+ * @brief set the theta Kt value
+ */
+int shell_cmd_set_theta_kt(shell_cmd_args *args)
+{
+	printf("Sorry, Kt not yet implemented!\n");
+	return 0;
+}
+
+/*
+ * @brief set the omega Kp value
+ */
+int shell_cmd_set_omega_kp(shell_cmd_args *args)
+{
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	float newVal = strtol(args->args[1].val,NULL,10);
+	rightController_ptr->set_Kp(newVal);
+	return 0;
+}
+
+/*
+ * @brief set the omega Ki value
+ */
+int shell_cmd_set_omega_ki(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
+ * @brief set the omega Kd value
+ */
+int shell_cmd_set_omega_kd(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
+ * @brief set the omega Ks value
+ */
+int shell_cmd_set_omega_ks(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
+ * @brief set the omega Kt value
+ */
+int shell_cmd_set_omega_kt(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
+ * @brief set left target voltage
+ */
+int shell_cmd_set_left_target_voltage(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
+ * @brief set right target voltage
+ */
+int shell_cmd_set_right_target_voltage(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
+ * @brief set angle average filter
+ */
+int shell_cmd_set_angle_average_filter(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
+ * @brief set theta zero filter
+ */
+int shell_cmd_set_theta_zero_filter(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
+ * @brief set omega zero filter
+ */
+int shell_cmd_set_omega_zero_filter(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
+ * @brief set angle smoothed filter
+ */
+int shell_cmd_set_angle_smoothed_filter(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
+ * @brief set friction value
+ */
+int shell_cmd_set_friction_value(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
+ * @brief show extended data
+ */
+int shell_cmd_show_extended_data(shell_cmd_args *args)
+{
+	return 0;
+}
+
+/*
  * @brief process the balance command
  */
+/*
 int shell_cmd_balance(shell_cmd_args *args)
 {
 	for (int i = 0; i < balance_options.count; i++)
@@ -165,6 +471,7 @@ int shell_cmd_balance(shell_cmd_args *args)
 	printf("Invalid balance option \n");
 	return 0;
 }
+*/
 
 /*
  * @brief processes the deviceinfo menu option
@@ -172,6 +479,14 @@ int shell_cmd_balance(shell_cmd_args *args)
 int shell_cmd_deviceinfo(shell_cmd_args *args)
 {
 	DisplaySystemInformation();
+	return 0;
+}
+
+/*
+ * @brief show help
+ */
+int shell_cmd_show_help(shell_cmd_args *args)
+{
 	return 0;
 }
 
