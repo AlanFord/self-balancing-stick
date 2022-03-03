@@ -13,10 +13,6 @@
 #include "imu.hpp"
 #include "motor.hpp"
 
-enum Direction {
-	theta, omega
-};
-
 class Controller {
 	const float stiction_speed_threshold = 0.5;  // RPM
 	int PID_Voltage = 0;
@@ -33,9 +29,9 @@ class Controller {
 	Encoder *encoder;
 	IMU *imu;
 	Motor *motor;
-	Direction angle;
+	imu_angle angle;
 public:
-	Controller(Direction angle, float Kp, float Ki, float Kd, float Ks,
+	Controller(imu_angle angle, float Kp, float Ki, float Kd, float Ks,
 			IMU *imu, Encoder *encoder, Motor *motor, float friction = 10.);
 	int get_PID_Voltage_Value();
 	void set_Kp(float value);

@@ -335,35 +335,27 @@ bool IMU::update_IMU_values(void) {
 }
 
 /*
- * @brief returns previously calculated theta values
+ * @brief returns previously calculated angle (theta or omega) values
  *
- * @param theta_Now current theta value
- * @param theta_Integral integral of the theta error (actual - desired)
- * @param theta_Speed_Now theta rate of changle, degrees/sec
- * @param theta_Zero target angle
+ * @param angle_Now current angle value
+ * @param angle_Integral integral of the angle error (actual - desired)
+ * @param angle_Speed_Now angle rate of change, degrees/sec
+ * @param angle_Zero target angle
  */
-void IMU::get_theta_values(float &theta_Now, float &theta_Integral,
-		float &theta_Speed_Now, float& theta_Zero) {
-	theta_Now = this->theta_Now;
-	theta_Integral = this->theta_Integral;
-	theta_Speed_Now = this->theta_Speed_Now;
-	theta_Zero = this->theta_Zero;
-}
-
-/*
- * @brief returns previously calculated omega values
- * @param omega_Now current omega value
- * @param omega_Integral integral of the omega error (actual - desired)
- * @param omega_Speed_Now omega rate of changle, degrees/sec
- * @param omega_Zero target angle
- *
- */
-void IMU::get_omega_values(float &omega_Now, float &omega_Integral,
-		float &omega_Speed_Now, float& omega_Zero) {
-	omega_Now = this->omega_Now;
-	omega_Integral = this->omega_Integral;
-	omega_Speed_Now = this->omega_Speed_Now;
-	omega_Zero = this->omega_Zero;
+void IMU::get_values(imu_angle angle, float &angle_Now, float &angle_Integral,
+		float &angle_Speed_Now, float& angle_Zero) {
+	if (angle == THETA) {
+		angle_Now = this->theta_Now;
+		angle_Integral = this->theta_Integral;
+		angle_Speed_Now = this->theta_Speed_Now;
+		angle_Zero = this->theta_Zero;
+	}
+	else {  // must be OMEGA
+		angle_Now = this->omega_Now;
+		angle_Integral = this->omega_Integral;
+		angle_Speed_Now = this->omega_Speed_Now;
+		angle_Zero = this->omega_Zero;
+	}
 }
 
 /**

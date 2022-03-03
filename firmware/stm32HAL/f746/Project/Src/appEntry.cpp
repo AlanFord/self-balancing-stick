@@ -77,12 +77,12 @@ void app_entry(void) {
 	// FIXME : wait for, and check, for a functional imu
 
 	//initialize right controller (omega)
-	Controller rightController(omega, omega_Kp, omega_Ki, omega_Kd, omega_Ks,
+	Controller rightController(OMEGA, omega_Kp, omega_Ki, omega_Kd, omega_Ks,
 			&imu, &rightEncoder, &rightMotor, friction_Value);
 	rightController_ptr = &rightController;
 
 	//initialize left controller (theta)
-	Controller leftController(theta, theta_Kp, theta_Ki, theta_Kd, theta_Ks,
+	Controller leftController(THETA, theta_Kp, theta_Ki, theta_Kd, theta_Ks,
 			&imu, &leftEncoder, &leftMotor, friction_Value);
 	leftController_ptr = &leftController;
 
@@ -97,9 +97,9 @@ void app_entry(void) {
 		if (update_available) {
 			float theta_Now, theta_integral, theta_speed, theta_zero;
 			float omega_Now, omega_integral, omega_speed, omega_zero;
-			imu.get_theta_values( theta_Now,  theta_integral,
+			imu.get_values(THETA, theta_Now,  theta_integral,
 					 theta_speed,  theta_zero);
-			imu.get_omega_values( omega_Now,  omega_integral,
+			imu.get_values(OMEGA, omega_Now,  omega_integral,
 					 omega_speed,  omega_zero);
 			printf("%f, %f\n", theta_Now, omega_Now);
 			if (left_controller_active)

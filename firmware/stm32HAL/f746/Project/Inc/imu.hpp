@@ -24,6 +24,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 }
 #endif
 
+typedef enum { THETA, OMEGA } imu_angle;
+
+
 class IMU {
 	uint16_t dmpReady = false;     // set true if DMP init was successful
 	uint16_t packetSize;       // expected DMP packet size (default is 42 bytes)
@@ -57,10 +60,8 @@ class IMU {
 public:
 	IMU(I2C_HandleTypeDef *hi2c, uint8_t address = MPU6050_DEFAULT_ADDRESS);
 	bool update_IMU_values(void);
-	void get_theta_values(float &theta_Now, float &theta_Integral,
-			float &theta_Speed_Now, float& theta_Zero);
-	void get_omega_values(float &omega_Now, float &omega_Integral,
-			float &omega_Speed_Now, float& omega_Zero);
+	void get_values(imu_angle angle, float &angle_Now, float &angle_Integral,
+			float &angle_Speed_Now, float& angle_Zero);
 	bool GetCurrentFIFOPacket(uint8_t *data, uint8_t length, uint32_t *timestamp);
 	uint16_t get_Status(void) {
 		return dmpReady;

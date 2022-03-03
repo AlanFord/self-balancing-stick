@@ -25,7 +25,7 @@
  * @param friction
  *
  */
-Controller::Controller(Direction angle, float Kp, float Ki, float Kd, float Ks,
+Controller::Controller(imu_angle angle, float Kp, float Ki, float Kd, float Ks,
 		IMU *imu, Encoder *encoder, Motor *motor, float friction) {
 	this->angle = angle;
 	this->Kp = Kp;
@@ -47,11 +47,7 @@ int Controller::get_PID_Voltage_Value() {
 	float angle_Integral;
 	float angle_Speed_Now;
 	float angle_Zero;
-	if (angle == theta) {
-		imu->get_theta_values(angle_Now, angle_Integral, angle_Speed_Now, angle_Zero);
-	} else {
-		imu->get_omega_values(angle_Now, angle_Integral, angle_Speed_Now, angle_Zero);
-	}
+	imu->get_values(angle, angle_Now, angle_Integral, angle_Speed_Now, angle_Zero);
 	float speed;  //speed in RPM
 	float accel;
 	encoder->get_Encoder_Speeds(speed, accel);
