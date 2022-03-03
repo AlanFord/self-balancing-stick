@@ -16,8 +16,14 @@
 extern "C" {
 #endif
 
+/*
+ * Note:  There are FOUR different return/status code definitions in use.
+ * 1) the IO_RESULT enum shown below, used exclusively for terminal functions
+ * 2) the HAL_StatusTypeDef enum used for STM32 HAL function calls
+ * 3) the SHELL_PROCESS defines in shell.h
+ * 4) the C++ boolean data type
+ */
 typedef enum { IO_TRUE = 1, IO_FALSE = 0, IO_ERROR = -1, ERROR_INVALID_POINTER = -2 } IO_RESULT;
-
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief Firmware version

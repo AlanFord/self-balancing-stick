@@ -114,3 +114,44 @@ void Controller::set_friction(float value) {
 	friction_Value = value;
 }
 
+/*
+ * @brief Updates Kp, the PID imu angle proportional gain
+ * @param new value of Kp
+ */
+float Controller::get_Kp(void) {
+	return Kp;
+}
+
+/*
+ * @brief Updates Ki, the PID imu angle integral gain
+ * @param new value of Ki
+ */
+float Controller::get_Ki(void) {
+	return Ki;
+}
+
+/*
+ * @brief Updates Kd, the PID imu angle derivative gain
+ * @param new value of Kd
+ */
+float Controller::get_Kd(void) {
+	return Kd;
+}
+
+/*
+ * @brief Updates Ks, the rotor speed proportional gain
+ * @param new value of Ks
+ */
+float Controller::get_Ks(void) {
+	return Ks;
+}
+
+/*
+ * @brief Updates friction factor
+ * @param new value of friction factor
+ */
+float Controller::get_friction(void) {
+	return friction_Value;
+}
+
+

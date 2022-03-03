@@ -6,7 +6,7 @@
 #include "stm32f7xx_hal.h"
 #include <string.h>
 //#include <string>
-#include <stdio.h>
+#include <cstdio>
 // FIXME : flesh out the commands (similar to original arduino program?)
 shell_cmds pencil_cmds =
 {
@@ -359,6 +359,12 @@ int shell_cmd_set_omega_kp(shell_cmd_args *args)
  */
 int shell_cmd_set_omega_ki(shell_cmd_args *args)
 {
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	float newVal = strtof(args->args[1].val,NULL);
+	rightController_ptr->set_Kp(newVal);
 	return 0;
 }
 
@@ -367,6 +373,12 @@ int shell_cmd_set_omega_ki(shell_cmd_args *args)
  */
 int shell_cmd_set_omega_kd(shell_cmd_args *args)
 {
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	float newVal = strtof(args->args[1].val,NULL);
+	rightController_ptr->set_Kp(newVal);
 	return 0;
 }
 
@@ -375,6 +387,12 @@ int shell_cmd_set_omega_kd(shell_cmd_args *args)
  */
 int shell_cmd_set_omega_ks(shell_cmd_args *args)
 {
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	float newVal = strtof(args->args[1].val,NULL);
+	rightController_ptr->set_Kp(newVal);
 	return 0;
 }
 
@@ -383,6 +401,7 @@ int shell_cmd_set_omega_ks(shell_cmd_args *args)
  */
 int shell_cmd_set_omega_kt(shell_cmd_args *args)
 {
+	printf("Sorry, Kt not yet implemented!\n");
 	return 0;
 }
 
@@ -442,11 +461,35 @@ int shell_cmd_set_friction_value(shell_cmd_args *args)
 	return 0;
 }
 
+const char* statusString = R"(
+
+
+theta PID:	%f	%f	%f	
+omega PID:	%f	%f	%f	
+
+Angle Average Filter:	%f
+Theta Zero Filter:	%f
+Omega Zero Filter:	%f
+
+Friction:	%i
+
+left Target Voltage:	%f
+right Target Voltage:	%f)";
+
 /*
  * @brief show extended data
  */
 int shell_cmd_show_extended_data(shell_cmd_args *args)
 {
+	// FIXME turn off motors
+	printf(statusString,
+			leftController_ptr->get_Kp(),
+			leftController_ptr->get_Kd(),
+			leftController_ptr->get_Ks(),
+			rightController_ptr->get_Kp(),
+			rightController_ptr->get_Kd(),
+			rightController_ptr->get_Ks()
+			);
 	return 0;
 }
 

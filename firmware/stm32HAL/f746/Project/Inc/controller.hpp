@@ -43,5 +43,10 @@ public:
 	void set_Kd(float value);
 	void set_Ks(float value);
 	void set_friction(float value);
+	float get_Kp(void);
+	float get_Ki(void);
+	float get_Kd(void);
+	float get_Ks(void);
+	float get_friction(void);
 };
 #endif /* INC_CONTROLLER_HPP_ */
