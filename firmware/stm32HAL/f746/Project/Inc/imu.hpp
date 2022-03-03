@@ -54,11 +54,26 @@ class IMU {
 	float right_Speed_RPM;
 	int p = 0;
 	int p_Prev = 0;
+	float angle_Average_Filter = 0.970;
+	float theta_Zero_Filter = 0.995;
+	float omega_Zero_Filter = 0.986;
+	float theta_Kt = 0.6;
+	float theta_Ktd = 0;
+	float omega_Kt = 0.6;
+	float omega_Ktd = 1.0;
 
 	bool update_ypr_values(float (&ypr)[3], uint32_t *timestamp);
 
 public:
 	IMU(I2C_HandleTypeDef *hi2c, uint8_t address = MPU6050_DEFAULT_ADDRESS);
+	void set_angle_Average_Filter(float filter_value);
+	float get_angle_Average_Filter(void);
+	void set_Zero_Filter(imu_angle angle, float filter_value);
+	float get_Zero_Filter(imu_angle angle);
+	void set_Ktd(imu_angle angle, float value);
+	float get_Ktd(imu_angle angle);
+	void set_Kt(imu_angle angle, float value);
+	float get_Kt(imu_angle angle);
 	bool update_IMU_values(void);
 	void get_values(imu_angle angle, float &angle_Now, float &angle_Integral,
 			float &angle_Speed_Now, float& angle_Zero);

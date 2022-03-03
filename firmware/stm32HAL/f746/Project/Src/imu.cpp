@@ -78,18 +78,9 @@ const float theta_Integral_Max = 3.0;
 const float omega_Integral_Max = 3.0;
 const float theta_Speed_Filter = 0.7;
 const float omega_Speed_Filter = 0.7;
-const float angle_Average_Filter = 0.970;
 const float angle_Smoothed_Filter = 0.997;
 const float theta_Filter = 0.7;
 const float omega_Filter = 0.7;
-
-
-float theta_Kt = 0.6;
-float theta_Ktd = 0;
-float omega_Kt = 0.6;
-float omega_Ktd = 1.0;
-float theta_Zero_Filter = 0.995;
-float omega_Zero_Filter = 0.986;
 
 
 volatile uint16_t mpuInterrupt = false; // indicates whether MPU interrupt pin has gone high
@@ -171,6 +162,68 @@ IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
 		printf("DMP Initialization failed (code ");
 		printf("%u", devStatus);
 		printf(")");
+	}
+}
+
+void IMU::set_angle_Average_Filter(float filter_value){
+	this->angle_Average_Filter = filter_value;
+}
+
+float IMU::get_angle_Average_Filter(void){
+	return angle_Average_Filter;
+}
+
+void IMU::set_Zero_Filter(imu_angle angle, float filter_value){
+	if (angle == THETA){
+		theta_Zero_Filter = filter_value;
+	}
+	else {
+		omega_Zero_Filter = filter_value;
+	}
+}
+
+float IMU::get_Zero_Filter(imu_angle angle){
+	if (angle == THETA){
+		return theta_Zero_Filter;
+	}
+	else {
+		return omega_Zero_Filter;
+	}
+}
+
+void IMU::set_Ktd(imu_angle angle, float value){
+	if (angle == THETA){
+		theta_Ktd = value;
+	}
+	else {
+		omega_Ktd = value;
+	}
+}
+
+float IMU::get_Ktd(imu_angle angle) {
+	if (angle == THETA){
+		return theta_Ktd;
+	}
+	else {
+		return omega_Ktd;
+	}
+}
+
+void IMU::set_Kt(imu_angle angle, float value){
+	if (angle == THETA){
+		theta_Kt = value;
+	}
+	else {
+		omega_Kt = value;
+	}
+}
+
+float IMU::get_Kt(imu_angle angle) {
+	if (angle == THETA){
+		return theta_Kt;
+	}
+	else {
+		return omega_Kt;
 	}
 }
 

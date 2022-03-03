@@ -463,18 +463,16 @@ int shell_cmd_set_friction_value(shell_cmd_args *args)
 
 const char* statusString = R"(
 
+            Kp	Ki	Kd	Ks	Kt	Ktd
+theta PID:	%f	%f	%f	%f	%f	%f
+omega PID:	%f	%f	%f	%f	%f	%f	
 
-theta PID:	%f	%f	%f	
-omega PID:	%f	%f	%f	
+Angle Average Filter:	%f.3
+Theta Zero Filter:	%f.3
+Omega Zero Filter:	%f.3
 
-Angle Average Filter:	%f
-Theta Zero Filter:	%f
-Omega Zero Filter:	%f
-
-Friction:	%i
-
-left Target Voltage:	%f
-right Target Voltage:	%f)";
+left Friction:	%i
+right Friction:	%i)";
 
 /*
  * @brief show extended data
@@ -484,11 +482,22 @@ int shell_cmd_show_extended_data(shell_cmd_args *args)
 	// FIXME turn off motors
 	printf(statusString,
 			leftController_ptr->get_Kp(),
+			leftController_ptr->get_Ki(),
 			leftController_ptr->get_Kd(),
 			leftController_ptr->get_Ks(),
+			imu_ptr->get_Kt(THETA),
+			imu_ptr->get_Ktd(THETA),
 			rightController_ptr->get_Kp(),
+			rightController_ptr->get_Ki(),
 			rightController_ptr->get_Kd(),
-			rightController_ptr->get_Ks()
+			rightController_ptr->get_Ks(),
+			imu_ptr->get_Kt(THETA),
+			imu_ptr->get_Ktd(THETA),
+			imu_ptr->get_angle_Average_Filter(),
+			imu_ptr->get_Zero_Filter(THETA),
+			imu_ptr->get_Zero_Filter(OMEGA),
+			leftController_ptr->get_friction(),
+			rightController_ptr->get_friction()
 			);
 	return 0;
 }
