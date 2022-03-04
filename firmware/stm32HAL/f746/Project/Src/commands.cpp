@@ -187,6 +187,8 @@ list_t zero_options =
  */
 int shell_cmd_charge_left(shell_cmd_args *args)
 {
+	leftController_ptr->set_mode(MANUAL);
+	rightController_ptr->set_mode(OFF);
 	return 0;
 }
 
@@ -195,6 +197,8 @@ int shell_cmd_charge_left(shell_cmd_args *args)
  */
 int shell_cmd_charge_right(shell_cmd_args *args)
 {
+	leftController_ptr->set_mode(OFF);
+	rightController_ptr->set_mode(MANUAL);
 	return 0;
 }
 
@@ -203,6 +207,8 @@ int shell_cmd_charge_right(shell_cmd_args *args)
  */
 int shell_cmd_charge_both(shell_cmd_args *args)
 {
+	leftController_ptr->set_mode(MANUAL);
+	rightController_ptr->set_mode(MANUAL);
 	return 0;
 }
 
@@ -211,6 +217,8 @@ int shell_cmd_charge_both(shell_cmd_args *args)
  */
 int shell_cmd_balance_left(shell_cmd_args *args)
 {
+	leftController_ptr->set_mode(AUTO);
+	rightController_ptr->set_mode(OFF);
 	return 0;
 }
 
@@ -219,6 +227,8 @@ int shell_cmd_balance_left(shell_cmd_args *args)
  */
 int shell_cmd_balance_right(shell_cmd_args *args)
 {
+	leftController_ptr->set_mode(OFF);
+	rightController_ptr->set_mode(AUTO);
 	return 0;
 }
 
@@ -227,6 +237,8 @@ int shell_cmd_balance_right(shell_cmd_args *args)
  */
 int shell_cmd_balance_both(shell_cmd_args *args)
 {
+	leftController_ptr->set_mode(AUTO);
+	rightController_ptr->set_mode(AUTO);
 	return 0;
 }
 
@@ -336,7 +348,12 @@ int shell_cmd_set_theta_ks(shell_cmd_args *args)
  */
 int shell_cmd_set_theta_kt(shell_cmd_args *args)
 {
-	printf("Sorry, Kt not yet implemented!\n");
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	float newVal = strtof(args->args[1].val,NULL);
+	imu_ptr->set_Kt(THETA, newVal);
 	return 0;
 }
 
@@ -401,7 +418,12 @@ int shell_cmd_set_omega_ks(shell_cmd_args *args)
  */
 int shell_cmd_set_omega_kt(shell_cmd_args *args)
 {
-	printf("Sorry, Kt not yet implemented!\n");
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	float newVal = strtof(args->args[1].val,NULL);
+	imu_ptr->set_Kt(OMEGA, newVal);
 	return 0;
 }
 
@@ -410,6 +432,12 @@ int shell_cmd_set_omega_kt(shell_cmd_args *args)
  */
 int shell_cmd_set_left_target_voltage(shell_cmd_args *args)
 {
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	int newVal = strtol(args->args[1].val,NULL,10);
+	leftController_ptr->set_default_voltage(newVal);
 	return 0;
 }
 
@@ -418,6 +446,12 @@ int shell_cmd_set_left_target_voltage(shell_cmd_args *args)
  */
 int shell_cmd_set_right_target_voltage(shell_cmd_args *args)
 {
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	int newVal = strtol(args->args[1].val,NULL,10);
+	rightController_ptr->set_default_voltage(newVal);
 	return 0;
 }
 
@@ -426,6 +460,7 @@ int shell_cmd_set_right_target_voltage(shell_cmd_args *args)
  */
 int shell_cmd_set_angle_average_filter(shell_cmd_args *args)
 {
+	printf("Not Implemented Yet\n");
 	return 0;
 }
 
@@ -434,6 +469,7 @@ int shell_cmd_set_angle_average_filter(shell_cmd_args *args)
  */
 int shell_cmd_set_theta_zero_filter(shell_cmd_args *args)
 {
+	printf("Not Implemented Yet\n");
 	return 0;
 }
 
@@ -442,6 +478,7 @@ int shell_cmd_set_theta_zero_filter(shell_cmd_args *args)
  */
 int shell_cmd_set_omega_zero_filter(shell_cmd_args *args)
 {
+	printf("Not Implemented Yet\n");
 	return 0;
 }
 
@@ -450,6 +487,7 @@ int shell_cmd_set_omega_zero_filter(shell_cmd_args *args)
  */
 int shell_cmd_set_angle_smoothed_filter(shell_cmd_args *args)
 {
+	printf("Not Implemented Yet\n");
 	return 0;
 }
 
@@ -458,6 +496,7 @@ int shell_cmd_set_angle_smoothed_filter(shell_cmd_args *args)
  */
 int shell_cmd_set_friction_value(shell_cmd_args *args)
 {
+	printf("Not Implemented Yet\n");
 	return 0;
 }
 

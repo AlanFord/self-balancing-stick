@@ -37,12 +37,19 @@ Controller::Controller(imu_angle angle, float Kp, float Ki, float Kd, float Ks,
 	this->encoder = encoder;
 	this->motor = motor;
 }
+void Controller::set_mode(controller_mode new_mode) {
+	this->mode = new_mode;
+}
+controller_mode Controller::get_mode(void) {
+	return mode;
+}
 
 /*
  * @brief calculate a motor voltage based on encoder, motor, and imu data
  * @returns motor voltage (between -255 and 255)
  */
 int Controller::get_PID_Voltage_Value() {
+	int return_voltage;
 	float angle_Now;
 	float angle_Integral;
 	float angle_Speed_Now;
@@ -67,7 +74,19 @@ int Controller::get_PID_Voltage_Value() {
 	float voltage = (PID_Accel + 0.30 * speed + friction) / 9.4; // Equation measured from Acceleration Motor Tests
 	int voltage_limit = motor->get_max_voltage();
 	PID_Voltage = round(constrain(voltage, -voltage_limit, voltage_limit));
-	return PID_Voltage;
+	switch (mode) {
+	case AUTO:
+		return_voltage = PID_Voltage;
+		break;
+	case MANUAL:
+		return_voltage = default_voltage;
+		break;
+	case OFF:
+	default:
+		return_voltage = 0;
+		break;
+	}
+	return return_voltage;
 }
 
 /*
@@ -148,6 +167,13 @@ float Controller::get_Ks(void) {
  */
 float Controller::get_friction(void) {
 	return friction_Value;
+}
+
+void Controller::set_default_voltage(int voltage){
+	default_voltage = voltage;
+}
+int Controller::get_defult_voltage(void){
+	return default_voltage;
 }
 
 

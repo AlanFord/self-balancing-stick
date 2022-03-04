@@ -13,6 +13,8 @@
 #include "imu.hpp"
 #include "motor.hpp"
 
+typedef enum { OFF, MANUAL, AUTO } controller_mode;
+
 class Controller {
 	const float stiction_speed_threshold = 0.5;  // RPM
 	int PID_Voltage = 0;
@@ -25,6 +27,8 @@ class Controller {
 	// voltage_Offset is ALWAYS used, while friction_Value is applied at low speeds.
 	// friction value was used in the original source.
 	float friction_Value = 0;
+	controller_mode mode = OFF;
+	int default_voltage = 0;
 
 	Encoder *encoder;
 	IMU *imu;
@@ -44,5 +48,9 @@ public:
 	float get_Kd(void);
 	float get_Ks(void);
 	float get_friction(void);
+	void set_mode(controller_mode new_mode);
+	controller_mode get_mode(void);
+	void set_default_voltage(int voltage);
+	int get_defult_voltage(void);
 };
 #endif /* INC_CONTROLLER_HPP_ */
