@@ -13,6 +13,7 @@ extern "C" {
 int shell_cmd_charge_left(shell_cmd_args *args);
 int shell_cmd_charge_right(shell_cmd_args *args);
 int shell_cmd_charge_both(shell_cmd_args *args);
+int shell_cmd_shutdown_both(shell_cmd_args *args);
 int shell_cmd_balance_left(shell_cmd_args *args);
 int shell_cmd_balance_right(shell_cmd_args *args);
 int shell_cmd_balance_both(shell_cmd_args *args);

@@ -78,7 +78,6 @@ const float theta_Integral_Max = 3.0;
 const float omega_Integral_Max = 3.0;
 const float theta_Speed_Filter = 0.7;
 const float omega_Speed_Filter = 0.7;
-const float angle_Smoothed_Filter = 0.997;
 const float theta_Filter = 0.7;
 const float omega_Filter = 0.7;
 
@@ -173,6 +172,14 @@ float IMU::get_angle_Average_Filter(void){
 	return angle_Average_Filter;
 }
 
+void IMU::set_angle_Smoothed_Filter(float filter_value){
+	this->angle_Smoothed_Filter = filter_value;
+}
+
+float IMU::get_angle_Smoothed_Filter(void){
+	return angle_Smoothed_Filter;
+}
+
 void IMU::set_Zero_Filter(imu_angle angle, float filter_value){
 	if (angle == THETA){
 		theta_Zero_Filter = filter_value;
@@ -206,6 +213,24 @@ float IMU::get_Ktd(imu_angle angle) {
 	}
 	else {
 		return omega_Ktd;
+	}
+}
+
+void IMU::set_Zero(imu_angle angle, float value){
+	if (angle == THETA){
+		theta_Zero = value;
+	}
+	else {
+		omega_Zero = value;
+	}
+}
+
+float IMU::get_Zero(imu_angle angle) {
+	if (angle == THETA){
+		return theta_Zero;
+	}
+	else {
+		return omega_Zero;
 	}
 }
 

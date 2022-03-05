@@ -55,6 +55,7 @@ class IMU {
 	int p = 0;
 	int p_Prev = 0;
 	float angle_Average_Filter = 0.970;
+	float angle_Smoothed_Filter = 0.997;
 	float theta_Zero_Filter = 0.995;
 	float omega_Zero_Filter = 0.986;
 	float theta_Kt = 0.6;
@@ -68,8 +69,14 @@ public:
 	IMU(I2C_HandleTypeDef *hi2c, uint8_t address = MPU6050_DEFAULT_ADDRESS);
 	void set_angle_Average_Filter(float filter_value);
 	float get_angle_Average_Filter(void);
+	void set_angle_Smoothed_Filter(float filter_value);
+	float get_angle_Smoothed_Filter(void);
 	void set_Zero_Filter(imu_angle angle, float filter_value);
 	float get_Zero_Filter(imu_angle angle);
+	void set_Zero(imu_angle angle, float filter_value);
+	float get_Zero(imu_angle angle);
+	void set_theta_Zero(imu_angle angle, float value);
+	float get_theta_Zero(imu_angle angle);
 	void set_Ktd(imu_angle angle, float value);
 	float get_Ktd(imu_angle angle);
 	void set_Kt(imu_angle angle, float value);

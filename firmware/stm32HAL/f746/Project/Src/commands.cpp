@@ -7,10 +7,9 @@
 #include <string.h>
 //#include <string>
 #include <cstdio>
-// FIXME : flesh out the commands (similar to original arduino program?)
 shell_cmds pencil_cmds =
 {
-	.count = 28,
+	.count = 29,
 	.cmds  = {
 		{
 			.cmd     = "y",
@@ -26,6 +25,11 @@ shell_cmds pencil_cmds =
 			.cmd     = "n",
 			.desc    = "Charge both motors",
 			.func    = shell_cmd_charge_both,
+		},
+		{
+			.cmd     = "=",
+			.desc    = "Shutdown both motors",
+			.func    = shell_cmd_shutdown_both,
 		},
 		{
 			.cmd     = "u",
@@ -209,6 +213,18 @@ int shell_cmd_charge_both(shell_cmd_args *args)
 {
 	leftController_ptr->set_mode(MANUAL);
 	rightController_ptr->set_mode(MANUAL);
+	return 0;
+}
+/*
+ * @brief shutdown both motors
+ */
+int shell_cmd_shutdown_both(shell_cmd_args *args)
+{
+	leftController_ptr->set_mode(OFF);
+	rightController_ptr->set_mode(OFF);
+	// as insurance, kill the motors directly
+	leftMotor_ptr->set_voltage(0);
+	rightMotor_ptr->set_voltage(0);
 	return 0;
 }
 
@@ -460,7 +476,12 @@ int shell_cmd_set_right_target_voltage(shell_cmd_args *args)
  */
 int shell_cmd_set_angle_average_filter(shell_cmd_args *args)
 {
-	printf("Not Implemented Yet\n");
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	int newVal = strtof(args->args[1].val,NULL);
+	imu_ptr->set_angle_Average_Filter(newVal);
 	return 0;
 }
 
@@ -469,7 +490,12 @@ int shell_cmd_set_angle_average_filter(shell_cmd_args *args)
  */
 int shell_cmd_set_theta_zero_filter(shell_cmd_args *args)
 {
-	printf("Not Implemented Yet\n");
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	float newVal = strtof(args->args[1].val,NULL);
+	imu_ptr->set_Zero(THETA, newVal);
 	return 0;
 }
 
@@ -478,7 +504,12 @@ int shell_cmd_set_theta_zero_filter(shell_cmd_args *args)
  */
 int shell_cmd_set_omega_zero_filter(shell_cmd_args *args)
 {
-	printf("Not Implemented Yet\n");
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	float newVal = strtof(args->args[1].val,NULL);
+	imu_ptr->set_Zero(OMEGA, newVal);
 	return 0;
 }
 
@@ -487,7 +518,12 @@ int shell_cmd_set_omega_zero_filter(shell_cmd_args *args)
  */
 int shell_cmd_set_angle_smoothed_filter(shell_cmd_args *args)
 {
-	printf("Not Implemented Yet\n");
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	int newVal = strtof(args->args[1].val,NULL);
+	imu_ptr->set_angle_Smoothed_Filter(newVal);
 	return 0;
 }
 
@@ -496,7 +532,13 @@ int shell_cmd_set_angle_smoothed_filter(shell_cmd_args *args)
  */
 int shell_cmd_set_friction_value(shell_cmd_args *args)
 {
-	printf("Not Implemented Yet\n");
+	if (args->count != 2) {
+		printf("Invalid zero option arguments\n");
+		return 0;
+	}
+	float newVal = strtof(args->args[1].val,NULL);
+	leftController_ptr->set_friction(newVal);
+	rightController_ptr->set_friction(newVal);
 	return 0;
 }
 
@@ -578,6 +620,11 @@ int shell_cmd_deviceinfo(shell_cmd_args *args)
  */
 int shell_cmd_show_help(shell_cmd_args *args)
 {
+	// FIXME add secondary info about setting zeros
+	for (int i = 0; i< pencil_cmds.count; i++){
+		printf("commands:\n%s:\t%s\n",pencil_cmds.cmds[i].cmd, pencil_cmds.cmds[i].desc);
+	}
+	printf("\n");
 	return 0;
 }
 
