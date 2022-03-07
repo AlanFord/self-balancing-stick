@@ -86,7 +86,7 @@ volatile uint16_t mpuInterrupt = false; // indicates whether MPU interrupt pin h
 
 /*
  * @brief external interrupt callback for gpio pins
- * @param gpio pin number (0-15)
+ * @param[in] GPIO_Pin gpio pin number (0-15)
  */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (GPIO_Pin == IMU_INT_Pin) {
@@ -108,8 +108,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  * - Sets up the MPU-6050 gyro offsets
  * - gets the packetSize for this configuration
  *
- * @param hi2c I2C HAL handle
- * @param addrress imu I2C address
+ * @param[in] hi2c I2C HAL handle
+ * @param[in] addrress imu I2C address
  */
 IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
 		mpu(hi2c, address),
@@ -164,10 +164,18 @@ IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
 	}
 }
 
+/*
+ * @brief sets the angle average filter coefficient
+ * @param[in] filter_value coefficient
+ */
 void IMU::set_angle_Average_Filter(float filter_value){
 	this->angle_Average_Filter = filter_value;
 }
 
+/*
+ * @brief returns the angle average filter coefficient
+ * @return current value of the coefficient
+ */
 float IMU::get_angle_Average_Filter(void){
 	return angle_Average_Filter;
 }
@@ -254,8 +262,9 @@ float IMU::get_Kt(imu_angle angle) {
 
 /*
  * @brief Retrieves raw ypr values from the imu if data is ready
- * @param ypr an array of floats representing yaw, pitch, and roll in radians
- * @returns true if new data is found, false otherwise
+ * @param[out] ypr an array of floats representing yaw, pitch, and roll in RADIANS
+ * @param[out] timestamp in microseconds
+ * @return true if new data is found, false otherwise
  *
  */
 
@@ -289,10 +298,10 @@ bool IMU::update_ypr_values(float (&ypr)[3], uint32_t *timestamp){
  * @brief Converts pitch and roll into filtered values of omega and theta
  *
  * Theta values then calculated from the roll.  Omega value calculated from the pitch.
- * Theta is forward/backward angle (i.e pitch) in degrees, from -180 to +180.
- * Omega is left/right angle (i.e.roll) in degrees, from -180 to +180.
+ * Theta is forward/backward angle (i.e pitch) in DEGREES, from -180 to +180.
+ * Omega is left/right angle (i.e.roll) in DEGREES, from -180 to +180.
  *
- * @returns true if updated data is available, false otherwise
+ * @return true if updated data is available, false otherwise
  */
 bool IMU::update_IMU_values(void) {
 	float ypr[3]; // [yaw, pitch, roll] in radians
@@ -415,10 +424,11 @@ bool IMU::update_IMU_values(void) {
 /*
  * @brief returns previously calculated angle (theta or omega) values
  *
- * @param angle_Now current angle value
- * @param angle_Integral integral of the angle error (actual - desired)
- * @param angle_Speed_Now angle rate of change, degrees/sec
- * @param angle_Zero target angle
+ * @param[in] angle Denotes which axis to retrieve OMEGA or THETA
+ * @param[out] angle_Now Current angle value in DEGREES
+ * @param[out] angle_Integral Integral of the angle error (actual - desired) in DEGREES
+ * @param[out] angle_Speed_Now Angle rate of change, DEGREES/sec
+ * @param[out] angle_Zero Target angle in DEGREES
  */
 void IMU::get_values(imu_angle angle, float &angle_Now, float &angle_Integral,
 		float &angle_Speed_Now, float& angle_Zero) {
@@ -438,13 +448,11 @@ void IMU::get_values(imu_angle angle, float &angle_Now, float &angle_Integral,
 
 /**
  @brief Get latest byte from FIFO buffer no matter how much time has passed.
+ @param[out] data Buffer for returned data
+ @param[in]  length Length is bytes of data to be returned
+ @param[out] timestamp Timestamp in microseconds
+ @returns true if data is available, false if no valid data is availabl
 */
-/* ================================================================
- * ===                  GetCurrentFIFOPacket                    ===
- * ================================================================
- * Returns 1) when nothing special was done
- *         0) when no valid data is available
- * ================================================================ */
  bool IMU::GetCurrentFIFOPacket(uint8_t *data, uint8_t length, uint32_t *timestamp) { // overflow proof
 	 int16_t fifoC;
 	 // This section of code is for when we allowed more than 1 packet to be acquired

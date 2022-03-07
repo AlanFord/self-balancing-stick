@@ -37,9 +37,18 @@ Controller::Controller(imu_angle angle, float Kp, float Ki, float Kd, float Ks,
 	this->encoder = encoder;
 	this->motor = motor;
 }
+
+/*
+ * @brief set the operating mode of the controller
+ * @param new_mode ZERO, MANUAL, or AUTO
+ */
 void Controller::set_mode(controller_mode new_mode) {
 	this->mode = new_mode;
 }
+/*
+ * @brief returns the operating mode of the controller
+ * @return the controller mode of type controller_mode, ZERO, MANUAL, or AUTO
+ */
 controller_mode Controller::get_mode(void) {
 	return mode;
 }
@@ -169,9 +178,18 @@ float Controller::get_friction(void) {
 	return friction_Value;
 }
 
+/*
+ * @brief updates the default output voltage used in MANUAL mode
+ * @param voltage the new default voltage
+ */
 void Controller::set_default_voltage(int voltage){
 	default_voltage = voltage;
 }
+
+/*
+ * @brief returns the current default output voltage used in MANUAL mode
+ * @return int default voltage (-255 to 255)
+ */
 int Controller::get_defult_voltage(void){
 	return default_voltage;
 }
