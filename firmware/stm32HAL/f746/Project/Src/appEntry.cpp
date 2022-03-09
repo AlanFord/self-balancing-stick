@@ -95,6 +95,7 @@ void app_entry(void) {
 		bool update_available = imu.update_IMU_values();
 		// don't mess with motor voltages if no new imu angles are available
 		if (update_available) {
+/*
 			float theta_Now, theta_integral, theta_speed, theta_zero;
 			float omega_Now, omega_integral, omega_speed, omega_zero;
 			imu.get_values(THETA, theta_Now,  theta_integral,
@@ -102,6 +103,7 @@ void app_entry(void) {
 			imu.get_values(OMEGA, omega_Now,  omega_integral,
 					 omega_speed,  omega_zero);
 			printf("%f, %f\n", theta_Now, omega_Now);
+*/
 			if (left_controller_active)
 				leftMotor.set_voltage(leftController.get_PID_Voltage_Value());
 			if (right_controller_active)

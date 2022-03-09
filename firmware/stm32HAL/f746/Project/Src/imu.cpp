@@ -74,8 +74,7 @@
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 const uint16_t angle_Rounding_Value = 1000; // Defines what value to multiple by before round theta and omega. Cuts down on noise, [10 = x.1,  100 = x.x1 , 1(Default)]
-const float theta_Integral_Max = 3.0;
-const float omega_Integral_Max = 3.0;
+//const float omega_Integral_Max = 3.0;
 const float theta_Speed_Filter = 0.7;
 const float omega_Speed_Filter = 0.7;
 const float theta_Filter = 0.7;
@@ -335,6 +334,9 @@ bool IMU::update_IMU_values(void) {
 
 	p_Prev = p;
 
+	// time interval in microseconds;
+	deltaTime = imu_Time_Now - imu_Time_Prev;
+
 	////////////////////////////////////////////////////////// Theta Calcs//////////////////////////////////////////////////////////////////////////////////////////
 
 	float theta_Prev = theta_Now;
@@ -348,6 +350,7 @@ bool IMU::update_IMU_values(void) {
 	// angle error in degrees
 	theta_Error = theta_Now - theta_Zero;
 
+/*
 	// integral angle error in degree*seconds
 	theta_Integral += theta_Error * (imu_Time_Now - imu_Time_Prev) / 1000000.0;
 	if (theta_Integral > theta_Integral_Max) {
@@ -355,6 +358,7 @@ bool IMU::update_IMU_values(void) {
 	} else if (theta_Integral < -theta_Integral_Max) {
 		theta_Integral = -theta_Integral_Max;
 	}
+*/
 
 	// calculate the rotational velocity in degrees/sec using a digital filter
 	// FIXME validate more filtering
@@ -387,12 +391,14 @@ bool IMU::update_IMU_values(void) {
 
 	omega_Error = omega_Now - omega_Zero;
 
+/*
 	omega_Integral += omega_Error * (imu_Time_Now - imu_Time_Prev) / 1000000.0;
 	if (omega_Integral > omega_Integral_Max) {
 		omega_Integral = omega_Integral_Max;
 	} else if (omega_Integral < -omega_Integral_Max) {
 		omega_Integral = -omega_Integral_Max;
 	}
+*/
 
 	// calculate the angular velocity
 	float omega_Speed_Prev = omega_Speed_Now;
@@ -430,17 +436,16 @@ bool IMU::update_IMU_values(void) {
  * @param[out] angle_Speed_Now Angle rate of change, DEGREES/sec
  * @param[out] angle_Zero Target angle in DEGREES
  */
-void IMU::get_values(imu_angle angle, float &angle_Now, float &angle_Integral,
-		float &angle_Speed_Now, float& angle_Zero) {
+void IMU::get_values(imu_angle angle, float &angle_Now,
+		float &angle_Speed_Now, float& angle_Zero, uint32_t& deltaTime) {
+	deltaTime = this->deltaTime;
 	if (angle == THETA) {
 		angle_Now = this->theta_Now;
-		angle_Integral = this->theta_Integral;
 		angle_Speed_Now = this->theta_Speed_Now;
 		angle_Zero = this->theta_Zero;
 	}
 	else {  // must be OMEGA
 		angle_Now = this->omega_Now;
-		angle_Integral = this->omega_Integral;
 		angle_Speed_Now = this->omega_Speed_Now;
 		angle_Zero = this->omega_Zero;
 	}

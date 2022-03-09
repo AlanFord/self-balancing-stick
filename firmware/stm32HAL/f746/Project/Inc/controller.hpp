@@ -22,6 +22,8 @@ class Controller {
 	float Ki = 0;
 	float Kd = 0;
 	float Ks = 0;
+	float angle_Integral = 0;
+	const float angle_Integral_Max = 3.0;
 	// Defines amount of voltage added to compensate for motor stiction, [0 - 255].
 	// The other option to use is the motor voltage_Offset.
 	// voltage_Offset is ALWAYS used, while friction_Value is applied at low speeds.

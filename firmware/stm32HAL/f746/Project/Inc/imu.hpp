@@ -54,6 +54,7 @@ class IMU {
 	float right_Speed_RPM;
 	int p = 0;
 	int p_Prev = 0;
+	uint32_t deltaTime;
 	float angle_Average_Filter = 0.970;
 	float angle_Smoothed_Filter = 0.997;
 	float theta_Zero_Filter = 0.995;
@@ -82,8 +83,8 @@ public:
 	void set_Kt(imu_angle angle, float value);
 	float get_Kt(imu_angle angle);
 	bool update_IMU_values(void);
-	void get_values(imu_angle angle, float &angle_Now, float &angle_Integral,
-			float &angle_Speed_Now, float& angle_Zero);
+	void get_values(imu_angle angle, float &angle_Now,
+			float &angle_Speed_Now, float& angle_Zero, uint32_t& deltaTime);
 	bool GetCurrentFIFOPacket(uint8_t *data, uint8_t length, uint32_t *timestamp);
 	uint16_t get_Status(void) {
 		return dmpReady;

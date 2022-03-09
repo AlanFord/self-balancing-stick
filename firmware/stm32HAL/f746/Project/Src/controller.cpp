@@ -43,6 +43,10 @@ Controller::Controller(imu_angle angle, float Kp, float Ki, float Kd, float Ks,
  * @param new_mode ZERO, MANUAL, or AUTO
  */
 void Controller::set_mode(controller_mode new_mode) {
+	if ((new_mode == AUTO) && (new_mode != this->mode)) {
+		// we are starting AUTO mode, so reset integrals
+		angle_Integral = 0;
+	}
 	this->mode = new_mode;
 }
 /*
@@ -60,14 +64,26 @@ controller_mode Controller::get_mode(void) {
 int Controller::get_PID_Voltage_Value() {
 	int return_voltage;
 	float angle_Now;
-	float angle_Integral;
 	float angle_Speed_Now;
 	float angle_Zero;
-	imu->get_values(angle, angle_Now, angle_Integral, angle_Speed_Now, angle_Zero);
+	uint32_t deltaTime;
+	imu->get_values(angle, angle_Now, angle_Speed_Now, angle_Zero, deltaTime);
+
+	// calculate angle error in degrees
+	float angle_Error = angle_Now - angle_Zero;
+
+	// integral angle error in degree*seconds
+	angle_Integral += angle_Error * deltaTime / 1000000.0;
+	if (angle_Integral > angle_Integral_Max) {
+		angle_Integral = angle_Integral_Max;
+	} else if (angle_Integral < -angle_Integral_Max) {
+		angle_Integral = -angle_Integral_Max;
+	}
+
 	float speed;  //speed in RPM
 	float accel;
 	encoder->get_Encoder_Speeds(speed, accel);
-	float P_Accel = Kp * (angle_Now - angle_Zero);
+	float P_Accel = Kp * angle_Error;
 	float I_Accel = Ki * angle_Integral;
 	float D_Accel = Kd * angle_Speed_Now;
 	float S_Accel = Ks * speed / 1000.;
