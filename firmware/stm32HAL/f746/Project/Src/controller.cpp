@@ -26,7 +26,10 @@
  *
  */
 Controller::Controller(imu_angle angle, float Kp, float Ki, float Kd, float Ks,
-		IMU *imu, Encoder *encoder, Motor *motor, float friction) {
+		IMU *imu, Encoder *encoder, Motor *motor, float friction) :
+		angleAverageFilter((float) angle_Average_Filter),
+		angleSmoothedFilter((float) angle_Smoothed_Filter),
+		angleZeroFilter((float) angle_Zero_Filter) {
 	this->angle = angle;
 	this->Kp = Kp;
 	this->Ki = Ki;
@@ -46,6 +49,8 @@ void Controller::set_mode(controller_mode new_mode) {
 	if ((new_mode == AUTO) && (new_mode != this->mode)) {
 		// we are starting AUTO mode, so reset integrals
 		angle_Integral = 0;
+		angle_Smoothed = 0;
+		angle_Smoothed_Speed = 0;
 	}
 	this->mode = new_mode;
 }
@@ -63,11 +68,12 @@ controller_mode Controller::get_mode(void) {
  */
 int Controller::get_PID_Voltage_Value() {
 	int return_voltage;
-	float angle_Now;
+	static float angle_Now = 0;;
+	static float angle_Average = 0;
 	float angle_Speed_Now;
-	float angle_Zero;
 	uint32_t deltaTime;
-	imu->get_values(angle, angle_Now, angle_Speed_Now, angle_Zero, deltaTime);
+
+	imu->get_values(angle, angle_Now, angle_Speed_Now, deltaTime);
 
 	// calculate angle error in degrees
 	float angle_Error = angle_Now - angle_Zero;
@@ -78,6 +84,24 @@ int Controller::get_PID_Voltage_Value() {
 		angle_Integral = angle_Integral_Max;
 	} else if (angle_Integral < -angle_Integral_Max) {
 		angle_Integral = -angle_Integral_Max;
+	}
+
+	// calculate the angular velocity
+	float angle_Average_Prev = angle_Average;
+	angle_Average = angleAverageFilter.filter(angle_Now);
+
+	float angle_Smoothed_Prev = angle_Smoothed;
+	angle_Smoothed = angleSmoothedFilter.filter(angle_Now);
+	angle_Smoothed_Speed = (angle_Smoothed - angle_Smoothed_Prev)
+			/ deltaTime * 1000000.;
+
+	float angle_Zero_Prev = angle_Zero;
+	if (mode == AUTO) {                               // Automatic setpoint adjustment
+		float angle_Zero_Unfiltered = angle_Zero - Kt * angle_Error
+				- Ktd * angle_Smoothed_Speed;
+		angle_Zero = angleZeroFilter.filter(angle_Zero_Unfiltered);
+	} else {
+		angle_Zero = angle_Average;
 	}
 
 	float speed;  //speed in RPM
@@ -210,4 +234,58 @@ int Controller::get_defult_voltage(void){
 	return default_voltage;
 }
 
+/*
+ * @brief sets the angle average filter coefficient
+ * @param[in] filter_value coefficient
+ */
+void Controller::set_angle_Average_Filter(float filter_value){
+	this->angle_Average_Filter = filter_value;
+}
 
+/*
+ * @brief returns the angle average filter coefficient
+ * @return current value of the coefficient
+ */
+float Controller::get_angle_Average_Filter(void){
+	return angle_Average_Filter;
+}
+
+void Controller::set_angle_Smoothed_Filter(float filter_value){
+	this->angle_Smoothed_Filter = filter_value;
+}
+
+float Controller::get_angle_Smoothed_Filter(void){
+	return angle_Smoothed_Filter;
+}
+
+void Controller::set_Kt(float value){
+	Kt = value;
+}
+
+float Controller::get_Kt() {
+	return Kt;
+}
+
+void Controller::set_Ktd(float value){
+	Ktd = value;
+}
+
+float Controller::get_Ktd() {
+	return Ktd;
+}
+
+void Controller::set_Zero_Filter(float filter_value){
+		angle_Zero_Filter = filter_value;
+}
+
+float Controller::get_Zero_Filter(){
+		return angle_Zero_Filter;
+}
+
+void Controller::set_Zero(float value){
+		angle_Zero = value;
+}
+
+float Controller::get_Zero() {
+		return angle_Zero;
+}

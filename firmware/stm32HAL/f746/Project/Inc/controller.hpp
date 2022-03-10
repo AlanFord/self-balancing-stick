@@ -16,14 +16,25 @@
 typedef enum { OFF, MANUAL, AUTO } controller_mode;
 
 class Controller {
+	ExponentialFilter angleAverageFilter;
+	ExponentialFilter angleSmoothedFilter;
+	ExponentialFilter angleZeroFilter;
 	const float stiction_speed_threshold = 0.5;  // RPM
+	float angle_Zero;
 	int PID_Voltage = 0;
 	float Kp = 0;
 	float Ki = 0;
 	float Kd = 0;
 	float Ks = 0;
+	float Kt = 0.6;
+	float Ktd = 0;
 	float angle_Integral = 0;
+	const float angle_Speed_Filter = 0.7;
 	const float angle_Integral_Max = 3.0;
+	float angle_Smoothed_Filter = 0.997;
+	float angle_Zero_Filter = 0.995;
+	float angle_Smoothed = 0;
+	float angle_Smoothed_Speed = 0;
 	// Defines amount of voltage added to compensate for motor stiction, [0 - 255].
 	// The other option to use is the motor voltage_Offset.
 	// voltage_Offset is ALWAYS used, while friction_Value is applied at low speeds.
@@ -31,6 +42,7 @@ class Controller {
 	float friction_Value = 0;
 	controller_mode mode = OFF;
 	int default_voltage = 0;
+	float angle_Average_Filter = 0.970;
 
 	Encoder *encoder;
 	IMU *imu;
@@ -40,6 +52,14 @@ public:
 	Controller(imu_angle angle, float Kp, float Ki, float Kd, float Ks,
 			IMU *imu, Encoder *encoder, Motor *motor, float friction = 10.);
 	int get_PID_Voltage_Value();
+	void set_angle_Average_Filter(float filter_value);
+	float get_angle_Average_Filter(void);
+	void set_angle_Smoothed_Filter(float filter_value);
+	float get_angle_Smoothed_Filter(void);
+	void set_Zero_Filter(float filter_value);
+	float get_Zero_Filter(void);
+	void set_Zero(float filter_value);
+	float get_Zero(void);
 	void set_Kp(float value);
 	void set_Ki(float value);
 	void set_Kd(float value);
@@ -50,6 +70,10 @@ public:
 	float get_Kd(void);
 	float get_Ks(void);
 	float get_friction(void);
+	void set_Ktd(float value);
+	float get_Ktd(void);
+	void set_Kt(float value);
+	float get_Kt(void);
 	void set_mode(controller_mode new_mode);
 	controller_mode get_mode(void);
 	void set_default_voltage(int voltage);

@@ -74,7 +74,6 @@
 #define MIN(X, Y) (((X) < (Y)) ? (X) : (Y))
 
 const uint16_t angle_Rounding_Value = 1000; // Defines what value to multiple by before round theta and omega. Cuts down on noise, [10 = x.1,  100 = x.x1 , 1(Default)]
-//const float omega_Integral_Max = 3.0;
 const float theta_Speed_Filter = 0.7;
 const float omega_Speed_Filter = 0.7;
 const float theta_Filter = 0.7;
@@ -114,9 +113,9 @@ IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
 		mpu(hi2c, address),
 		thetaFilter((float) theta_Filter),
 		thetaSpeedFilter((float) theta_Speed_Filter),
-		thetaAverageFilter((float) angle_Average_Filter),
-		thetaSmoothedFilter((float) angle_Smoothed_Filter),
-		thetaZeroFilter((float) theta_Zero_Filter),
+//		thetaAverageFilter((float) angle_Average_Filter),
+//		thetaSmoothedFilter((float) angle_Smoothed_Filter),
+//		thetaZeroFilter((float) theta_Zero_Filter),
 		omegaFilter((float) omega_Filter),
 		omegaSpeedFilter((float) omega_Speed_Filter) {
 
@@ -160,102 +159,6 @@ IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
 		printf("DMP Initialization failed (code ");
 		printf("%u", devStatus);
 		printf(")");
-	}
-}
-
-/*
- * @brief sets the angle average filter coefficient
- * @param[in] filter_value coefficient
- */
-void IMU::set_angle_Average_Filter(float filter_value){
-	this->angle_Average_Filter = filter_value;
-}
-
-/*
- * @brief returns the angle average filter coefficient
- * @return current value of the coefficient
- */
-float IMU::get_angle_Average_Filter(void){
-	return angle_Average_Filter;
-}
-
-void IMU::set_angle_Smoothed_Filter(float filter_value){
-	this->angle_Smoothed_Filter = filter_value;
-}
-
-float IMU::get_angle_Smoothed_Filter(void){
-	return angle_Smoothed_Filter;
-}
-
-void IMU::set_Zero_Filter(imu_angle angle, float filter_value){
-	if (angle == THETA){
-		theta_Zero_Filter = filter_value;
-	}
-	else {
-		omega_Zero_Filter = filter_value;
-	}
-}
-
-float IMU::get_Zero_Filter(imu_angle angle){
-	if (angle == THETA){
-		return theta_Zero_Filter;
-	}
-	else {
-		return omega_Zero_Filter;
-	}
-}
-
-void IMU::set_Ktd(imu_angle angle, float value){
-	if (angle == THETA){
-		theta_Ktd = value;
-	}
-	else {
-		omega_Ktd = value;
-	}
-}
-
-float IMU::get_Ktd(imu_angle angle) {
-	if (angle == THETA){
-		return theta_Ktd;
-	}
-	else {
-		return omega_Ktd;
-	}
-}
-
-void IMU::set_Zero(imu_angle angle, float value){
-	if (angle == THETA){
-		theta_Zero = value;
-	}
-	else {
-		omega_Zero = value;
-	}
-}
-
-float IMU::get_Zero(imu_angle angle) {
-	if (angle == THETA){
-		return theta_Zero;
-	}
-	else {
-		return omega_Zero;
-	}
-}
-
-void IMU::set_Kt(imu_angle angle, float value){
-	if (angle == THETA){
-		theta_Kt = value;
-	}
-	else {
-		omega_Kt = value;
-	}
-}
-
-float IMU::get_Kt(imu_angle angle) {
-	if (angle == THETA){
-		return theta_Kt;
-	}
-	else {
-		return omega_Kt;
 	}
 }
 
@@ -304,15 +207,7 @@ bool IMU::update_ypr_values(float (&ypr)[3], uint32_t *timestamp){
  */
 bool IMU::update_IMU_values(void) {
 	float ypr[3]; // [yaw, pitch, roll] in radians
-	static float theta_Error = 0;
-	static float omega_Error = 0;
-	static float theta_Smoothed = 0;
-	static float theta_Smoothed_Speed = 0;
-	static float omega_Smoothed = 0;
-	static float omega_Smoothed_Speed = 0;
 	static uint32_t imu_Time_Now = 0;
-	static float theta_Average = 0;
-	float omega_Average = 0;
 
 	// hold the last valid ypr timestamp before updating (to permit calculaton of velocities)
 	unsigned long imu_Time_Prev = imu_Time_Now;
@@ -320,19 +215,6 @@ bool IMU::update_IMU_values(void) {
 	if (!update_ypr_values(ypr, &imu_Time_Now)) {
 		return false;
 	}
-	//FIXME: p must be managed by the terminal interface
-	if (p == 1 && p_Prev == 0) { // Resets integral when balancing mode is started to avoid wind up while holding
-		theta_Integral = 0;
-		omega_Integral = 0;
-		theta_Error = 0;
-		omega_Error = 0;
-		theta_Smoothed = theta_Now;
-		omega_Smoothed = omega_Now;
-		theta_Smoothed_Speed = 0;
-		omega_Smoothed_Speed = 0;
-	}
-
-	p_Prev = p;
 
 	// time interval in microseconds;
 	deltaTime = imu_Time_Now - imu_Time_Prev;
@@ -347,83 +229,19 @@ bool IMU::update_IMU_values(void) {
 			(ypr[2] * 180 / M_PI) * angle_Rounding_Value) / angle_Rounding_Value; //undo
 	theta_Now = thetaFilter.filter(theta_Now_Unfiltered);
 
-	// angle error in degrees
-	theta_Error = theta_Now - theta_Zero;
-
-/*
-	// integral angle error in degree*seconds
-	theta_Integral += theta_Error * (imu_Time_Now - imu_Time_Prev) / 1000000.0;
-	if (theta_Integral > theta_Integral_Max) {
-		theta_Integral = theta_Integral_Max;
-	} else if (theta_Integral < -theta_Integral_Max) {
-		theta_Integral = -theta_Integral_Max;
-	}
-*/
-
 	// calculate the rotational velocity in degrees/sec using a digital filter
 	// FIXME validate more filtering
 	theta_Speed_Now = thetaSpeedFilter.filter((theta_Now - theta_Prev) / (imu_Time_Now - imu_Time_Prev) * 1000000.);
 
-	// again, another digital filter based on averaging the angle
-	theta_Average = thetaAverageFilter.filter(theta_Now);
-
-	// yep, let's smooth theta  and rotational velocity one more time
-	float theta_Smoothed_Prev = theta_Smoothed;
-	theta_Smoothed = thetaSmoothedFilter.filter(theta_Now);
-	theta_Smoothed_Speed = (theta_Smoothed - theta_Smoothed_Prev) / (imu_Time_Now - imu_Time_Prev) * 1000000.;
-
-	if (p == 1) {                               // Automatic setpoint adjustment
-		float theta_Zero_Unfiltered = theta_Zero - theta_Kt * theta_Error
-				- theta_Ktd * theta_Smoothed_Speed;
-		theta_Zero = thetaZeroFilter.filter(theta_Zero_Unfiltered);
-	} else {
-		theta_Zero = theta_Average;
-	}
-
 	//////////////////////////////////////////////////////////////// Omega Calcs//////////////////////////////////////////////////////////////////////////////////////
 	float omega_Prev = omega_Now;
-	//  omega_Now_Unfiltered = round((-ypr[1] * 180 / M_PI) * angle_Rounding_Value) / angle_Rounding_Value;    //undo
 	float omega_Now_Unfiltered = round(
 			(ypr[1] * 180 / M_PI) * angle_Rounding_Value) / angle_Rounding_Value; //undo
-	omega_Now = (1 - omega_Filter) * (omega_Now_Unfiltered)
-			+ omega_Filter * (omega_Prev); //undo
-	omega_Error = omega_Now - omega_Zero;
-
-	omega_Error = omega_Now - omega_Zero;
-
-/*
-	omega_Integral += omega_Error * (imu_Time_Now - imu_Time_Prev) / 1000000.0;
-	if (omega_Integral > omega_Integral_Max) {
-		omega_Integral = omega_Integral_Max;
-	} else if (omega_Integral < -omega_Integral_Max) {
-		omega_Integral = -omega_Integral_Max;
-	}
-*/
+	omega_Now = omegaFilter.filter(omega_Now_Unfiltered);
 
 	// calculate the angular velocity
-	float omega_Speed_Prev = omega_Speed_Now;
-	omega_Speed_Now = ((1 - omega_Speed_Filter) * (omega_Now - omega_Prev)
-			/ (imu_Time_Now - imu_Time_Prev) * 1000000.)
-			+ omega_Speed_Filter * omega_Speed_Prev; // Relative to absolute zero
-	float omega_Average_Prev = omega_Average;
-	omega_Average = (1 - angle_Average_Filter) * (omega_Now)
-			+ (angle_Average_Filter * omega_Average_Prev);
+	omega_Speed_Now = omegaSpeedFilter.filter((omega_Now - omega_Prev) / (imu_Time_Now - imu_Time_Prev) * 1000000.);
 
-	float omega_Smoothed_Prev = omega_Smoothed;
-	omega_Smoothed = (1 - angle_Smoothed_Filter) * omega_Now
-			+ angle_Smoothed_Filter * omega_Smoothed_Prev;
-	omega_Smoothed_Speed = (omega_Smoothed - omega_Smoothed_Prev)
-			/ (imu_Time_Now - imu_Time_Prev) * 1000000.;
-
-	float omega_Zero_Prev = omega_Zero;
-	if (p == 1) {                               // Automatic setpoint adjustment
-		float omega_Zero_Unfiltered = omega_Zero - omega_Kt * omega_Error
-				- omega_Ktd * omega_Smoothed_Speed;
-		omega_Zero = (1 - omega_Zero_Filter) * omega_Zero_Unfiltered
-				+ omega_Zero_Filter * omega_Zero_Prev;
-	} else {
-		omega_Zero = omega_Average;
-	}
 	return true;
 }
 
@@ -432,22 +250,19 @@ bool IMU::update_IMU_values(void) {
  *
  * @param[in] angle Denotes which axis to retrieve OMEGA or THETA
  * @param[out] angle_Now Current angle value in DEGREES
- * @param[out] angle_Integral Integral of the angle error (actual - desired) in DEGREES
  * @param[out] angle_Speed_Now Angle rate of change, DEGREES/sec
- * @param[out] angle_Zero Target angle in DEGREES
+ * @param[out] deltaTime elapsed time since last IMU update
  */
 void IMU::get_values(imu_angle angle, float &angle_Now,
-		float &angle_Speed_Now, float& angle_Zero, uint32_t& deltaTime) {
+		float &angle_Speed_Now, uint32_t& deltaTime) {
 	deltaTime = this->deltaTime;
 	if (angle == THETA) {
 		angle_Now = this->theta_Now;
 		angle_Speed_Now = this->theta_Speed_Now;
-		angle_Zero = this->theta_Zero;
 	}
 	else {  // must be OMEGA
 		angle_Now = this->omega_Now;
 		angle_Speed_Now = this->omega_Speed_Now;
-		angle_Zero = this->omega_Zero;
 	}
 }
 

@@ -369,7 +369,7 @@ int shell_cmd_set_theta_kt(shell_cmd_args *args)
 		return 0;
 	}
 	float newVal = strtof(args->args[1].val,NULL);
-	imu_ptr->set_Kt(THETA, newVal);
+	leftController_ptr->set_Kt(newVal);
 	return 0;
 }
 
@@ -439,7 +439,7 @@ int shell_cmd_set_omega_kt(shell_cmd_args *args)
 		return 0;
 	}
 	float newVal = strtof(args->args[1].val,NULL);
-	imu_ptr->set_Kt(OMEGA, newVal);
+	rightController_ptr->set_Kt(newVal);
 	return 0;
 }
 
@@ -481,7 +481,8 @@ int shell_cmd_set_angle_average_filter(shell_cmd_args *args)
 		return 0;
 	}
 	int newVal = strtof(args->args[1].val,NULL);
-	imu_ptr->set_angle_Average_Filter(newVal);
+	rightController_ptr->set_angle_Average_Filter(newVal);
+	leftController_ptr->set_angle_Average_Filter(newVal);
 	return 0;
 }
 
@@ -495,7 +496,7 @@ int shell_cmd_set_theta_zero_filter(shell_cmd_args *args)
 		return 0;
 	}
 	float newVal = strtof(args->args[1].val,NULL);
-	imu_ptr->set_Zero(THETA, newVal);
+	leftController_ptr->set_Zero(newVal);
 	return 0;
 }
 
@@ -509,7 +510,7 @@ int shell_cmd_set_omega_zero_filter(shell_cmd_args *args)
 		return 0;
 	}
 	float newVal = strtof(args->args[1].val,NULL);
-	imu_ptr->set_Zero(OMEGA, newVal);
+	rightController_ptr->set_Zero(newVal);
 	return 0;
 }
 
@@ -523,7 +524,8 @@ int shell_cmd_set_angle_smoothed_filter(shell_cmd_args *args)
 		return 0;
 	}
 	int newVal = strtof(args->args[1].val,NULL);
-	imu_ptr->set_angle_Smoothed_Filter(newVal);
+	rightController_ptr->set_angle_Smoothed_Filter(newVal);
+	leftController_ptr->set_angle_Smoothed_Filter(newVal);
 	return 0;
 }
 
@@ -566,17 +568,17 @@ int shell_cmd_show_extended_data(shell_cmd_args *args)
 			leftController_ptr->get_Ki(),
 			leftController_ptr->get_Kd(),
 			leftController_ptr->get_Ks(),
-			imu_ptr->get_Kt(THETA),
-			imu_ptr->get_Ktd(THETA),
+			leftController_ptr->get_Kt(),
+			leftController_ptr->get_Ktd(),
 			rightController_ptr->get_Kp(),
 			rightController_ptr->get_Ki(),
 			rightController_ptr->get_Kd(),
 			rightController_ptr->get_Ks(),
-			imu_ptr->get_Kt(THETA),
-			imu_ptr->get_Ktd(THETA),
-			imu_ptr->get_angle_Average_Filter(),
-			imu_ptr->get_Zero_Filter(THETA),
-			imu_ptr->get_Zero_Filter(OMEGA),
+			rightController_ptr->get_Kt(),
+			rightController_ptr->get_Ktd(),
+			leftController_ptr->get_angle_Average_Filter(),
+			leftController_ptr->get_Zero_Filter(),
+			rightController_ptr->get_Zero_Filter(),
 			leftController_ptr->get_friction(),
 			rightController_ptr->get_friction()
 			);
