@@ -77,12 +77,12 @@ void app_entry(void) {
 	// FIXME : wait for, and check, for a functional imu
 
 	//initialize right controller (omega)
-	Controller rightController(OMEGA, omega_Kp, omega_Ki, omega_Kd, omega_Ks,
+	Controller rightController(imu_angle::OMEGA, omega_Kp, omega_Ki, omega_Kd, omega_Ks,
 			&imu, &rightEncoder, &rightMotor, friction_Value);
 	rightController_ptr = &rightController;
 
 	//initialize left controller (theta)
-	Controller leftController(THETA, theta_Kp, theta_Ki, theta_Kd, theta_Ks,
+	Controller leftController(imu_angle::THETA, theta_Kp, theta_Ki, theta_Kd, theta_Ks,
 			&imu, &leftEncoder, &leftMotor, friction_Value);
 	leftController_ptr = &leftController;
 

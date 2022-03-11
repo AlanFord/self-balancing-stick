@@ -191,8 +191,8 @@ list_t zero_options =
  */
 int shell_cmd_charge_left(shell_cmd_args *args)
 {
-	leftController_ptr->set_mode(MANUAL);
-	rightController_ptr->set_mode(OFF);
+	leftController_ptr->set_mode(controller_mode::MANUAL);
+	rightController_ptr->set_mode(controller_mode::OFF);
 	return 0;
 }
 
@@ -201,8 +201,8 @@ int shell_cmd_charge_left(shell_cmd_args *args)
  */
 int shell_cmd_charge_right(shell_cmd_args *args)
 {
-	leftController_ptr->set_mode(OFF);
-	rightController_ptr->set_mode(MANUAL);
+	leftController_ptr->set_mode(controller_mode::OFF);
+	rightController_ptr->set_mode(controller_mode::MANUAL);
 	return 0;
 }
 
@@ -211,8 +211,8 @@ int shell_cmd_charge_right(shell_cmd_args *args)
  */
 int shell_cmd_charge_both(shell_cmd_args *args)
 {
-	leftController_ptr->set_mode(MANUAL);
-	rightController_ptr->set_mode(MANUAL);
+	leftController_ptr->set_mode(controller_mode::MANUAL);
+	rightController_ptr->set_mode(controller_mode::MANUAL);
 	return 0;
 }
 /*
@@ -220,8 +220,8 @@ int shell_cmd_charge_both(shell_cmd_args *args)
  */
 int shell_cmd_shutdown_both(shell_cmd_args *args)
 {
-	leftController_ptr->set_mode(OFF);
-	rightController_ptr->set_mode(OFF);
+	leftController_ptr->set_mode(controller_mode::OFF);
+	rightController_ptr->set_mode(controller_mode::OFF);
 	// as insurance, kill the motors directly
 	leftMotor_ptr->set_voltage(0);
 	rightMotor_ptr->set_voltage(0);
@@ -233,8 +233,8 @@ int shell_cmd_shutdown_both(shell_cmd_args *args)
  */
 int shell_cmd_balance_left(shell_cmd_args *args)
 {
-	leftController_ptr->set_mode(AUTO);
-	rightController_ptr->set_mode(OFF);
+	leftController_ptr->set_mode(controller_mode::AUTO);
+	rightController_ptr->set_mode(controller_mode::OFF);
 	return 0;
 }
 
@@ -243,8 +243,8 @@ int shell_cmd_balance_left(shell_cmd_args *args)
  */
 int shell_cmd_balance_right(shell_cmd_args *args)
 {
-	leftController_ptr->set_mode(OFF);
-	rightController_ptr->set_mode(AUTO);
+	leftController_ptr->set_mode(controller_mode::OFF);
+	rightController_ptr->set_mode(controller_mode::AUTO);
 	return 0;
 }
 
@@ -253,8 +253,8 @@ int shell_cmd_balance_right(shell_cmd_args *args)
  */
 int shell_cmd_balance_both(shell_cmd_args *args)
 {
-	leftController_ptr->set_mode(AUTO);
-	rightController_ptr->set_mode(AUTO);
+	leftController_ptr->set_mode(controller_mode::AUTO);
+	rightController_ptr->set_mode(controller_mode::AUTO);
 	return 0;
 }
 

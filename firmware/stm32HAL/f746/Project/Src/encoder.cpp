@@ -47,7 +47,6 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 	}
 
 	int Encoder_Direction_Now; // Encoder measured direction, [-1 or 1]
-	int Encoder_Direction_Prev; // Encoder measured direction, [-1 or 1]
 	unsigned long Time_Prev; // Time at previous absolute tick change, [us]
 
 	currentEncoder->Rel_Tick_Count++;
@@ -70,7 +69,6 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 		//      right_Encoder_Direction = right_Encoder_Direction_Now;
 		//    }
 
-		Encoder_Direction_Prev = Encoder_Direction_Now;
 		currentEncoder->Abs_Tick_Count += currentEncoder->Encoder_Direction;
 
 		Time_Prev = currentEncoder->Time_Now;
@@ -131,7 +129,6 @@ void Encoder::get_Encoder_Speeds(float &speed, float &accel) {
 				* Encoder_Direction_Debug;    // Speed measurement
 	}
 
-	long Abs_Tick_Count_Prev = Abs_Tick_Count;
 	// FIXME : determine if this low-pass filter is appropriate
 	Speed_RPM = ((1 - Speed_Filter) * Speed_RPM_Unfiltered)
 			+ (Speed_Filter * Speed_RPM_Prev);

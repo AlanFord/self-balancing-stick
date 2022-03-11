@@ -13,36 +13,36 @@
 #include "imu.hpp"
 #include "motor.hpp"
 
-typedef enum { OFF, MANUAL, AUTO } controller_mode;
+enum class controller_mode { OFF, MANUAL, AUTO };
 
 class Controller {
+	float angle_Average_Filter;
+	float angle_Smoothed_Filter;
+	float angle_Zero_Filter;
 	ExponentialFilter angleAverageFilter;
 	ExponentialFilter angleSmoothedFilter;
 	ExponentialFilter angleZeroFilter;
-	const float stiction_speed_threshold = 0.5;  // RPM
+	const float stiction_speed_threshold{0.5};  // RPM
 	float angle_Zero;
-	int PID_Voltage = 0;
-	float Kp = 0;
-	float Ki = 0;
-	float Kd = 0;
-	float Ks = 0;
-	float Kt = 0.6;
-	float Ktd = 0;
-	float angle_Integral = 0;
-	const float angle_Speed_Filter = 0.7;
-	const float angle_Integral_Max = 3.0;
-	float angle_Smoothed_Filter = 0.997;
-	float angle_Zero_Filter = 0.995;
-	float angle_Smoothed = 0;
-	float angle_Smoothed_Speed = 0;
+	int PID_Voltage{0};
+	float Kp{0};
+	float Ki{0};
+	float Kd{0};
+	float Ks{0};
+	float Kt{0.6};
+	float Ktd{0};
+	float angle_Integral{0};
+	const float angle_Speed_Filter{0.7};
+	const float angle_Integral_Max{3.0};
+	float angle_Smoothed{0};
+	float angle_Smoothed_Speed{0};
 	// Defines amount of voltage added to compensate for motor stiction, [0 - 255].
 	// The other option to use is the motor voltage_Offset.
 	// voltage_Offset is ALWAYS used, while friction_Value is applied at low speeds.
 	// friction value was used in the original source.
-	float friction_Value = 0;
-	controller_mode mode = OFF;
-	int default_voltage = 0;
-	float angle_Average_Filter = 0.970;
+	float friction_Value{0};
+	controller_mode mode{controller_mode::OFF};
+	int default_voltage{0};
 
 	Encoder *encoder;
 	IMU *imu;

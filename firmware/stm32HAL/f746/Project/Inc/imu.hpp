@@ -24,7 +24,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 }
 #endif
 
-typedef enum { THETA, OMEGA } imu_angle;
+enum class imu_angle { THETA, OMEGA };
 
 
 class IMU {

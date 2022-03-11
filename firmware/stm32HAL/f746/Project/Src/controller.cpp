@@ -27,9 +27,12 @@
  */
 Controller::Controller(imu_angle angle, float Kp, float Ki, float Kd, float Ks,
 		IMU *imu, Encoder *encoder, Motor *motor, float friction) :
-		angleAverageFilter((float) angle_Average_Filter),
-		angleSmoothedFilter((float) angle_Smoothed_Filter),
-		angleZeroFilter((float) angle_Zero_Filter) {
+		angle_Average_Filter{0.970},
+		angle_Smoothed_Filter{0.997},
+		angle_Zero_Filter{0.995},
+		angleAverageFilter{angle_Average_Filter},
+		angleSmoothedFilter{angle_Smoothed_Filter},
+		angleZeroFilter{angle_Zero_Filter} {
 	this->angle = angle;
 	this->Kp = Kp;
 	this->Ki = Ki;
@@ -46,7 +49,7 @@ Controller::Controller(imu_angle angle, float Kp, float Ki, float Kd, float Ks,
  * @param new_mode ZERO, MANUAL, or AUTO
  */
 void Controller::set_mode(controller_mode new_mode) {
-	if ((new_mode == AUTO) && (new_mode != this->mode)) {
+	if ((new_mode == controller_mode::AUTO) && (new_mode != this->mode)) {
 		// we are starting AUTO mode, so reset integrals
 		angle_Integral = 0;
 		angle_Smoothed = 0;
@@ -87,7 +90,6 @@ int Controller::get_PID_Voltage_Value() {
 	}
 
 	// calculate the angular velocity
-	float angle_Average_Prev = angle_Average;
 	angle_Average = angleAverageFilter.filter(angle_Now);
 
 	float angle_Smoothed_Prev = angle_Smoothed;
@@ -95,8 +97,7 @@ int Controller::get_PID_Voltage_Value() {
 	angle_Smoothed_Speed = (angle_Smoothed - angle_Smoothed_Prev)
 			/ deltaTime * 1000000.;
 
-	float angle_Zero_Prev = angle_Zero;
-	if (mode == AUTO) {                               // Automatic setpoint adjustment
+	if (mode == controller_mode::AUTO) {                               // Automatic setpoint adjustment
 		float angle_Zero_Unfiltered = angle_Zero - Kt * angle_Error
 				- Ktd * angle_Smoothed_Speed;
 		angle_Zero = angleZeroFilter.filter(angle_Zero_Unfiltered);
@@ -124,13 +125,13 @@ int Controller::get_PID_Voltage_Value() {
 	int voltage_limit = motor->get_max_voltage();
 	PID_Voltage = round(constrain(voltage, -voltage_limit, voltage_limit));
 	switch (mode) {
-	case AUTO:
+	case controller_mode::AUTO:
 		return_voltage = PID_Voltage;
 		break;
-	case MANUAL:
+	case controller_mode::MANUAL:
 		return_voltage = default_voltage;
 		break;
-	case OFF:
+	case controller_mode::OFF:
 	default:
 		return_voltage = 0;
 		break;

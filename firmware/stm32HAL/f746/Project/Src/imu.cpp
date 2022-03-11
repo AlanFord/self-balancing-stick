@@ -256,7 +256,7 @@ bool IMU::update_IMU_values(void) {
 void IMU::get_values(imu_angle angle, float &angle_Now,
 		float &angle_Speed_Now, uint32_t& deltaTime) {
 	deltaTime = this->deltaTime;
-	if (angle == THETA) {
+	if (angle == imu_angle::THETA) {
 		angle_Now = this->theta_Now;
 		angle_Speed_Now = this->theta_Speed_Now;
 	}
@@ -292,7 +292,7 @@ void IMU::get_values(imu_angle angle, float &angle_Now,
 					 fifoC = fifoC - length; // Save the last packet
 					 uint16_t  RemoveBytes;
 					 while (fifoC) { // fifo count will reach zero so this is safe
-						 RemoveBytes = MIN((int)fifoC, I2CDEVLIB_WIRE_BUFFER_LENGTH); // Buffer Length is different than the packet length this will efficiently clear the buffer
+						 RemoveBytes = MIN((int)fifoC, (int)I2CDEVLIB_WIRE_BUFFER_LENGTH); // Buffer Length is different than the packet length this will efficiently clear the buffer
                         mpu.getFIFOBytes(Trash, (uint8_t)RemoveBytes);
 						 fifoC -= RemoveBytes;
 					 }
