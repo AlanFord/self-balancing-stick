@@ -43,14 +43,14 @@ class IMU {
 	float omega_Speed_Now;
 	uint32_t deltaTime;
 
-	bool update_ypr_values(float (&ypr)[3], uint32_t *timestamp);
+	bool update_ypr_values(float (&ypr)[3], uint32_t &timestamp);
 
 public:
 	IMU(I2C_HandleTypeDef *hi2c, uint8_t address = MPU6050_DEFAULT_ADDRESS);
 	bool update_IMU_values(void);
 	void get_values(imu_angle angle, float &angle_Now,
 			float &angle_Speed_Now, uint32_t& deltaTime);
-	bool GetCurrentFIFOPacket(uint8_t *data, uint8_t length, uint32_t *timestamp);
+	bool GetCurrentFIFOPacket(uint8_t *data, uint8_t length, uint32_t &timestamp);
 	uint16_t get_Status(void) {
 		return dmpReady;
 	}

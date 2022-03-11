@@ -170,7 +170,7 @@ IMU::IMU(I2C_HandleTypeDef *hi2c, uint8_t address) :
  *
  */
 
-bool IMU::update_ypr_values(float (&ypr)[3], uint32_t *timestamp){
+bool IMU::update_ypr_values(float (&ypr)[3], uint32_t &timestamp){
 
 	// if programming failed, don't try to do anything
 	if (!dmpReady) {
@@ -181,7 +181,9 @@ bool IMU::update_ypr_values(float (&ypr)[3], uint32_t *timestamp){
 	if (!mpuInterrupt) {
 		return false;
 	}
-	if (GetCurrentFIFOPacket(fifoBuffer, packetSize, timestamp)){
+	//if (GetCurrentFIFOPacket(fifoBuffer, packetSize, timestamp)){
+	if (mpu.GetCurrentFIFOPacket(fifoBuffer, packetSize)){
+		timestamp = __MICROS();
 		mpuInterrupt = false;                                // reset interrupt flag
 		Quaternion q;                   // [w, x, y, z]         quaternion container
 		mpu.dmpGetQuaternion(&q, fifoBuffer);   // display YPR angles in degrees
@@ -212,7 +214,7 @@ bool IMU::update_IMU_values(void) {
 	// hold the last valid ypr timestamp before updating (to permit calculaton of velocities)
 	unsigned long imu_Time_Prev = imu_Time_Now;
 
-	if (!update_ypr_values(ypr, &imu_Time_Now)) {
+	if (!update_ypr_values(ypr, imu_Time_Now)) {
 		return false;
 	}
 
@@ -266,6 +268,7 @@ void IMU::get_values(imu_angle angle, float &angle_Now,
 	}
 }
 
+// FIXME: IMU::GetCurrentFIFOPacket may be redundant, see MPU6050_Base::GetCurrentFIFOPacket
 /**
  @brief Get latest byte from FIFO buffer no matter how much time has passed.
  @param[out] data Buffer for returned data
@@ -273,7 +276,7 @@ void IMU::get_values(imu_angle angle, float &angle_Now,
  @param[out] timestamp Timestamp in microseconds
  @returns true if data is available, false if no valid data is availabl
 */
- bool IMU::GetCurrentFIFOPacket(uint8_t *data, uint8_t length, uint32_t *timestamp) { // overflow proof
+ bool IMU::GetCurrentFIFOPacket(uint8_t *data, uint8_t length, uint32_t &timestamp) { // overflow proof
 	 int16_t fifoC;
 	 // This section of code is for when we allowed more than 1 packet to be acquired
 	 uint32_t BreakTimer = __MICROS();
@@ -305,7 +308,7 @@ void IMU::get_values(imu_angle angle, float &angle_Now,
 	 } while (fifoC != length);
 	 // keep the following two lines together so the timestamp is valid!
 	 mpu.getFIFOBytes(data, length);     // read a packet from FIFO
-	 *timestamp = __MICROS();
+	 timestamp = __MICROS();
 return true;
 }
 
