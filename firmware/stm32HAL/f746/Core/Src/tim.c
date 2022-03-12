@@ -243,12 +243,12 @@ void MX_TIM5_Init(void)
 
   /* USER CODE BEGIN TIM5_Init 1 */
 
-  //FIXME: Set the Prescaler to produce a 1 usec clock.  A value of 72 works for
+  //NOTE: Set the Prescaler to produce a 1 usec clock.  A value of 71 works for
   // a 72 MHz timer clock
 
   /* USER CODE END TIM5_Init 1 */
   htim5.Instance = TIM5;
-  htim5.Init.Prescaler = 72;
+  htim5.Init.Prescaler = 71;
   htim5.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim5.Init.Period = 4294967295;
   htim5.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;

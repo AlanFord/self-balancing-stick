@@ -8,6 +8,11 @@
 #ifndef INC_APPENTRY_HPP_
 #define INC_APPENTRY_HPP_
 
+/*
+ * IMPORTANT:
+ * If changing mcs's or clock speeds, change the TIM5 prescaler.  The prescaler value of 71
+ * is appropriate only for a clock speed of 72 MHz.
+ */
 
 
 
