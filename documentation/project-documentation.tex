@@ -244,7 +244,7 @@ Reference \cite{monograph} give the relationship between motor current and volta
 \nomenclature[O]{\(K_{v}\)}{motor voltage constant (V rad\textsuperscript{-1} s)}
 \nomenclature[O]{\(\omega\)}{motor rotation speed (rad s\textsuperscript{-1})}
 
-Normally the inductance of the motor is much lower than the resistance, such that $L/r \sim 0.001$.  
+Normally the inductance of the motor is much lower than the resistance, such that $L/r \sim 0.001$ sec.  
 In such cases it is acceptable to ignore the time dependence of the current and write
 %
 \begin{equation}
@@ -615,24 +615,38 @@ performed at the motor input leads.  Rotor angular velocity was measured with a 
 Case & $v$ & $i$ & $\omega$ & $\omega$ \\
       & (V) &  (A) & (RPM) & (rad/s) \\
 \hline
-1	& 0.722	& 0.0543	& 49.6	& 5.19 \\
-2	& 1.02	& 0.0591	& 80.4	& 8.42 \\
-3	& 1.487	& 0.0589	& 146	& 15.29 \\
-4	& 2.012	& 0.0599	& 230	& 24.09 \\
-5	& 2.532	& 0.0631	& 307	& 32.15 \\
-6	& 3.086	& 0.065	& 386	& 40.42 \\
-7	& 3.549	& 0.067	& 454	& 47.54 \\
-8	& 3.948	& 0.0682	& 511	& 53.51 \\
-9	& 4.56	& 0.0721	& 601	& 62.94 \\
-10	& 5.03	& 0.073	& 668	& 69.95 \\
-11	& 5.94	& 0.0751	& 807	& 84.51 \\
-12	& 6.84	& 0.0751	& 940	& 98.44 \\
-13	& 7.4	        & 0.0765	& 1021	& 106.92 \\
-14	& 8.44	& 0.08	& 1175	& 123.05 \\
-15	& 9.46	& 0.082	& 1323	& 138.54 \\
-16	& 10.42	& 0.0839	& 1460	& 152.89 \\
+1	& 0.0438	& 0.0034	& 0.	& 0. \\
+2	& 0.286	& 0.015	& 0.	& 0. \\
+3	& 0.601	& 0.0135	& 0.	& 0. \\
+4	& 0.681	& 0.0788	& 0.	& 0. \\
+5	& 1.02	& 0.0591	& 80.4	& 8.42 \\
+6	& 1.487	& 0.0589	& 146.	& 15.29 \\
+7	& 2.012	& 0.0599	& 230.	& 24.09 \\
+8	& 2.532	& 0.0631	& 307.	& 32.15 \\
+9	& 3.086	& 0.065	& 386.	& 40.42 \\
+10	& 3.549	& 0.067	& 454.	& 47.54 \\
+11	& 3.948	& 0.0682	& 511.	& 53.51 \\
+12	& 4.56	& 0.0721	& 601.	& 62.94 \\
+13	& 5.03	& 0.073	& 668.	& 69.95 \\
+14	& 5.94	& 0.0751	& 807.	& 84.51 \\
+15	& 6.84	& 0.0751	& 940.	& 98.44 \\
+16	& 7.4	& 0.0765	& 1021.	& 106.92 \\
+17	& 8.44	& 0.08	& 1175.	& 123.05 \\
+18	& 9.46	& 0.082	& 1323.	& 138.54 \\
+19	& 10.42	& 0.0839	& 1460.	& 152.89 \\
+20	& 0.2618	& 0.0354	& 0.	& 0. \\
+21	& 0.3561	& 0.0481	& 0.	& 0. \\
+22	& 0.476	& 0.0646	& 0.	& 0. \\
+23	& 0.597	& 0.0808	& 0.	& 0. \\
+24	& 0.718	& 0.0969	& 0.	& 0. \\
+25	& 0.722	& 0.0543	& 49.6	& 5.19 \\
 \hline
 \end{tabular}
+
+\includegraphics[width=\textwidth]{images/current.pdf} 
+
+\includegraphics[width=\textwidth]{images/voltage.pdf} 
+
 
 Linear regression analysis results in the following values for the motor constants:\\
 $A$ = 0.00363 N m\\
@@ -648,7 +662,8 @@ the gearbox associated with the motor used in the current work.  In any event, t
 in the system modeling.\\
 
 $l$ was 
-measured with the same instrument as 6.004 mH at 1kHz.  This gives a motor electrical time constant $l/r$ of 7.6E-4 sec.  This is the time taken by the current in the motor to go from rest to 63\% of the final steady-state current.\\
+measured with the same instrument as 6.004 mH at 1kHz.  This gives a motor electrical time constant $l/r$ of 7.6E-4 sec.  This is the time taken by the current in the motor to go from rest to 63\% of the final steady-state current.  This
+validates the assumption used in  \eqref{motor} .\\
 
 
 
