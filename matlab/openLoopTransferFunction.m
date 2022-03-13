@@ -1,9 +1,10 @@
 %% Open Loop Transfer Function
-% Calculate the various physical constants of the inverted pendulum
-%% Section 1 Input Data
-[mass, length, rotor_inertia, inertia] = pendulum();
+%Brief: Calculate the various physical constants of the inverted pendulum
 
-[R, tConstant, Kt, frictionFactor] = motorMeasured();
+%% Section 1 Input Data
+[mass, length, rotor_inertia, inertia] = PT1_pendulum(true);
+
+[R, tConstant, Kt, frictionFactor] = PT2_motorMeasured();
 
 g = 9.80665; % m/s/s
 
@@ -30,6 +31,9 @@ Ctf = 1+(q/s)+(p*s);
 sysForward = Ptf;
 sysBackward = Rtf*Ctf*Mtf;
 sys = sysForward*sysBackward
+
+%% Section 3 root locus with no PID or rotor speed feedback
+
 figure(1)
 rlocus(sys)
 axis('equal');
@@ -37,8 +41,7 @@ axis([-8 8 -8 8]);
 grid on
 title(['p=' num2str(p) ', q=' num2str(q) ', Kw=' num2str(Kw)]); 
 
-
-%Re-plot the root locus using a PD feedback constant r = 1/4.5
+%% Section 4 root locus with PD feedback but no rotor speed feedback
 
 p = 1/4.5;   % PD zero location at 1/4, gain of r
 %p = 1/3.5;    % PD zero location at 1/4, gain of r
@@ -52,6 +55,8 @@ axis([-8 8 -8 8]);
 grid on
 title(['p=' num2str(p) ', q=' num2str(q) ', Kw=' num2str(Kw)]); 
 
+
+%% Section 5 root locus with PD feedback and rotor speed feedback
 
 %Re-plot the root locus using a PD feedback constant r = 1/4.5
 % and a rotor velocity coefficient of 0.075

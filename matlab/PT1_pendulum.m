@@ -1,11 +1,18 @@
-function [totalMass, length, rInertia, inertia] = pendulum()
+function [totalMass, length, rInertia, inertia] = PT1_pendulum(simpleRotor)
 %% Inverted Pendulum Constants
-% Calculate the various physical constants of the inverted pendulum
-
+%brief:  Calculate  the various physical constants of the inverted pendulum
+%
+%inputs:
+% simpleRotor: logical variable indicating a simpleRotor (true) or
+%              the standard rotor (false)
+%
+% outputs:
+% totalMass: total mass of the pendulum, motors, and rotors in kg
+% length:    Length of the pendulum in meters
+% rInertia:  rotor moment of inertia = kg m^2
+% inertia:   pendulum moment of inertia = kg m^2
+% 
 %% Section 1 Input Data
-
-% Logic Flags
-simpleRotor = false;
 
 % Masses
 mmountMass = 0.00615; %[kg] - mass of a single motor mount
@@ -24,11 +31,10 @@ wireMass = 0.060; %[kg] - mass of the motor and gyro wiring
 gyroMass = 0.003; %[kg] - mass of the gyro pcb, Adafruit estimate
 
 % Inertial Data from Fusion360
-wInertia = 1.562E-4; %[kg m^2] inertia of a single rotor wheel around the midline
 if ~simpleRotor   
-    wInertia = 1.562E-4; %[kg m^2] inertia of a single normal rotor wheel around the midline
+    wInertia = 1.595E-4; %[kg m^2] inertia of a single normal rotor wheel around the midline
 else
-    wInertia = 1.605E-4; %[kg m^2] inertia of a single simple rotor wheel around the midline
+    wInertia = 1.585E-4; %[kg m^2] inertia of a single simple rotor wheel around the midline
 end
 
 % Dimensions
@@ -37,7 +43,7 @@ motorDiameter = 0.025; %[m] diameter of motor and gearbox assembly
 shaftLength = 0.35; %[m] length of the entire pendulum shaft
 motorHeight = 0.3; %[m] location of the motor assembly on the pendulum
 
-%% Section 2 Mass
+%% Section 2 Mass Calculations
 % Calculate the total mass of the reaction wheel pendulum
 
 mAssemblyMass = mmountMass + motorMass + hubMass + wheelMass;
@@ -77,10 +83,16 @@ length = shaftLength/2 + ...
           (gmountMass+gyroMass)*gyroHeight;
 
 %% Section 5 Printing Results
+fprintf('Part 1: Calculating Pendulum Data\n');
+if (simpleRotor) phrase = ' simple rotor';
+else phrase = 'standard rotor';
+end
+fprintf(strcat('The rotor is modeled as a', phrase,'\n'));
 fprintf('total mass of the pendulum = %f kg \n',totalMass);
 fprintf('distance from the pivot point to the pendulum center of mass = %f m \n', length)
 fprintf('rotor moment of inertia = %f kg m^2 \n',rInertia);
 fprintf('pendulum moment of inertia = %f kg m^2 \n',inertia);
+fprintf('\n');
 
 
 
