@@ -219,7 +219,7 @@ Again, using the notation $\omega = \dot{\phi}$,
 \end{equation}
 %
 
-As will be seen, this equation is easier to implement because $K_{t}$, $A$, and $B$ can be measured experimentally (see Appendixes \ref{appendix:measure} and \ref{appendix:friction}).  
+As will be seen, this equation is easier to implement because $K_{t}$, $A$, and $B$ can be measured experimentally (see Appendix \ref{appendix:measure}).  
 
 
 
@@ -402,13 +402,13 @@ Using \eqref{EQ.simpleController}, \eqref{franco}, \eqref{groucho}, and \eqref{r
 	{(s^2-\frac{m g l}{I_{c}})(s+(\frac{K_{v}^2}{r I_{f}}+\frac{B}{I_{f}}))}
 \end{equation}
 
-Substituting in values from the appendixes, the transfer function for the pendulum is\todo{check the numbers}
+Substituting in values from the appendixes, the transfer function for the pendulum is
 \begin{equation}
-	T(s) =\frac{-0.2464 s}{s^3 + 4.73 s^2 -34.8 s -164.6}
+	T(s) =\frac{-0.1731 s}{s^3 + 3.113 s^2 -34.8 s -108.3}
 \end{equation}
 
 The numerator of the transfer function is the characteristic equation that, when factored, is
-$(s-5.8993) (s+5.8993) (s+4.7303)$.
+$(s-5.899) (s+5.899) (s+3.113)$.
 
 Using the root locus technique and the open loop transfer function, Figure \ref{rootLocus} shows the
 behavior of the closed loop poles as a function of feedback gain.  Note that one pole is always in the right
@@ -575,13 +575,13 @@ Motor wiring is effected via the provided 0.1"-pitch connector.
 
 
 \section{Pendulum Constants}
-A multitude of other values were calculated in MATLAB.  \\
+A multitude of other values were calculated in MATLAB.\todo{needs values for both rotors and move after rotor description}  \\
 
 \begin{tabular}{l l}
 $m$ & 0.517327 kg \\
 $l$ & 0.319038 m \\
-$I_{c}$ & 0.046508 kg m\textsuperscript{2} \\
-$I_{f}$ & 0.000164 kg m\textsuperscript{2} \\
+$I_{c}$ & 0.046512 kg m\textsuperscript{2} \\
+$I_{f}$ & 0.000168 kg m\textsuperscript{2} \\
 $g$ & 9.81 m s\textsuperscript{-2} \\
 \end{tabular}
 
@@ -680,14 +680,14 @@ per second, where the motor has 211.2 counts/rev of gearbox shaft. \\
 
 The initial reaction wheel design was modeled after Reference \cite{hackaday}, with modifications to allow the reaction wheel
 to mate properly with a Pololu motor hub.  The reaction wheel is shown in Figure \ref{reactionWheel}.
-The reaction wheel body is aluminum an outer diameter of 90 mm, a width of 18 mm, and an annular thickness of 7 mm. 
+The reaction wheel body is Aluminum 6061 with an outer diameter of 90 mm, a width of 18 mm, and an annular thickness of 7 mm. 
 Fusion 360 reports the mass of the reaction wheel to be 0.09391 kg (assuming a density of 2.7 g/cc).
 The moment of inertia around the centerline is 1.562E-4 kg/m2.
 
 An alternate, simpler design (although less elegant) is shown in Figure \ref{simpleReactionWheel}.
 Fashioned from carbon steel with a density of  7.85 g/cc, the diameter of the wheel is 90 mm and the
 thickness is 3.175 mm (1/8").  The reaction wheel mass is 0.175 kg and the moment of inertia 
-around the centerline is 1.605E04 kg/m2\todo{sign error?}.  The simpler design with only a small change in the moment
+around the centerline is 1.605E-04 kg/m2.  The simpler design with only a small change in the moment
 of inertia permits an easier fabrication at a cost of a doubling of the reaction wheel mass.
 
 
