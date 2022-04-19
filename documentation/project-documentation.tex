@@ -496,6 +496,21 @@ Figure \ref{rootLocusFull} shows the root locus with $p = 1/4.5$ and $K_{\omega}
     \captionof{figure}{Root Locus Plot With PD and Rotor Velocity Feedback}  
     \label{rootLocusFull}
 
+\section{State Space Model}
+
+A State Space model can be constructed from equations ?? and ??.  The
+state space variables are omega, theta, and theta-dot.  The state space model
+is then
+x-dot = Am * x + B * u
+
+Generally it is more convenient to monitor the relative velocity of the 
+reaction wheel, wr = w - theta-dot.  The input vector is modified using
+a transformation matrix in the following manner:
+x-new = P*x
+The state space model is then
+x-dot-new = PAPinv *x-new + P*B*u
+where Pinv is ----???---
+
 \section{Implementation Details}
 
 In \autoref{sec:Modeling} the necessary constants for the control system were developed.  However those constants
