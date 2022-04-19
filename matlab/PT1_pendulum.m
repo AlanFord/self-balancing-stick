@@ -32,9 +32,9 @@ gyroMass = 0.003; %[kg] - mass of the gyro pcb, Adafruit estimate
 
 % Inertial Data from Fusion360
 if ~simpleRotor   
-    wInertia = 1.595E-4; %[kg m^2] inertia of a single normal rotor wheel around the midline
+    wInertia = 1.605E-4; %[kg m^2] inertia of a single normal rotor wheel around the midline
 else
-    wInertia = 1.585E-4; %[kg m^2] inertia of a single simple rotor wheel around the midline
+    wInertia = 1.562E-4; %[kg m^2] inertia of a single simple rotor wheel around the midline
 end
 
 % Dimensions
@@ -85,7 +85,7 @@ length = shaftLength/2 + ...
 %% Section 5 Printing Results
 fprintf('Part 1: Calculating Pendulum Data\n');
 if (simpleRotor) phrase = ' simple rotor';
-else phrase = 'standard rotor';
+else phrase = ' standard rotor';
 end
 fprintf(strcat('The rotor is modeled as a', phrase,'\n'));
 fprintf('total mass of the pendulum = %f kg \n',totalMass);

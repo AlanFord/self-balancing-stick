@@ -192,7 +192,7 @@ reformulated as
 \end{equation}
 %
 \begin{equation}
-    T_{friction} = A \, sgn(\dot{\phi} ) + B \dot{\phi} 
+    T_{friction} = A \, sgn(\dot{\phi} - \dot{\theta} ) + B (\dot{\phi} - \dot{\theta})
 \end{equation}
 %
 \begin{equation}
@@ -206,16 +206,18 @@ reformulated as
 \nomenclature[O]{\(A\)}{coulomb friction coefficient (N m)}
 \nomenclature[O]{\(B\)}{rotational friction coefficient(N m rad\textsuperscript{-1} s)}
 
+Note the use of $(\dot{\phi} - \dot{\theta})$.  Friction is dependent on the relative motion of the motor armature and the motor frame.  If the pendulum angular velocity $\dot{\phi}$ is equal to the reaction wheel angular velocity $\dot{\theta}$ there will be no relative motion between the motor armature and frame; no friction will occur.
+
 Combining equations,
 %
 \begin{equation}
-    I_{f} \, \ddot{\phi}  = K_{t} \, i - A \, sgn(\dot{\phi} ) - B \dot{\phi}
+    I_{f} \, \ddot{\phi}  = K_{t} \, i - A \, sgn(\dot{\phi} - \dot{\theta} ) - B (\dot{\phi} - \dot{\theta})
 \end{equation}
 %
 Again, using the notation $\omega = \dot{\phi}$,
 %
 \begin{equation}
-    I_{f} \, \dot{\omega}  = K_{t} \, i - A \, sgn(\omega) - B \omega \label{wheel}
+    I_{f} \, \dot{\omega}  = K_{t} \, i - A \, sgn(\omega - \dot{\theta}) - B (\omega - \dot{\theta}) \label{wheel}
 \end{equation}
 %
 
@@ -231,10 +233,10 @@ As will be seen, this equation is easier to implement because $K_{t}$, $A$, and 
 The previous chapter determined the relationship between the motor current and the acceleration of the flywheel.  
 However, the motor will be not be controlled via motor current.  Instead, a motor controller will be used to control the 
 motor by adjusting the motor voltage via a PWM signal.  The equivalent, average voltage will then regulate the motor.  
-Reference \cite{monograph} give the relationship between motor current and voltage as
+Following Reference \cite{monograph}, but recognizing the motor is at the end of a pendulum, the relationship between motor current and voltage is
 %
 \begin{equation}
-    L\, \frac{di}{dt} + r \,i = v - K_{v} \, \omega
+    L\, \frac{di}{dt} + r \,i = v - K_{v} \, (\omega - \dot{\theta})
 \end{equation}
 %
 
@@ -248,11 +250,11 @@ Normally the inductance of the motor is much lower than the resistance, such tha
 In such cases it is acceptable to ignore the time dependence of the current and write
 %
 \begin{equation}
-    r \,i = v - K_{v} \, \omega \label{motor}
+    r \,i = v - K_{v} \, (\omega - \dot{\theta}) \label{motor}
 \end{equation}
 %
 Note that, provided SI units are used, $K_{v}$ and $K_{t}$ will have the same magnitude.  This can be seen by equating the 
-mechanical and electrical power
+mechanical and electrical power of a motor:
 %
 \begin{equation}
     T \omega = v i
@@ -275,23 +277,18 @@ or
 Back to the motor equation, we can solve \eqref{motor} for i:
 %
 \begin{equation}
-    i = \frac{v}{r} - \frac{K_{v} \, \omega}{r}
+    i = \frac{v}{r} - \frac{K_{v} \, (\omega - \dot{\theta})}{r}
 \end{equation}
 %
 Combining with \eqref{wheel}
 %
 \begin{equation}
-    I_{f} \, \dot{\omega}  =  K_{t} \, \left( \frac{v}{r} - \frac{ K_{v} \, \omega}{r} \right) - A \, sgn(\omega ) - B \omega
+    I_{f} \, \dot{\omega}  =  K_{t} \, \left( \frac{v}{r} - \frac{ K_{v} \, (\omega - \dot{\theta})}{r} \right) - A \, sgn(\omega - \dot{\theta} ) - B (\omega - \dot{\theta})
 \end{equation}
 Rearranging,
 
 \begin{equation}
-    I_{f} \, \dot{\omega} + \left( B+\frac{K_{t} K_{v}}{r} \right) \omega +A \, sgn(\omega)= \left(\frac{K_{t}} {r}\right)v 
-\end{equation}
-
-Recognizing that $K_{t} = K_{v}$,
-\begin{equation}
-    I_{f} \, \dot{\omega} + \left( B+\frac{K_{v}^2}{r} \right) \omega +A \, sgn(\omega)= \left(\frac{K_{v}} {r}\right)v\label{eq.motorSemiFinal} 
+    I_{f} \, \dot{\omega} + \left( B+\frac{K_{t} K_{v}}{r} \right) (\omega - \dot{\theta}) +A \, sgn(\omega - \dot{\theta})= \left(\frac{K_{t}} {r}\right)v \label{eq.motorSemiFinal}
 \end{equation}
 
 Not all of the voltage results in acceleration of the reaction wheel.  As the reaction wheel velocity increases, an
@@ -304,13 +301,17 @@ The voltage used to drive the motor is determined by the controller.  Here the v
 \nomenclature[O]{\(u\)}{controller output}
 Substituting into \eqref{eq.motorSemiFinal}
 \begin{equation}
-    I_{f} \, \dot{\omega} + \left( B+\frac{K_{v}^2}{r} \right) \omega +A \, sgn(\omega)= \left(\frac{K_{v}} {r}\right)u\label{eq.motorFinal} 
+    I_{f} \, \dot{\omega} + \left( B+\frac{K_{v} K_{t}}{r} \right) (\omega - \dot{\theta}) +A \, sgn(\omega - \dot{\theta}) = \left(\frac{K_{t}} {r}\right)u\
 \end{equation}
 The simple substitution of $u$ for $v$ does not seem to have much purpose at this point in the analysis, but will be useful
 when complex controllers are evaluated.\\
 
 It is useful to assume that the control function can adjust the demand voltage by adding or subtracting a constant, depending on the current spin direction of the reaction wheel.  This means that $-A\,sgn(\dot{\phi})$ is folded
-into $u$ for the purposes of this analysis.  
+into $u$ for the purposes of this analysis.  Our motor control equation is then
+\begin{equation}
+    I_{f} \, \dot{\omega} + \left( B+\frac{K_{v} K_{v}}{r} \right) (\omega - \dot{\theta}) = \left(\frac{K_{t}} {r}\right)u\label{eq.motorFinal} 
+\end{equation}
+
 
 
 
@@ -385,21 +386,23 @@ junction shown in Figure \ref{transferFunction}, this produces a negative feedba
  
 
 
-The motor transfer function can be derived from \eqref{eq.motorFinal} as
+The motor transfer function must be derived from \eqref{eq.motorFinal}.  However,  in \eqref{eq.motorFinal} $\omega$
+is a function of both $\theta$ and $u$, preventing the determination of a single-input, single-output transfer function.  One solution is to make the approximation $\omega \approx (\omega - \dot{\theta})$.  The reaction wheel may rotate at hundreds of RPM, while the pendulum is expected to deviate from vertical for only brief periods.  With this approximation 
+the motor transfer function can be derived from \eqref{eq.motorFinal} as
 \begin{equation}
-    I_{f} \, \omega(s) s + \left( B+\frac{K_{v}^2}{r} \right) \omega(s) = \left(\frac{K_{v}} {r}\right)u(s)
+    I_{f} \, \omega(s) s + \left( B+\frac{K_{v} K_{t}}{r} \right) \omega(s) = \left(\frac{K_{t}} {r}\right)u(s)
 \end{equation}
 %
 \begin{equation}
-    M(s) = \frac{\omega(s)}{u(s)} =  \frac{\left(\frac{K_{v}} {r}\right)}{I_{f} s + (\frac{K_{v}^2}{r}+B)}
+    M(s) = \frac{\omega(s)}{u(s)} =  \frac{\left(\frac{K_{t}} {r}\right)}{I_{f} s + (\frac{K_{v} K_{t}}{r}+B)}
     \label{rondo}
 \end{equation} 
 
 Using \eqref{EQ.simpleController}, \eqref{franco}, \eqref{groucho}, and \eqref{rondo} results in 
 %
 \begin{equation}
-	T(s) =\frac{-(\frac{1} {I_{c}})(\frac{K_{v}}{r})s}
-	{(s^2-\frac{m g l}{I_{c}})(s+(\frac{K_{v}^2}{r I_{f}}+\frac{B}{I_{f}}))}
+	T(s) =\frac{-(\frac{1} {I_{c}})(\frac{K_{t}}{r})s}
+	{(s^2-\frac{m g l}{I_{c}})(s+(\frac{K_{v} K_{t}}{r I_{f}}+\frac{B}{I_{f}}))}
 \end{equation}
 
 Substituting in values from the appendixes, the transfer function for the pendulum is
