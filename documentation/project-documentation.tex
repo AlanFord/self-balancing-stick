@@ -253,28 +253,8 @@ In such cases it is acceptable to ignore the time dependence of the current and 
     r \,i = v - K_{v} \, (\omega - \dot{\theta}) \label{motor}
 \end{equation}
 %
-Note that, provided SI units are used, $K_{v}$ and $K_{t}$ will have the same magnitude.  This can be seen by equating the 
-mechanical and electrical power of a motor:
-%
-\begin{equation}
-    T \omega = v i
-\end{equation}
-%
-where $T$ is the motor torque.
-Rearranging,
-%
-\begin{equation}
-    \frac{T}{i} = \frac{v}{\omega}
-\end{equation}
-%
-or
-%
-\begin{equation}
-    K_{t} = K_{v} 
-\end{equation}
-%
 
-Back to the motor equation, we can solve \eqref{motor} for i:
+Solving for i:
 %
 \begin{equation}
     i = \frac{v}{r} - \frac{K_{v} \, (\omega - \dot{\theta})}{r}
@@ -498,18 +478,57 @@ Figure \ref{rootLocusFull} shows the root locus with $p = 1/4.5$ and $K_{\omega}
 
 \section{State Space Model}
 
-A State Space model can be constructed from equations ?? and ??.  The
-state space variables are omega, theta, and theta-dot.  The state space model
+A State Space model can be constructed from equations \eqref{eq.motorSemiFinal} and \eqref{bigOne}.  The
+state space variables are $\omega$, $\theta$, and $\dot{\theta}$.  The state space model
 is then
-x-dot = Am * x + B * u
+\begin{equation}
+\dot{x_{m}} = A_{m} x + B_{m} v
+\end{equation}
+where $x_{m} = (\omega, \theta, \dot{\theta})^{T}$ and
 
-Generally it is more convenient to monitor the relative velocity of the 
-reaction wheel, wr = w - theta-dot.  The input vector is modified using
-a transformation matrix in the following manner:
-x-new = P*x
-The state space model is then
-x-dot-new = PAPinv *x-new + P*B*u
-where Pinv is ----???---
+\begin{equation}
+A_{m} = 
+\begin{bmatrix}
+-\frac{B}{I_{f}}-\frac{K_{v} K{t}}{I_{f} r} & 0 & \frac{B}{I_{f}}+\frac{K_{v} K{t}}{I_{f} r}\\
+0 & 0 & 1\\
+\frac{B}{I_{c}}+\frac{K_{v} K{t}}{I_{c} r} & \frac{mgl}{I_{c}} & -\frac{B}{I_{c}}-\frac{K_{v} K{t}}{I_{c} r}
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+B_{m} = 
+\begin{bmatrix}
+\frac{K_{t}}{I_{f} r} \\
+0 \\
+ -\frac{K_{t}}{I_{c} r}
+\end{bmatrix}
+\end{equation}
+
+
+However, measured sensor data from motor encoder signals are proportional to the relative velocity of the 
+reaction wheel, $\omega_{r} = \omega - \dot{\theta}$.  Changing the state space variables to $x = (\omega_{r}, \theta, \dot{\theta})^{T}$ is performed using a transformation matrix $x = P x_{m}$ where
+\begin{equation}
+ P = 
+\begin{bmatrix}
+1 & 0 & -1\\
+0 & 1 & 0\\
+0 & 0 & 1\\
+\end{bmatrix}
+\end{equation}
+
+From Reference \cite{book} the new state space model is then
+\begin{equation}
+\dot{x} = A x + B v
+\end{equation}
+where $x = (\omega_{r}, \theta, \dot{\theta})^{T}$ and
+
+\begin{equation}
+A = P A_{m} P^{-1}
+\end{equation}
+
+\begin{equation}
+B = P B_{m}
+\end{equation}
 
 \section{Implementation Details}
 
@@ -553,11 +572,12 @@ be converted to other units prior to use.
 
  
 \begin{thebibliography}{99}
-\bibitem{monograph} Block, D. J., Astrom, K. J., and Spong, M. W. (2007).  \emph{The Reaction Wheel Pendulum} . Morgan \& Claypool Publishers.
+\bibitem{monograph} Block, D. J., Astrom, K. J., and Spong, M. W. (2007).  \emph{The Reaction Wheel Pendulum}. Morgan \& Claypool Publishers.
 \bibitem{reactionWheel} \href{http://www.diva-portal.se/smash/get/diva2:916271/FULLTEXT01.pdf}{Ramm, A., and Sjostedt, M. (2015). Reaction wheel balanced robot, Design and Sensor Analysis of Inverted Pendulum Robot. Technical Report, KTH Royal Institute of Technology.}
 \bibitem{balanceBot} \href{https://kth.diva-portal.org/smash/get/diva2:916184/FULLTEXT01.pdf}{Hellman, H. and Sunnerman, H, (2015).  Two-Wheeled Self-Balancing Robot. Technical report, KTH Royal Institute of Technology.}
 \bibitem{twoWheeled} \href{http://geoffrey.chauveau.free.fr/pendulum/reports/final_report.pdf}{Chauveau, G., Chazal, D., Nakayama, D., Olsen, E., and Palm, S., (2005).  Controlling the Reaction Wheel Pendulum.}
 \bibitem{hackaday} \href{https://hackaday.com/2016/08/11/stick-balances-itself-with-reaction-wheels/}{"Stick Balances Itself With Reaction Wheels" by Gerrit Coetzee}
+\bibitem{book} \href{https://eng.libretexts.org/Bookshelves/Industrial_and_Systems_Engineering/Book%3A_Introduction_to_Control_Systems_(Iqbal)/08%3A_State_Variable_Models/8.04%3A_Linear_Transformation_of_State_Variables}{Iqbal, Kamran (2020).  \emph{Introduction to Control Systems}.}
 \end{thebibliography}
 
 \begin{appendices}
@@ -608,7 +628,22 @@ $g$ & 9.81 m s\textsuperscript{-2} \\
 
 \section{Measuring Motor Constants}
 \label{appendix:measure}
-Measurements were made to determine a number of motor constants, including $A$, $B$, $r$, $l$, and $K_{v}$, remembering that $K_{t} = K_{v}$ provided that SI units are used.  Not all of these motor constants can be directly measured.  The resistance and inductance of the motor windings can be measured with an LCR meter.
+Measurements were made to determine a number of motor constants, including $A$, $B$, $r$, $l$, and $K_{v}$, remembering that $K_{t} = K_{v}$ provided that SI units are used.\footnote{Provided SI units are used, $K_{v}$ and $K_{t}$ will have the same magnitude.  This can be seen by equating the 
+mechanical and electrical power of a motor:
+\begin{equation*}
+    T \omega = v i
+\end{equation*}
+where $T$ is the motor torque.
+Rearranging,
+\begin{equation*}
+    \frac{T}{i} = \frac{v}{\omega}
+\end{equation*}
+or
+\begin{equation*}
+    K_{t} = K_{v} 
+\end{equation*}
+}
+Not all of these motor constants can be directly measured.  The resistance and inductance of the motor windings can be measured with an LCR meter.
 Motor voltage, current, and RPM can be measured by connecting the motor to a power supply and varying the voltage.  The RPM can be measured either with a microcontroller monitoring the encoder or using a tachometer.\\
 
 $\frac{A}{K_{t}}$ and $\frac{B}{K_{t}}$ can be determined from \eqref{wheel} by ensuring that the motor speed is constant.  Then
