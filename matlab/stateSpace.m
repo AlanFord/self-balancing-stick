@@ -19,7 +19,26 @@ if exist('Kw','var') == 0
     Kw=0;  % rotor velocity coefficient
 end
 
-%% Section 2 Calculate the Coefficients
+%% Section 2 Set up the matrixes
+part1 = frictionFactor/rotor_inertia +Kt*Kt/rotor_inertia/R;
+part2 = frictionFactor/inertia       +Kt*Kt/inertia/R;
+part3 = mass*g*length;
+Am = [-part1 0 part1;0 0 1; part2 part3 -part2]
+clear part1 part2 part3;
+
+part1 = Kt/rotor_inertia/R;
+part2 = -Kt/inertia/R;
+Bm = [part1; 0; part2]
+clear part1 part2;
+
+P = [1 0 -1; 0 1 0; 0 0 1];
+A = P*Am*inv(P)
+B=P*Bm
+
+C = [1 0 0 ; 0 1 0]
+
+%{
+%% Section X Calculate the Coefficients
 K2 = 700; % the proportional gain
 
 K1 = K2*q;   % the integral gain
@@ -45,9 +64,10 @@ b = transpose([0 0 1/inertia 0]);
 c = [0 1 0 0];
 sys = ss(a,b,c,0);
 time = 0:0.01:6;
-figure(1)
+% figure(1)
 %step(sys,time)
-step(sys)
-myTitle = title(['Step, Parameters: K1=' num2str(K1) ', K2=' num2str(K2) ', K3=' num2str(K3)]); 
-myTitle.FontSize = 12;
-ylabel('Pendulum angle (radians)');
+% step(sys)
+% myTitle = title(['Step, Parameters: K1=' num2str(K1) ', K2=' num2str(K2) ', K3=' num2str(K3)]); 
+% myTitle.FontSize = 12;
+% ylabel('Pendulum angle (radians)');
+%}

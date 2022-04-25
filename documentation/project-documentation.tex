@@ -400,6 +400,10 @@ half of the plane, indicating that the system is unstable regardless of the magn
 
 The system might be stabilized by using both proportional and derivative, or PD, feedback.  The control function would be:
 \begin{equation}
+	u = \theta + p\dot{\theta}
+\end{equation}
+thus
+\begin{equation}
 	C(s) = 1 + p s
 \end{equation}
 Rearranging,
@@ -413,6 +417,10 @@ eliminates any oscillation but does not remediate the pole in the right half of 
 
 
 One additional possibility for resolving the issue of the zero at the origin would be to implement a PID controller.
+\begin{equation*}
+	u(t) = \theta(t) + q\int \theta\,dt + p\dot{\theta}
+\end{equation*}
+then
 \begin{equation}
 	C(s) = 1 + \frac{q}{s} + p s
 \end{equation}
@@ -504,7 +512,6 @@ B_{m} =
 \end{bmatrix}
 \end{equation}
 
-
 However, measured sensor data from motor encoder signals are proportional to the relative velocity of the 
 reaction wheel, $\omega_{r} = \omega - \dot{\theta}$.  Changing the state space variables to $x = (\omega_{r}, \theta, \dot{\theta})^{T}$ is performed using a transformation matrix $x = P x_{m}$ where
 \begin{equation}
@@ -520,7 +527,10 @@ From Reference \cite{book} the new state space model is then
 \begin{equation}
 \dot{x} = A x + B v
 \end{equation}
-where $x = (\omega_{r}, \theta, \dot{\theta})^{T}$ and
+\begin{equation}
+y = C x
+\end{equation}
+where $x = (\omega_{r}, \theta, \dot{\theta})^{T}$,  $y=(\omega_{r},\theta)^{T}$
 
 \begin{equation}
 A = P A_{m} P^{-1}
@@ -529,6 +539,38 @@ A = P A_{m} P^{-1}
 \begin{equation}
 B = P B_{m}
 \end{equation}
+
+resulting in
+
+\begin{equation}
+A = 
+\begin{bmatrix}
+-\frac{B}{I_{f}}-\frac{B}{I_{c}}-\frac{K_{v} K{t}}{I_{f} r}-\frac{K_{v} K{t}}{I_{c} r}  & -\frac{mgl}{I_{c}} & 0 \\
+0 & 0 & 1\\
+\frac{B}{I_{c}}+\frac{K_{v} K{t}}{I_{c} r} & \frac{mgl}{I_{c}} & 0
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+B = 
+\begin{bmatrix}
+\frac{K_{t}}{I_{f} r} + \frac{K_{t}}{I_{c} r}\\
+0 \\
+ -\frac{K_{t}}{I_{c} r}
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+C = 
+\begin{bmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 
+\end{bmatrix}
+\end{equation}
+
+
+
+
 
 \section{Implementation Details}
 

@@ -35,18 +35,18 @@ end
 %Kw=0.075;   % rotor feedback
 
 s=tf('s');
-Ptf = 1/(inertia*s^2-(mass*g*length));
-Rtf = rotor_inertia*s; % the negative sign is implemented using a negative feedback model
+Ptf = 1/(inertia*s^2-(mass*g*length)); % pendulum tf
+Rtf = rotor_inertia*s; % rotor tf % the negative sign is implemented using a negative feedback model
 %Mtf = (Kt/R/rotor_inertia)/(s + ((1/rotor_inertia)*((Kt^2)/R -(Kt*Kw)/R + frictionFactor)));
-Mtf = (Kt/R)/(rotor_inertia*s + ((Kt^2)/R -(Kt*Kw)/R + frictionFactor));
-Ctf = 1+(q/s)+(p*s);
-sysForward = Ptf;
-sysBackward = Rtf*Ctf*Mtf;
-sys = sysForward*sysBackward
-[z,gain] = zero(sys)
-P = pole(sys)
-H = zpk(sys)
-memo = tf(H)
+Mtf = (Kt/R)/(rotor_inertia*s + ((Kt^2)/R -(Kt*Kw)/R + frictionFactor)); % motor tf
+Ctf = 1+(q/s)+(p*s); % controller tf
+sysForward = Ptf;  % forward tf
+sysBackward = Rtf*Ctf*Mtf; % backward tf
+sys = sysForward*sysBackward  % full 'open loop' tf
+[z,gain] = zero(sys) % determine zeros and gain of open loop
+P = pole(sys)  % poles of open loop
+H = zpk(sys) % zeros, poles, and gain of open loop
+memo = tf(H) % full poly form of open loop
 
 
 %% Section 3 root locus
@@ -62,4 +62,12 @@ fprintf('Press any key to continue \n');
 pause
 
 %close all
-rr=rlocus(sys,400)
+clear gain
+gain = 370;
+fprintf(['Parameters: p=' num2str(p) ', q=' num2str(q) ', Kw=' num2str(Kw) ', gain=' num2str(gain) '\n'])
+fprintf('Kp= %f Ki= %f Kd= %f Kw= %f \n',gain, gain*q, gain*p, gain*Kw)
+rr=rlocus(sys,gain)
+
+%% Section 4 state space conversion
+myCl = feedback(sys,gain)
+mySS = ss(myCl)
