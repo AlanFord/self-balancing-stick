@@ -22,13 +22,13 @@ end
 %% Section 2 Set up the matrixes
 part1 = frictionFactor/rotor_inertia +Kt*Kt/rotor_inertia/R;
 part2 = frictionFactor/inertia       +Kt*Kt/inertia/R;
-part3 = mass*g*length;
+part3 = mass*g*length/inertia;
 Am = [-part1 0 part1;0 0 1; part2 part3 -part2]
 clear part1 part2 part3;
 
 part1 = Kt/rotor_inertia/R;
-part2 = -Kt/inertia/R;
-Bm = [part1; 0; part2]
+part2 = Kt/inertia/R;
+Bm = [part1; 0; -part2]
 clear part1 part2;
 
 P = [1 0 -1; 0 1 0; 0 0 1];
@@ -36,6 +36,10 @@ A = P*Am*inv(P)
 B=P*Bm
 
 C = [1 0 0 ; 0 1 0]
+
+D = [0;0]
+
+model = ss(A, B, C, D)
 
 %{
 %% Section X Calculate the Coefficients

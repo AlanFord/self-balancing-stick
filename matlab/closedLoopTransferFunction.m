@@ -1,14 +1,18 @@
-% start by computing the open loop transfer functions with feedback
+% start by computing the open loop transfer function with feedback
 openLoopTransferFunction;
 
 % Let's calculate the response of the pendulum angle to a step change
 %  in the applied force.
 opt = stepDataOptions('StepAmplitude',0.05);
-%gain=266;
-gain=370;
+fprintf('--> Closed-loop model with feedback <-- \n')
 T = feedback(sysForward,sysBackward*gain,-1)
+fprintf('--> Closed-loop model poles <-- \n')
 pole(T)
+fprintf('--> Closed-loop state-space model <-- \n')
 stateSpace = ss(T)
+t = 0:0.01:10;
+r =0.105*ones(size(t)); % roughly the torque from spare motor
+lsim(stateSpace,r,t)
 %bongo = tf2ss(T);
 %[num,den] = tfdata(T);
 %stateSpace = tf2ss(num{1}, den{1})

@@ -1,4 +1,4 @@
-%% Open Loop Transfer Function
+ %% Open Loop Transfer Function
 %Brief: Calculate the various physical constants of the inverted pendulum
 
 %% Section 1 Input Data
@@ -49,6 +49,7 @@ H = zpk(sys) % zeros, poles, and gain of open loop
 memo = tf(H) % full poly form of open loop
 
 
+
 %% Section 3 root locus
 figure(1)
 rlocus(sys)
@@ -63,11 +64,13 @@ pause
 
 %close all
 clear gain
-gain = 370;
+gain = 347;
+%gain = 370;
 fprintf(['Parameters: p=' num2str(p) ', q=' num2str(q) ', Kw=' num2str(Kw) ', gain=' num2str(gain) '\n'])
 fprintf('Kp= %f Ki= %f Kd= %f Kw= %f \n',gain, gain*q, gain*p, gain*Kw)
 rr=rlocus(sys,gain)
+fprintf('--> End of open loop calculations <-- \n')
 
 %% Section 4 state space conversion
-myCl = feedback(sys,gain)
-mySS = ss(myCl)
+%myCl = feedback(sys,gain)
+%mySS = ss(myCl)

@@ -528,7 +528,7 @@ From Reference \cite{book} the new state space model is then
 \dot{x} = A x + B v
 \end{equation}
 \begin{equation}
-y = C x
+y = C x + D v
 \end{equation}
 where $x = (\omega_{r}, \theta, \dot{\theta})^{T}$,  $y=(\omega_{r},\theta)^{T}$
 
@@ -565,6 +565,14 @@ C =
 \begin{bmatrix}
 1 & 0 & 0 \\
 0 & 1 & 0 
+\end{bmatrix}
+\end{equation}
+
+\begin{equation}
+D = 
+\begin{bmatrix}
+0  \\
+0 
 \end{bmatrix}
 \end{equation}
 
