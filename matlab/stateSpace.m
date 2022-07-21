@@ -41,6 +41,10 @@ D = [0;0]
 
 model = ss(A, B, C, D)
 
+%C = [0 1 0]
+
+%D = [0]
+
 %{
 %% Section X Calculate the Coefficients
 K2 = 700; % the proportional gain

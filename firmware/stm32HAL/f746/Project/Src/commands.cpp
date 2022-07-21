@@ -263,7 +263,6 @@ int shell_cmd_balance_both(shell_cmd_args *args)
  */
 int shell_cmd_change_zeros(shell_cmd_args *args)
 {
-	// FIXME: sort out the secondary options
 	int voltage = 0;
 	if (args->count != 2) {
 		printf("Invalid zero option arguments\n");

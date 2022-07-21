@@ -226,13 +226,11 @@ bool IMU::update_IMU_values(void) {
 	float theta_Prev = theta_Now;
 	//FIXME: does the use of an angle_rounding_value make any sense when using floats?
 	// convert the pitch for radians to degrees and apply a digital filter
-	// FIXME : validate filtering
 	float theta_Now_Unfiltered = round(
 			(ypr[2] * 180 / M_PI) * angle_Rounding_Value) / angle_Rounding_Value; //undo
 	theta_Now = thetaFilter.filter(theta_Now_Unfiltered);
 
 	// calculate the rotational velocity in degrees/sec using a digital filter
-	// FIXME validate more filtering
 	theta_Speed_Now = thetaSpeedFilter.filter((theta_Now - theta_Prev) / (imu_Time_Now - imu_Time_Prev) * 1000000.);
 
 	//////////////////////////////////////////////////////////////// Omega Calcs//////////////////////////////////////////////////////////////////////////////////////
