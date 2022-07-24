@@ -700,7 +700,7 @@ $\frac{A}{K_{t}}$ and $\frac{B}{K_{t}}$ can be determined from \eqref{wheel} by 
 \begin{equation}
     i = \frac{A}{K_{t}}sgn(\omega) + \frac{B}{K_{t}} \omega
 \end{equation}
-Measuring $I$ at various values of $\omega$ permits estimating both $\frac{A}{K_{t}}$ and $\frac{B}{K_{t}}$ by linear
+Measuring $i$ at various values of $\omega$ permits estimating both $\frac{A}{K_{t}}$ and $\frac{B}{K_{t}}$ by linear
 regression.  Optimally this should be performed using the rotor mounted on the motor. This ensures that
 the weight of the rotor is accurately accounted for in the gearbox friction.\\
 
@@ -708,7 +708,7 @@ The next step is to determine values for $K_{v}$ (and hence $K_{t}$) and $R$.  S
 \begin{equation}
     v = r\frac{A}{K_{t}}sgn(\omega) + (r\frac{B}{K_{t}}+K_{v}) \omega
 \end{equation}
-Knowing $\frac{A}{K_{t}}$ and $\frac{B}{K_{t}}$ from the earlier regression, $r$ and $K_{v}$ can be determined by a linear regression of $v$ as a function of $K_{v}$.  Setting $K_{t}$ equal to $K_{v}$, values for $A$ and $B$ can then be resolved.\\
+Knowing $\frac{A}{K_{t}}$ and $\frac{B}{K_{t}}$ from the earlier regression, $r$ and $K_{v}$ can be determined by a linear regression of $v$ as a function of $\omega$.  Setting $K_{t}$ equal to $K_{v}$, values for $A$ and $B$ can then be resolved.\\
 
 Measurements of $i$, $v$, and $\omega$ were performed with the motor driven by a 12 V power supply.  Current measurements were made with a  a $\mu$Current DVM adapter and voltage measurements were 
 performed at the motor input leads.  Rotor angular velocity was measured with a hand-held tachometer.  The following table list the resulting measurements:
@@ -785,13 +785,15 @@ The initial reaction wheel design was modeled after Reference \cite{hackaday}, w
 to mate properly with a Pololu motor hub.  The reaction wheel is shown in Figure \ref{reactionWheel}.
 The reaction wheel body is Aluminum 6061 with an outer diameter of 90 mm, a width of 18 mm, and an annular thickness of 7 mm. 
 Fusion 360 reports the mass of the reaction wheel to be 0.09391 kg (assuming a density of 2.7 g/cc).
-The moment of inertia around the centerline is 1.562E-4 kg/m2.
+The moment of inertia around the centerline is 1.562E-4 kg m\textsuperscript{2}.
 
 An alternate, simpler design (although less elegant) is shown in Figure \ref{simpleReactionWheel}.
 Fashioned from carbon steel with a density of  7.85 g/cc, the diameter of the wheel is 90 mm and the
 thickness is 3.175 mm (1/8").  The reaction wheel mass is 0.175 kg and the moment of inertia 
-around the centerline is 1.605E-04 kg/m2.  The simpler design with only a small change in the moment
+around the centerline is 1.605E-04 kg m\textsuperscript{2}.  The simpler design with only a small change in the moment
 of inertia permits an easier fabrication at a cost of a doubling of the reaction wheel mass.
+
+A third, and final, design is less elegant still.  Figure \ref{acrylicReactionWheel} shows a reaction wheel fabricated from 3mm thick acrylic sheet, M6 button head bolts and nyloc nuts.  This design in intended to maintain a moment of inertia similar to the earlier designs, minimize the weight of the reaction wheel, and be easier to fabricate with common makerspace tools.  The wheel has an outer diameter of 90 mm with 12 bolts uniformly spaced at a radial distance of 39 mm.  The reaction wheel mass (including bolts) is  0.0808 kg, approximately half the mass of the steel reaction wheel.  The moment of inertial around the centerline (including the bolts) is 9.836E-05 kg m\textsuperscript{2}.  As with the other designs this reaction wheel is capable of being mated with a Pololu motor hub.
 
 
 
@@ -803,6 +805,10 @@ of inertia permits an easier fabrication at a cost of a doubling of the reaction
 \includegraphics[width=\textwidth]{images/simpleReactionWheel.png} 
     \captionof{figure}{Simplified Carbon Steel Reaction Wheel}  
     \label{simpleReactionWheel}
+
+\includegraphics[width=\textwidth]{images/acrylicReactionWheel.png} 
+    \captionof{figure}{Simplified Acrylic Reaction Wheel}  
+    \label{acrylicReactionWheel}
 
 \end{appendices}
 
