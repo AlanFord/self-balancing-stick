@@ -38,7 +38,7 @@ TIMER4:
 Motor and IMU Orientation
 
 The following was extracted from the file "imu.cpp".  The sketch
-represets a top-down look at the motor and imu layout.
+represents a top-down look at the motor and imu layout.
 
 // Discussion of IMU values and motor orientation
 //
@@ -76,15 +76,15 @@ represets a top-down look at the motor and imu layout.
 //      clockwise when viewed from the motor body end.
 //
 //      Hence,
-//      Positive Right Motor rotation ==> couter-clockwise shaft spin => pitch up => positive voltage ==> positive Omega ==> positive ypr[1]
-//      Positive Left Motor rotation ==> couter-clockwise shaft spin  => roll to the right => positive voltage ==> positive Theta ==> positive ypr[2]
+//      Positive Right Motor rotation ==> counter-clockwise shaft spin => pitch up => positive voltage ==> positive Omega ==> positive ypr[1]
+//      Positive Left Motor rotation ==> counter-clockwise shaft spin  => roll to the right => positive voltage ==> positive Theta ==> positive ypr[2]
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 ------------------------------------------------------
 Encoder Description
 
 The Pololu website states that the 25D DC motors with gearboxes have an encoder with 48 counts per coil revolution.  
-With a gearbox of 4.4:1, this results in 48*4.4 = 211.2 counts per shaft revoolution.  This is based
+With a gearbox of 4.4:1, this results in 48*4.4 = 211.2 counts per shaft revolution.  This is based
 on counting both the rising and falling edges of both the A and B outputs.  This is a suitable value to use
 in this application because Timers 3 and 4 are configured in "TI1 and TI2" mode.
 
@@ -104,7 +104,7 @@ Pololu Dual MAX14870 Motor Driver Shield for Arduino
 https://www.pololu.com/product/2519
 PWM operation up to 50 kHz
 The required pins are:
-DIR -> 0=foward at speed PWM %
+DIR -> 0=forward at speed PWM %
        1=reverse at speed PWM %
 PWM -> speed %
 
@@ -129,7 +129,7 @@ ADO ->
 INT -> F15
 
 The INT signal is an open-drain line that should be RISING when data is ready for download to the MCU.
-The MPU-6050 can accomodate I2C frequencies of up to 400 kHz.  The original Arduino design
+The MPU-6050 can accommodate I2C frequencies of up to 400 kHz.  The original Arduino design
 of this software used 100 kHz.
 The I2C rise time was set at 500 nsec, based on an average value for Std (100 kHz) operation.
 The I2C fall time was set to 150 nsec, based on an average value for Std (100 kHz) operation.

@@ -8,7 +8,7 @@ cleaner source structure.
 - Using the STM32 HAL library
 After writing a few low level libraries, I wanted to try taking 
 advantage of a "canned" library for the peripherals.  Many think that this incurs
-a lot of overhead.  Time will tell if it will be a significant impedement.  Note that
+a lot of overhead.  Time will tell if it will be a significant impediment.  Note that
 I did use the LL routines for the USART, as the HAL library didn't provide enough
 flexibility to implement the terminal process that I wanted.
 
