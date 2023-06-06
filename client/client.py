@@ -48,14 +48,19 @@ class MainWindow(qtw.QMainWindow):
         # build tab 1, Level 2b
         lineEdit1 = qtw.QLineEdit()
         lineEdit2 = qtw.QLineEdit()
+        button5 = qtw.QPushButton("Submit")
         level_2b_layout.addRow(
             qtw.QLabel('Theta Motor Target Voltage: '), lineEdit1)
         level_2b_layout.addRow(
             qtw. QLabel(' Omega Motor Target Voltage: '), lineEdit2)
+        level_2b_layout.addRow(
+            qtw. QLabel(' '), button5)
+        groupBox3 = qtw. QGroupBox(" Voltage Adjustments:")
+        groupBox3.setLayout(level_2b_layout)
 
         # build tab 1, Level 1
         level_1_layout.addWidget(groupBox1)
-        level_1_layout.addLayout(level_2b_layout)
+        level_1_layout.addWidget(groupBox3)
 
         # build. tab. 1
         zombo = qtw.QWidget()
